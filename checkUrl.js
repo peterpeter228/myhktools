@@ -12,7 +12,6 @@ if(0 < a.length)url = a[0];
 process.stdin.setEncoding('utf8');
 process.env.NODE_ENV = "production";
 
-
 // 基于socket发送数据
 function fnSocket(h,p,szSend,fnCbk)
 {
@@ -68,7 +67,7 @@ function fnDoHostAttack(url,fnCbk)
 	try{
 		var uO = urlObj.parse(url), ss = "I.am.summer.M.T.X.T",host = uO.host.split(/:/)[0], port = uO.port || 80;
 		if(/.*?\/$/g.test(uO.path))uO.path = uO.path.substr(0, uO.path.length - 1);
-		checkWeblogicT3(host,port);
+		// checkWeblogicT3(host,port);
 		fnSocket(host,port,'GET ' + uO.path + ' HTTP/1.1\r\nHost:' + ss + '\r\nUser-Agent:Mozilla/5.0 (iPhone; CPU iPhone OS 10_2 like ' + szMyName + ') AppleWebKit/602.3.12 (KHTML, like Gecko) Version/8.0 Mobile/14C92 Safari/602.3.12 MTX/3.0\r\n\r\n',
 			function(data)
 		{
@@ -173,7 +172,9 @@ function doStruts2_045(url,cmd,fnCbk)
 	  , function (error, response, body){
 	  		if(body)
 	  		{
-	  			if(-1 < body.indexOf("<html"))return;
+	  			if(-1 < body.indexOf("<html") || -1 < body.indexOf("<title>"))return;
+
+	  			// console.log(body);
 	  			g_oRst.struts2 || (g_oRst.struts2 = {});
 	  			var oT = g_oRst.struts2 = {"s2-045":"发现struts2高危漏洞s2-045，请尽快升级"},s1 = String(body).split(/\n/);
 	  			if(-1 < s1[0].indexOf("root"))
@@ -204,7 +205,7 @@ if(0 < a.length)
 	doStruts2_045(url);
 	fnTestAll();
 }
-checkWeblogicT3("192.168.10.133",9001);
+// checkWeblogicT3("192.168.10.133",9001);
 process.on('exit', (code) => 
 {
 	console.log(JSON.stringify(g_oRst,null,' '));
