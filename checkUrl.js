@@ -12,6 +12,11 @@ if(0 < a.length)url = a[0];
 process.stdin.setEncoding('utf8');
 process.env.NODE_ENV = "production";
 
+// tomcat测试
+// https://www.exploit-db.com/exploits/41783/
+// /?{{%25}}cake\=1
+// /?a'a%5c'b%22c%3e%3f%3e%25%7d%7d%25%25%3ec%3c[[%3f$%7b%7b%25%7d%7dcake%5c=1
+
 // 基于socket发送数据
 function fnSocket(h,p,szSend,fnCbk)
 {

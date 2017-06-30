@@ -23,7 +23,7 @@ function getIp(ip,fncbk)
 	{
 		if(oT[ip])return;
 		oT[ip] = o;
-		o.date = moment(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss');
+		if(!o.date)o.date = moment(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss');
 		if(o.bogon)
 		{
 			o.Private = "私有网络";
