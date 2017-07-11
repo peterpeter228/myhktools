@@ -195,9 +195,9 @@ function fnDoBody(body,t)
 	g_oRst.struts2 || (g_oRst.struts2 = {});
 	var oT = g_oRst.struts2 = {},s1 = String(body).split(/\n/);
 	oT[t] = "发现struts2高危漏洞" + t + "，请尽快升级";
-	if(-1 < body.indexOf("root"))
+	if(-1 < body.indexOf("root") && !oT["root"])
 		oT["root"] = "中间件不应该用root启动，不符合公司上线检查表要求";
-	if(s1[0] && 50 > s1[0].length)
+	if(s1[0] && 50 > s1[0].length && !oT["user"])
 		oT["user"] = "当前中间件启动的用户：" + (-1 < s1[0].indexOf('whoami')? s1[1]:s1[0]);
 	if(1 < s1.length)
 		oT["CurDir"] = {des:"当前中间件目录","path":3 < s1.length ? s1[3] : s1[1]};
