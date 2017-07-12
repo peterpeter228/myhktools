@@ -186,8 +186,26 @@ function doStruts2_048(url,cmd,fnCbk)
     });
 }
 
+function myLog(a)
+{
+	// console.log(String(a.callee))
+	var c = a.callee.caller;
+	// if(c.arguments && c.arguments.caller)console.log(c.arguments.caller)
+	if(a.callee.caller)
+	{
+		console.log(a.callee.caller.arguments);
+		a = a.callee.caller.arguments;
+		if(0 < a.length)myLog(a);
+	}
+}
+
 function fnDoBody(body,t)
 {
+	body||(body = "");
+	if(!body)
+	{
+		// myLog(arguments);
+	}
 	var i = body.indexOf("cmdend") || body.indexOf("<!DOCTYPE") || body.indexOf("<html") || body.indexOf("<body");
 	if(i) body = body.substr(0, i).trim();
 	if(!body)return;
