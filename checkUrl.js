@@ -247,6 +247,7 @@ function fnDoBody(body,t)
 	if(!body)return;
 	body = body.trim();
 	if(-1 == body.indexOf("whoami"))return;
+	console.log("发现高危漏洞：" + t);
 	var i = body.indexOf("cmdend") || body.indexOf("<!DOCTYPE") || body.indexOf("<html") || body.indexOf("<body");
 	
 	if(0 < i) body = body.substr(0, i).trim();
@@ -258,9 +259,9 @@ function fnDoBody(body,t)
 	if(-1 < body.indexOf("root") && !oT["root"])
 		oT["root"] = "中间件不应该用root启动，不符合公司上线检查表要求";
 	if(s1[0] && 50 > s1[0].length && !oT["user"])
-		oT["user"] = "当前中间件启动的用户：" + (-1 < s1[0].indexOf('whoami')? s1[1]:s1[0]);
+		oT["user"] = "当前中间件启动的用户：" + (-1 < s1[0].indexOf('whoami')? s1[1]:s1[0]).trim();
 	if(1 < s1.length)
-		oT["CurDir"] = {des:"当前中间件目录","path":3 < s1.length ? s1[3] : s1[1]};
+		oT["CurDir"] = {des:"当前中间件目录","path":(3 < s1.length ? s1[3] : s1[1]).trim()};
 }
 
 
