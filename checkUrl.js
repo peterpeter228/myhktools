@@ -371,9 +371,12 @@ function fnDoBody(body,t,rep)
 	}
 
 	if(!body || -1 == body.indexOf("whoami"))return;
-	console.log("发现高危漏洞：" + t);
+	
 	if(-1 < t.indexOf("s2-001"))console.log(body)
 	var i = body.indexOf("cmdend") || body.indexOf("<!DOCTYPE") || body.indexOf("<html") || body.indexOf("<body");
+	// 误报
+	if(-1 < body.indexOf("<body"))return;
+	console.log("发现高危漏洞：" + t);
 	
 	if(0 < i) body = body.substr(0, i).trim();
 	// console.log(body);
@@ -500,6 +503,8 @@ function fnTestAll()
 	for(var k in aMethod)
 		fnTest(aMethod[k]);
 }
+
+// java -jar ~/safe/mtx_jfxl/bin/jfxl.jar 192.168.10.115:8080
 
 if(0 < a.length)
 {
