@@ -1,72 +1,321 @@
 本工具以mac os x 10.12.5的环境
 # 依赖
+<pre>
 <code>
+
 $ node -v
 v8.1.2
-$ ls /usr/local/lib/node_modules
-AntColony			debug				ip				node-uuid			socksv5
-Buffer				decompress			isarray				node-wifi-scanner		spider
-CSSselect			deepmerge			iwebpp.io			node-xlrd			sqlite3
-CSSwhat				depcheck			jake				node-xlsx			sqlstring
-anyproxy			dgram				jdbc				node-xmpp-client		ssh2
-archiver			dht.js				jquery				node-xmpp-server		ssh2-sftp-client
-arp				dhtspider			jschardet			node-zip			stream
-async				dnscache			jsdom				nodeDHT				stream-throttle
-async-task-mgr			docxtemplater			jsqr				nodemailer			string_decoder
-attack				ejs				jszip				npm				strongloop
-axon				encoding			jugglingdb			npm-check			subcommand
-baidu-ocr-api			esformatter			juicer				npm-proxy-cache			superagent
-basic-auth			eventproxy			kademlia			npm-registry-client		superagent-charset
-bcrypt-nodejs			excel-export			klass				npmlog				superagent-proxy
-benchmark			excel-parser			knex				nsp				svg
-bencode				excel-stream			lazy-line-painter		ocrad.js			svg-sprite
-bignumber.js			exif				level				open				svg.js
-bitfield			exifdata			leveldown			opencv				svgo
-bittorrent-dht			express				levelup				owasp-nodejs-goat		svgpath
-bittorrent-protocol		express-generator		lib-qqwry			p2pspider			svn
-bittorrent-tracker		express-limiter			libpcap				pako				svn-spawn
-bloom-filter-cpp		express-session			livepool			path				svn-utils
-body-parser			fast				lodash				pdfkit				swig
-bookshelf			forever				log4js				pg				tagg
-bower				formidable			lusca				pg-promise			tamper
-browserify			fs				magnet-uri			phantomjs			tar
-buffer-equal-constant-time	fstream				mailx				pica				tedious
-bufferhelper			geoip-lite			mariasql			piexifjs			term.js
-cassandra-driver		getmac				md5				pm2				tesseract-ocr
-caw				gkt				microtime			poplib				tesseract.js
-change-case			global-tunnel			middle-man			postgresql			tessocr
-charset				gm				mime				promise				tfidf
-cheerio				google				mime-types			protobufjs			thinkjs
-child_process			google-search			mocha				protocol-buffers		tile-lnglat-transform
-chokidar			gps-util			module				proxy-tamper			tor
-cloc				graceful-fs			moment				pug				torrent
-cluster				grunt				mongodb				qr-image			toxy
-coap				grunt-cli			mongoose			qrcode-npm			tunnel
-colorful			grunt-retire			mongoskin			querystring			underscore
-colors				gulp-nsp			morgan				raphael				uniq
-commander			h2				msfnode				read-config			unzip
-compression			hashset-cpp			mssql				readable-stream			url
-connect				hbase				mstsc.js			readline			useragent
-consolidate			hbase-client			mtxapp				redis				ut_metadata
-content-type			helmet				multiparty			referrer-policy			util
-cookie-parser			helmet-csp			mysql				replacestream			uuid
-cookie-session			highcharts			nano				request				validator
-core-util-is			hipache				nedb				requiresafe			vivus
-crawler				honeypot			needle				retire				vm
-cron				html-entities			net-snmp			rimraf				web
-crypto				http				nexe				serve-favicon			webtorrent
-csp				http-proxy			node-dev			sha1				webtorrent-cli
-css-select			http-proxy-agent		node-easy-cert			shadowsocks			webtorrent-desktop
-css-what			http-proxy-middleware		node-gyp			sharp				where-am-i
-csurf				http-server			node-inspector			shodan				winston
-csv-parser			https				node-libnmap			shodan-client			wreck
-csv-stream			iconv				node-native-zip			slickgrid			ws
-cvss3				iconv-lite			node-raphael			smb2				xlsx
-d3				images				node-rdpjs			snyk				xmldom
-d3-shape			inherits			node-rsa			soap				xmlrpc
-dateformat			integrity			node-spider			socket.io			zaproxy
-dbx				internal			node-tesseract			sockjs				zip
-
+$ls -ld /usr/local/lib/node_modules/* | awk '{print $9}'|sed -e 's/\/usr\/local\/lib\/node_modules\///g'
+AntColony
+Buffer
+CSSselect
+CSSwhat
+anyproxy
+archiver
+arp
+async
+async-task-mgr
+attack
+axon
+baidu-ocr-api
+basic-auth
+bcrypt-nodejs
+benchmark
+bencode
+bignumber.js
+bitfield
+bittorrent-dht
+bittorrent-protocol
+bittorrent-tracker
+bloom-filter-cpp
+body-parser
+bookshelf
+bower
+browserify
+buffer-equal-constant-time
+bufferhelper
+cassandra-driver
+caw
+change-case
+charset
+cheerio
+child_process
+chokidar
+cloc
+cluster
+coap
+colorful
+colors
+commander
+compression
+connect
+consolidate
+content-type
+cookie-parser
+cookie-session
+core-util-is
+crawler
+cron
+crypto
+csp
+css-select
+css-what
+csurf
+csv-parser
+csv-stream
+cvss3
+d3
+d3-shape
+dateformat
+dbx
+debug
+decompress
+deepmerge
+depcheck
+dgram
+dht.js
+dhtspider
+dnscache
+docxtemplater
+ejs
+encoding
+esformatter
+eventproxy
+excel-export
+excel-parser
+excel-stream
+exif
+exifdata
+express
+express-generator
+express-limiter
+express-session
+fast
+forever
+formidable
+fs
+fstream
+geoip-lite
+getmac
+gkt
+global-tunnel
+gm
+google
+google-search
+gps-util
+graceful-fs
+grunt
+grunt-cli
+grunt-retire
+gulp-nsp
+h2
+hashset-cpp
+hbase
+hbase-client
+helmet
+helmet-csp
+highcharts
+hipache
+honeypot
+html-entities
+http
+http-proxy
+http-proxy-agent
+http-proxy-middleware
+http-server
+https
+iconv
+iconv-lite
+images
+inherits
+integrity
+internal
+ip
+isarray
+iwebpp.io
+jake
+jdbc
+jquery
+jschardet
+jsdom
+jsqr
+jszip
+jugglingdb
+juicer
+kademlia
+klass
+knex
+lazy-line-painter
+level
+leveldown
+levelup
+lib-qqwry
+libpcap
+livepool
+lodash
+log4js
+lusca
+magnet-uri
+mailx
+mariasql
+md5
+microtime
+middle-man
+mime
+mime-types
+mocha
+module
+moment
+mongodb
+mongoose
+mongoskin
+morgan
+msfnode
+mssql
+mstsc.js
+mtxapp
+multiparty
+mysql
+nano
+nedb
+needle
+net-snmp
+nexe
+node-dev
+node-easy-cert
+node-gyp
+node-inspector
+node-libnmap
+node-native-zip
+node-raphael
+node-rdpjs
+node-rsa
+node-spider
+node-tesseract
+node-uuid
+node-wifi-scanner
+node-xlrd
+node-xlsx
+node-xmpp-client
+node-xmpp-server
+node-zip
+nodeDHT
+nodemailer
+npm
+npm-check
+npm-proxy-cache
+npm-registry-client
+npmlog
+nsp
+ocrad.js
+open
+opencv
+owasp-nodejs-goat
+p2pspider
+pako
+path
+pdfkit
+pg
+pg-promise
+phantomjs
+pica
+piexifjs
+pm2
+poplib
+postgresql
+promise
+protobufjs
+protocol-buffers
+proxy-tamper
+pug
+qr-image
+qrcode-npm
+querystring
+raphael
+read-config
+readable-stream
+readline
+redis
+referrer-policy
+replacestream
+request
+requiresafe
+retire
+rimraf
+serve-favicon
+sha1
+shadowsocks
+sharp
+shodan
+shodan-client
+slickgrid
+smb2
+snyk
+soap
+socket.io
+sockjs
+socksv5
+spider
+sqlite3
+sqlstring
+ssh2
+ssh2-sftp-client
+stream
+stream-throttle
+string_decoder
+strongloop
+subcommand
+superagent
+superagent-charset
+superagent-proxy
+svg
+svg-sprite
+svg.js
+svgo
+svgpath
+svn
+svn-spawn
+svn-utils
+swig
+tagg
+tamper
+tar
+tedious
+term.js
+tesseract-ocr
+tesseract.js
+tessocr
+tfidf
+thinkjs
+tile-lnglat-transform
+tor
+torrent
+toxy
+tunnel
+underscore
+uniq
+unzip
+url
+useragent
+ut_metadata
+util
+uuid
+validator
+vivus
+vm
+web
+webtorrent
+webtorrent-cli
+webtorrent-desktop
+where-am-i
+winston
+wreck
+ws
+xlsx
+xmldom
+xmlrpc
+zaproxy
+zip
 </code>
 
 # 安装
@@ -75,3 +324,4 @@ mkdir ~/safe && cd ~/safe
 git clone https://github.com/hktalent/weblogic_java_des  mtx_jfxl
 
 myhktools
+</pre>
