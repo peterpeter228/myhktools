@@ -27,7 +27,7 @@ function doFile(filename)
 					{
 						fs.unlinkSync(filename + "/" + i);
 					}
-					else doFile(filename + "/" + i)；
+					else doFile(filename + "/" + i);
 				});
 			});
 		}
