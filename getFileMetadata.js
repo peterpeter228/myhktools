@@ -22,18 +22,55 @@ function fmt(d)
 }
 var aGpsO = {};
 
+// 通过经纬度获得地址
+function fnGetAddrFromGps(GPSLatitude,GPSLongitude,fnCbk)
+{
+  request.get("http://maps.googleapis.com/maps/api/geocode/json?latlng="
+   + GPSLatitude + ","
+   + GPSLongitude + "&sensor=false",function(e,r)
+  {
+    if(!e)
+    {
+      var oR = JSON.parse(r.body);
+      if("OK" == oR.status)
+      {
+         if(oR.results && oR.results.length)
+         {
+            fnCbk(oR.results[0].formatted_address,oR);
+         }
+      }// console.log(r.body);
+    }
+  });
+}
+// 拷贝一些属性
+function fnMyCopy(s, aS, aD)
+{
+  var a = s.split(/[,;\s]/);
+  for(var i = 0; i < a.length; i++)
+  {
+    if(aS[a[i]])aD[a[i]] = aS[a[i]];
+  }
+}
 
+// 获得图片metadata
 function getFileMetaDataInfo()
 {
   // 获取图片的经纬度信息
   new exif({image:a[0]},function(e,d)
   {
+    if(d.image)
+    {
+      fnMyCopy("Make,Software,ModifyDate", d.image,aGpsO);
+    }
+    if(d.exif)
+    {
+      fnMyCopy("CreateDate,DateTimeOriginal", d.exif,aGpsO);
+    }
     fs.stat(a[0],function(e,stats)
     {
       // GPSLatitudeRef：S 南方；N北方 GPSLongitudeRef：W 西方 E 东方
       aGpsO.fileName = a[0];
       if(stats && stats.birthtime)aGpsO.createTime = fmt(stats.birthtime);
-      
       if(d && d.gps && d.gps.GPSLatitude && d.gps.GPSLongitude)
       {
         // console.log(d.gps);
@@ -44,32 +81,11 @@ function getFileMetaDataInfo()
         aGpsO.GPSLatitude = aGps[0];
         aGpsO.GPSLongitude = aGps[1];
       }
-      request.get("http://maps.googleapis.com/maps/api/geocode/json?latlng="
-       + aGpsO.GPSLatitude + ","
-       + aGpsO.GPSLongitude + "&sensor=false",function(e,r)
+      fnGetAddrFromGps(aGpsO.GPSLatitude,aGpsO.GPSLongitude,function(r)
       {
-        if(!e)
-        {
-          var oR = JSON.parse(r.body);
-          if("OK" == oR.status)
-          {
-             if(oR.results && oR.results.length)
-             {
-                aGpsO.address = oR.results[0].formatted_address;
-             }
-          }// console.log(r.body);
-        }
+        aGpsO.address = r;
       });
-      
     });
-  	/*
-  	var k = gpsUtil.getTotalDistance([{lat:57.90360046457607, 
-  		lng:3.0384}],function(e,d)
-  		{
-
-  			console.log(arguments.length);
-  		});
-  	*/
   });
 }
 
@@ -96,36 +112,3 @@ process.on('exit', (code) =>
   console.log(s = JSON.stringify(aGpsO,null,' '));
   fs.writeFileSync("db/" + aGpsO.md5, s);
 });
-/*
-{ image: 
-   { XResolution: 72,
-     YResolution: 72,
-     ResolutionUnit: 2,
-     Software: 'Adobe Photoshop CS5 Windows',
-     YCbCrPositioning: 1,
-     ExifOffset: 142,
-     GPSInfo: 232 },
-  thumbnail: 
-   { Compression: 0,
-     XResolution: 72,
-     YResolution: 72,
-     ResolutionUnit: 0,
-     ThumbnailOffset: 440,
-     ThumbnailLength: 7984 },
-  exif: 
-   { ExifVersion: <Buffer 30 32 32 31>,
-     ComponentsConfiguration: <Buffer 01 02 03 00>,
-     FlashpixVersion: <Buffer 30 31 30 30>,
-     ColorSpace: 1,
-     ExifImageWidth: 800,
-     ExifImageHeight: 600,
-     SceneCaptureType: 0 },
-  gps: 
-   { GPSVersionID: [ 2, 3, 0, 0 ],
-     GPSLatitudeRef: 'N',
-     GPSLatitude: [ 64, 1, 57.90360046457607 ],
-     GPSLongitudeRef: 'W',
-     GPSLongitude: [ 22, 39, 3.0384 ] },
-  interoperability: {},
-  makernote: {} }
-*/

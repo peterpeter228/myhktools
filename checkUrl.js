@@ -273,6 +273,8 @@ function doStruts2_048(url,fnCbk)
     });
 }
 
+// /robots.txt
+
 // http://gdsw.lss.gov.cn/swwssb/userRegisterAction.do?redirect:http://webscan.360.cn
 // s2_016,s2_017
 function doStruts2_016(url)
@@ -505,9 +507,18 @@ function fnTestAll()
 }
 
 // java -jar ~/safe/mtx_jfxl/bin/jfxl.jar 192.168.10.115:8080
-
+/*
+request.get(
+	"http://gx.si.gov.cn:8870/jbwtqt/netHallHomeAction!turnPageList.do?channelid=" + encodeURIComponent(g_postData)
+	,function(e,r)
+	{
+		if(!e)console.log(r.body);
+		console.log(e);
+	});
+//*/
 if(0 < a.length)
 {
+	//*
 	doStruts2_001(url);
 	doStruts2_016(url);
 	doStruts2_019(url);
@@ -522,6 +533,7 @@ if(0 < a.length)
 	doStruts2_DevMode(url);
 	
 	fnTestAll();
+	////////////////////*/
 }
 // checkWeblogicT3("192.168.10.133",9001);
 process.on('exit', (code) => 
