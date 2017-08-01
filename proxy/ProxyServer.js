@@ -40,6 +40,7 @@ function getRequest()
 	if("string" == typeof aT)aT = aT.replace(/\s/gmi, "").split(/[,\|]/);
 	if(3 > aT.length)return request;
 	process.env[aT[0] + "_PROXY"] = aT[1] + ":" + aT[2];
+	console.log("当前代理: " + process.env[aT[0] + "_PROXY"]);
 	return request.defaults({'proxy': aT[0].toLowerCase()+ '://' + aT[1] + ":" + aT[2]});
 }
 
@@ -51,6 +52,16 @@ function getRequest()
 function fnSafeCheck(req, fnCbk)
 {
 	fnCbk();
+}
+
+// 请求前对一些信息进行处理
+function fnPrevReq(req)
+{
+	/*
+_this["random-agent"] = true;
+            var uas = require("./allUserAgents"), szTmpUa = uas[Math.random() * 20000 % uas.length];
+            req.headers["user-agent"] = szTmpUa;
+	*/
 }
 
 // 设置代理主程序
@@ -68,6 +79,8 @@ Error: ESOCKETTIMEDOUT
 			var r = getRequest(),
 				x = r({"uri":req.url,"timeout":nTimeout});
 			req.pipe(x);
+			delete resp.headers['x-powered-by'];
+        	delete resp.headers['server'];
 	    	x.pipe(resp);
 		});
 	});
@@ -96,5 +109,6 @@ Error: ESOCKETTIMEDOUT
 	server.timeout = nTimeout;
 	server.keepAliveTimeout = nTimeout;
 }
-
+// 启动多个
+// pm2 start ProxyServer.js -i max
 fnCreateProxyServer();

