@@ -3,6 +3,7 @@ var szMyName = 'M.T.X._2017-06-08',
 	urlObj = require('url'),
 	child_process = require("child_process"),
 	net = require('net'),
+	path        = require("path"),
 	fs = require('fs'),
 	url = "",bReDo = false, szLstLocation = "",
 	g_oRst = {},
@@ -517,37 +518,44 @@ function fnTestAll()
 function fnCheckJavaFx(s)
 {
 	var szF = "~/safe/mtx_jfxl/bin/jfxl.jar";
-	if(!fs.existsSync(szF))console.log("mkdir ~/safe && cd ~/safe && git clone https://github.com/hktalent/weblogic_java_des.git");
-	else
+	child_process.exec("ls " + szF,function(e,so,se)
 	{
-		szF = "java -jar " + szF + " " + s;
-		child_process.exec(szF,function(e,so,se)
+		if(!so)console.log("mkdir ~/safe && cd ~/safe && git clone https://github.com/hktalent/weblogic_java_des.git");
+		else
 		{
-			szF = __dirname + "/data/" + s.replace(/:/gmi,"_") + ".txt";
-			if(fs.existsSync(szF))
+			szF = "java -jar " + szF + " " + s;
+			child_process.exec(szF,function(e,so,se)
 			{
-				g_oRst.weblogic_java_des = {des:"发现weblogic【高危】java反序列化漏洞",result:szF};
-			}
-		});
-	}
+				szF = __dirname + "/data/" + s.replace(/:/gmi,"_") + ".txt";
+				if(fs.existsSync(szF))
+				{
+					g_oRst.weblogic_java_des = {des:"发现weblogic【高危】java反序列化漏洞",result:szF};
+				}
+			});
+		}
+	});
+	
 }
 
 function fnCheckKeys(b)
 {
 	var a,s,r = [],re = /<.*?type=['"]*password['"]*\s[^>]*>/gmi, r1 = /autocomplete=['"]*(off|0|no|false)['"]*/gmi;
 	g_oRst.checkKeys || (g_oRst.checkKeys = {});
-
+	var oMp = {}, ss;
 	if(!g_oRst.checkKeys.passwordInputs)
 	{
 		while(a = re.exec(b))
 		{
 			if(!r1.exec(a[0]))
 			{
-				r.push(a[0].replace(/[\r\n\t"'']/gmi,"").replace(/\s+/gmi," "));
+				ss = a[0].replace(/[\r\n\t"'']/gmi,"").replace(/\s+/gmi," ");
+				if(!oMp[ss])
+					oMp[ss] = 1,r.push(ss);
 			}
 		}
 		if(0 < r.length)g_oRst.checkKeys.passwordInputs = {"des":"密码字段应该添加autocomplete=off",list:r};
 	}
+	oMp = {};
 	if(!g_oRst.checkKeys.keys)
 	{
 		s = __dirname + "/urls/keywords";
@@ -555,7 +563,8 @@ function fnCheckKeys(b)
 		re = [];
 		while(s = a.exec(b))
 		{
-			re.push(s[1]);
+			if(!oMp[s[1]])
+				oMp[s[1]]=1,re.push(s[1]);
 		}
 		if(0 < re.length)g_oRst.checkKeys.keys = {"des":"这些关键词在网络中容易被监听，请更换",list:re};
 	}
@@ -614,7 +623,7 @@ function fnCheckTa3(u)
 					g_oRst.ta3menus || (g_oRst.ta3menus = {});
 					g_oRst.ta3menus.des = "这些url响应http 200";
 					g_oRst.ta3menus.urls  || (g_oRst.ta3menus.urls = []);
-					g_oRst.ta3menus.urls.push([u + url,t].json(","));
+					g_oRst.ta3menus.urls.push([u + url,t].join(","));
 				}
 			}
 		});
