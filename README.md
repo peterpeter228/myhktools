@@ -1,18 +1,38 @@
 本工具以mac os x 10.12.5的环境
+# 巅狼安全 团队倾情奉献
+# struts2安全检查
+```
+s2_001
+s2_016
+s2_019
+s2_029
+s2_032
+s2_033
+s2_037
+s2_045
+伪造host等检测
+node checkUrl.js url
+```
+
+# 获取图片中的元数据（经纬度、创建时间）
+```
+node getFileMetadata.js /your/img/file
+```
+
 # 动态代理，每次自动随机使用代理
-= 启动
+启动
 ```
 pm2 start ProxyServer.js -i max
 ```
-= 然后本机代理设置为127.0.0.1  8080
+然后本机代理设置为127.0.0.1  8080
 ```
 验证：curl -x http://127.0.0.1:8080 http://erp.yinhai.com:8070/ixp/ip.jsp?me=ok
 ```
-= pm2的安装
+pm2的安装
 ```
 npm install -g pm2
 ```
-= 更新代理 autoProxy.txt
+更新代理 autoProxy.txt
 ```
 node checkProxy.js
 cat autoProxy.txt|sort|uniq >ok.txt
