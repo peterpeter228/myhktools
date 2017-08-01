@@ -6,22 +6,24 @@ var fs  = require("fs"),
     g_oR = request;
 
 
-function fnCheck(a)
+function fnCheck(a,fnCbk)
 {
 	var aI = a || fs.readFileSync(a[0]).toString().trim().split(/\n/);
 	console.log("Ip数量: " + aI.length);
-	for(var i = 0; i < aI.length; i++)
+
+	var i = 0;
+	for(; i < aI.length; i++)
 	{
 		if(aI[i] = aI[i].trim())
 		{
 			var aT = aI[i].split(/\s*\|\s*/);
-			
 			if(3 > aT.length || !aT[1])continue;
 			// console.log("Start: " + aT[1]);
+			if(aT[3].indexOf(","))aT[3] = aT[3].split(/,/gmi)[0];
 			r = request.defaults({'proxy': aT[3].toLowerCase()+ '://' + aT[1] + ":" + aT[2]});
 			process.env[aT[3] + "_PROXY"] = aT[1] + ":" + aT[2];
 			// process.env["HTTPS_PROXY"] = ;
-			(function(t1,reP){
+			(function(t1,reP,aT2){
 				try{
 					r.get(
 						{
@@ -33,23 +35,32 @@ function fnCheck(a)
 						if(!e && b && /\d+\.\d+\.\d+\.\d+/.test(b = b.trim()))
 						{
 							console.log("Ok: " + b + "  秒:" + (new Date().getTime() - t1) / 1000);
-							// 
-							
+							fs.appendFileSync(__dirname + "/autoProxy.txt", [aT2[3],aT2[1],aT2[2]].join(",") + "\n");
 							g_oR = reP;
 						}
 					});
 				}catch(e1){};
-			})(new Date().getTime(), r);
+			})(new Date().getTime(), r,aT);
 		}
 	}
+	var nTm = setInterval(function()
+	{
+		if(i >= aI.length)
+		{
+			fnCbk();
+			clearInterval(nTm);
+		}
+	},133);
+	
 }
 
 // http://www.ip181.com/
 // http://www.ip181.com/daili/1.html
 // https.globalAgent.options
 // https.globalAgent.options
-function fnCrawler(url)
+function fnCrawler(url,fnCbk)
 {
+	console.log(url);
 	var a, aT = [], re = /<td>(\d+\.\d+\.\d+\.\d+)<\/td>\s*<td>(\d+)<\/td>\s*<td>[^<]*<\/td>\s*<td>([^<]+)<\/td>/gmi;
 	g_oR//.defaults({'proxy': 'http://127.0.0.1:8080'})
 	.get(url,function(e,r,b)
@@ -58,10 +69,19 @@ function fnCrawler(url)
 		{
 			aT.push(["",a[1],a[2],a[3]].join("|"))
 		}
-		fnCheck(aT);
+		fnCheck(aT,fnCbk);
 	});
 }
 
-fnCrawler("http://www.ip181.com/daili/1.html"
+var g_nI = 55;
+function fnDostart()
+{
+	fnCrawler("http://www.ip181.com/daili/"+ g_nI +".html"
 	// "http://www.ip181.com/"
-	);
+	,function(){
+		g_nI++;
+		fnDostart();
+	});
+}
+// 去重
+fnDostart();
