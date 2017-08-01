@@ -26,7 +26,7 @@ pm2 start ProxyServer.js -i max
 ```
 然后本机代理设置为127.0.0.1  8080
 ```
-验证：curl -x http://127.0.0.1:8080 http://erp.yinhai.com:8070/ixp/ip.jsp?me=ok
+验证：curl -x http://127.0.0.1:8080 http://good.www.com:8070/ixp/ip.jsp?me=ok
 ```
 pm2的安装
 ```
