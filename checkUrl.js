@@ -1,6 +1,7 @@
 var szMyName = 'M.T.X._2017-06-08',
 	request = require('request'),
 	urlObj = require('url'),
+	child_process = require("child_process"),
 	net = require('net'),
 	fs = require('fs'),
 	url = "",bReDo = false, szLstLocation = "",
@@ -520,6 +521,14 @@ function fnCheckJavaFx(s)
 	else
 	{
 		szF = "java -jar " + szF + " " + s;
+		child_process.exec(szF,function(e,so,se)
+		{
+			szF = __dirname + "/data/" + s.replace(/:/gmi,"_") + ".txt";
+			if(fs.existsSync(szF))
+			{
+				g_oRst.weblogic_java_des = {des:"发现weblogic【高危】java反序列化漏洞",result:szF};
+			}
+		});
 	}
 }
 
