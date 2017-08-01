@@ -32,7 +32,7 @@ function fnCheck(a,fnCbk)
 						},
 					function(e,r,b)
 					{
-						if(!e && b && /\d+\.\d+\.\d+\.\d+/.test(b = b.trim()))
+						if(!e && b && /^\s*\d+\.\d+\.\d+\.\d+\s*$/.test(b = b.trim()))
 						{
 							console.log("Ok: " + b + "  秒:" + (new Date().getTime() - t1) / 1000);
 							fs.appendFileSync(__dirname + "/autoProxy.txt", [aT2[3],aT2[1],aT2[2]].join(",") + "\n");
@@ -47,8 +47,8 @@ function fnCheck(a,fnCbk)
 	{
 		if(i >= aI.length)
 		{
-			fnCbk();
 			clearInterval(nTm);
+			fnCbk();
 		}
 	},133);
 	
@@ -84,4 +84,7 @@ function fnDostart()
 	});
 }
 // 去重
+//  cat autoProxy.txt|sort|uniq >ok.txt
+// mv ok.txt autoProxy.txt
+// cat autoProxy.txt|wc -l
 fnDostart();
