@@ -41,12 +41,14 @@ function getIp(ip,fncbk)
 	  }
 	  else 
 	  {
-	  	request.get("http://ipinfo.io/" + ip,function(e,r,b)
-	  	{
-	  		if(e)return ;
-	  		o = JSON.parse(b);
-	  		fncbk1(o);
-	  	});
+	  	if(-1 == ip.indexOf("192."))
+		  	request.get("http://ipinfo.io/" + ip,function(e,r,b)
+		  	{
+		  		if(e)return ;
+		  		o = JSON.parse(b);
+		  		fncbk1(o);
+		  	});
+	  	else fncbk1({ip:ip});
 	  }
 }
 
