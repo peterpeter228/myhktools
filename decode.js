@@ -63,7 +63,7 @@ function decodeHtml(s)
 
 
 
-// console.log(fnHex('fdb13baac646958fa3c6a056ef1d530b').toString("16"));
+// console.log(fnHex('9bed67ade8f04951b1d4cd43dfa0d2f2').toString("16"));
 
 // 解码统一入口： 自动各种解码，可以多次调用
 function mtxDecode(s,fncbk)
