@@ -66,7 +66,7 @@ function fnSocket(h,p,szSend,fnCbk)
 }
 
 // check weblogic T3
-// java -jar jfxl.jar 192.168.10.1/24:7001
+// java -jar ~/safe/mtx_jfxl/jfxl.jar 127.0.0.1:7001
 function checkWeblogicT3(h,p)
 {
 	var s  = "t3 12.1.2\nAS:2048\nHL:19\n\n";
@@ -521,7 +521,7 @@ function fnTestAll()
 }
 
 // 反序列化检测
-// java -jar ~/safe/mtx_jfxl/bin/jfxl.jar 192.178.10.1/24:7001
+// java -jar ~/safe/mtx_jfxl/jfxl.jar 192.178.10.1/24:7001
 function fnCheckJavaFx(s)
 {
 	var szF = "~/safe/mtx_jfxl/jfxl.jar";
