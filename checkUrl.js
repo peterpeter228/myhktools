@@ -582,6 +582,7 @@ function fnGetErrMsg(body)
 {
 	if(body)
 	{
+		body = body.toString();
 		fnCheckKeys(body);
 		var s1 = "Base._dealdata(", i = body.indexOf(s1);
 		if(-1 < i)body = body.substr(i + s1.length);
@@ -673,7 +674,7 @@ request.post(//  + encodeURIComponent(g_postData)
 if(0 < a.length)
 {
 	//*
-	fnCheckTa3(url);
+	// fnCheckTa3(url);
 	doStruts2_001(url);
 	doStruts2_016(url);
 	doStruts2_019(url);
