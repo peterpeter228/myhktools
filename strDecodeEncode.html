@@ -1,0 +1,184 @@
+<!doctype html><html><head><meta charset="utf-8"><title>渗透常用便捷工具：各种编码、解码(巅狼团队)</title><script>
+function fnBase64()
+{
+  var keyStr = "ABCDEFGHIJKLMNOP" +
+               "QRSTUVWXYZabcdef" +
+               "ghijklmnopqrstuv" +
+               "wxyz0123456789+/" +
+               "=";
+
+  function encode64(input) {
+     input = escape(input);
+     var output = "";
+     var chr1, chr2, chr3 = "";
+     var enc1, enc2, enc3, enc4 = "";
+     var i = 0;
+
+     do {
+        chr1 = input.charCodeAt(i++);
+        chr2 = input.charCodeAt(i++);
+        chr3 = input.charCodeAt(i++);
+
+        enc1 = chr1 >> 2;
+        enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+        enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+        enc4 = chr3 & 63;
+
+        if (isNaN(chr2)) {
+           enc3 = enc4 = 64;
+        } else if (isNaN(chr3)) {
+           enc4 = 64;
+        }
+
+        output = output +
+           keyStr.charAt(enc1) +
+           keyStr.charAt(enc2) +
+           keyStr.charAt(enc3) +
+           keyStr.charAt(enc4);
+        chr1 = chr2 = chr3 = "";
+        enc1 = enc2 = enc3 = enc4 = "";
+     } while (i < input.length);
+
+     return output;
+  }
+
+  function decode64(input) {
+     var output = "";
+     var chr1, chr2, chr3 = "";
+     var enc1, enc2, enc3, enc4 = "";
+     var i = 0;
+
+     // remove all characters that are not A-Z, a-z, 0-9, +, /, or =
+     var base64test = /[^A-Za-z0-9\+\/\=]/g;
+     if (base64test.exec(input)) {
+        alert("There were invalid base64 characters in the input text.\n" +
+              "Valid base64 characters are A-Z, a-z, 0-9, '+', '/',and '='\n" +
+              "Expect errors in decoding.");
+     }
+     input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+
+     do {
+        enc1 = keyStr.indexOf(input.charAt(i++));
+        enc2 = keyStr.indexOf(input.charAt(i++));
+        enc3 = keyStr.indexOf(input.charAt(i++));
+        enc4 = keyStr.indexOf(input.charAt(i++));
+
+        chr1 = (enc1 << 2) | (enc2 >> 4);
+        chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+        chr3 = ((enc3 & 3) << 6) | enc4;
+
+        output = output + String.fromCharCode(chr1);
+
+        if (enc3 != 64) {
+           output = output + String.fromCharCode(chr2);
+        }
+        if (enc4 != 64) {
+           output = output + String.fromCharCode(chr3);
+        }
+
+        chr1 = chr2 = chr3 = "";
+        enc1 = enc2 = enc3 = enc4 = "";
+
+     } while (i < input.length);
+
+     return unescape(output);
+  }
+  this.encode = encode64;
+  this.decode = decode64;
+}
+
+String.prototype.hex2bin = function ()
+{
+	var j;
+    var hexes = this.match(/.{1,4}/g) || [];
+    var back = "";
+    for(j = 0; j<hexes.length; j++) {
+        back += String.fromCharCode(parseInt(hexes[j], 16));
+    }
+    return back;
+}
+
+String.prototype.bin2hex = function ()
+{
+
+	var hex, i;
+    var result = "";
+    for (i=0; i<this.length; i++) {
+        hex = this.charCodeAt(i).toString(16);
+        result += ("000"+hex).slice(-4);
+    }
+    return result
+
+}
+
+var Base64 = new fnBase64(),a = [
+  ["Base64编码",Base64.encode]
+ ,["Base64解码",Base64.decode]
+ ,["hex编码",function(s){return s.bin2hex()}]
+ ,["hex解码",function(s){return s.hex2bin()}]
+ ,["URL编码encodeURIComponent",encodeURIComponent]
+ ,["URL解码decodeURIComponent",decodeURIComponent]
+ ,["URL全编码",function(s)
+ {
+ 	return s.replace(/./gmi,function(a)
+ 		{
+ 			return "%" + a.charCodeAt(0).toString(16);
+ 		});
+ }]
+ ,["URL全解码",function(s)
+ {
+ 	return s.replace(/%([a-fA-F0-9]{1,2})/gmi,function(a,c)
+ 		{
+ 			return String.fromCharCode(parseInt(c,16));
+ 		});
+ }]
+ ,["JS全编码",function(s)
+ {
+ 	return s.replace(/./gmi,function(a)
+ 		{
+ 			return "\\x" + a.charCodeAt(0).toString(16);
+ 		});
+ }]
+ ,["JS全解码",function(s)
+ {
+ 	return s.replace(/\\x([a-fA-F0-9]{1,6})/gmi,function(a,c)
+ 		{
+ 			return String.fromCharCode(parseInt(c,16));
+ 		});
+ }],["HTML全编码",function(s)
+ {
+ 	return s.replace(/./gmi,function(a)
+ 		{
+ 			return "&#x" + a.charCodeAt(0).toString(16) + ";";
+ 		});
+ }]
+ ,["HTML全解码",function(s)
+ {
+ 	return s.replace(/&#x([a-fA-F0-9]{1,6});/gmi,function(a,c)
+ 		{
+ 			return String.fromCharCode(parseInt(c,16));
+ 		});
+ }]
+  ];
+ function fnMyClick(i)
+ {
+ 	try{
+ 	  var o = document.getElementById('myCode');
+ 	  o.value = a[i][1](o.value.toString());
+ 	}catch(e){alert(e)}
+ 	return false;
+ } 
+</script>
+</head>
+<body>
+<textarea style='width:100%;height:200px' id=myCode>
+<![CDATA[
+
+]]>
+</textarea>
+<script>
+for(var i = 0; i < a.length;i++)
+{
+	document.write(i + "、<input type=button onclick=fnMyClick(" + i + ") value=" +  a[i][0]+ "><br>");
+}
+</script></body></html>
