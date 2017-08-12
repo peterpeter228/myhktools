@@ -33,6 +33,8 @@ Options:
 ```
 node getFileMetadata.js /your/img/file
 ```
+# 手工XSS、渗透时需要的一些常用编码、解码
+strDecodeEncode.html
 
 # 动态代理，每次自动随机使用代理
 启动
