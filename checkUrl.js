@@ -61,7 +61,7 @@ program.version(szMyName)
 // 检查对象
 var a = process.argv.splice(2)
 g_szUrl = program.url || 1 == a.length && a[0];
-if(!/[\?;!&]/.test(g_szUrl))
+if(!/[\?;!&]/.test(g_szUrl) && '/' != g_szUrl.substr(-1))
 	g_szUrl += "/";
 // 安装包
 if(program.install)
@@ -122,16 +122,25 @@ function fnSocket(h,p,szSend,fnCbk)
 function checkWeblogicT3(h,p)
 {
 	var s  = "t3 12.1.2\nAS:2048\nHL:19\n\n";
+	p || (p = 80);
 	// console.log(s);
 	fnSocket(h,p,s,function(data)
 	{
+		if(data)
+		g_oRst.t3 = {r:data.toString().trim(),des:"建议关闭T3协议，或者限定特定ip可访问"};
+		/*
 		var d = data && data.toString().trim() || "", 
 			re = /^HELO:(\d+\.\d+\.\d+\.\d+)\./gm;
 		console.log(d);
-		console.log(re.test(d));
+		console.log(re.test(d));*/
 	});
 }
 // checkWeblogicT3("192.168.18.89",7001);
+if(program.t3)
+{
+	var r1 = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):?(\d+)?/gmi.exec(g_szUrl);
+	checkWeblogicT3(r1[1],r1[2]);
+}
 
 // 解析裸头信息
 function fnParseHttpHd(s,fnCbk)
@@ -672,6 +681,7 @@ function fnCheckTa3(u)
 	var j = u.lastIndexOf('/');
 	if(10 < j)u = u.substr(0, j + 1);
 	else u += '/';
+
 	var s = program.menu || "./urls/ta3menu.txt",a,i = 0,fnCbk = function(url)
 	{
 		request(fnOptHeader({method: 'GET',uri: u + url
@@ -741,7 +751,7 @@ request.post(//  + encodeURIComponent(g_postData)
 if(0 < a.length)
 {
 	//*
-	if(program.proxy)fnCheckTa3(g_szUrl);
+	fnCheckTa3(g_szUrl);
 	doStruts2_001(g_szUrl);
 	doStruts2_016(g_szUrl);
 	doStruts2_019(g_szUrl);
