@@ -9,7 +9,8 @@ var szMyName = 'M.T.X._2017-06-08 1.0',
 	fs = require('fs'),
 	g_szUrl = "",bReDo = false, szLstLocation = "",
 	g_oRst = {},
-	timeout = 15000,
+	timeout = 5000,
+	g_nPool = 100,
 	iconv = require("iconv-lite"),
 	bRunHost = false,
 	g_szUa = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
@@ -54,12 +55,17 @@ program.version(szMyName)
 	.option('-t, --t3', 'check weblogic t3,default false')
 	.option('-i, --install', 'install node modules')
 	.option('-v, --verbose', 'show logs')
+	.option('-o, --timeout', 'default ' + timeout)
+	.option('-l, --pool', 'default ' + g_nPool)
 	.option('-m, --menu [value]', 'scan url + menus, default ./urls/ta3menu.txt')
 	.option('-s, --webshell [value]', 'scan webshell url，设置参数才会运行, default ./urls/webshell.txt')
 	.option('-d, --method [value]', 'default PUT,DELETE,OPTIONS,HEAD,PATCH test')
 	.option('-a, --host ', 'host attack test,设置代理后该项功能可能无法使用,default true')
 	.option('-k, --keys [value]', 'scan html keywords, default ./urls/keywords')
 	.parse(process.argv);
+timeout = program.timeout || timeout;
+g_nPool = program.pool || g_nPool;
+
 // 检查对象
 var a = process.argv.splice(2)
 g_szUrl = program.url || 1 == a.length && a[0];
@@ -93,7 +99,7 @@ if(program.proxy)
 }
 function fnOptHeader(o)
 {
-	var k = {followAllRedirects:false,followRedirect:false,"timeout":timeout};
+	var k = {followAllRedirects:false,followRedirect:false,"timeout":timeout,pool: {maxSockets: g_nPool}};
 	for(var i  in k)
 	{
 		o[i] = k[i];
@@ -370,7 +376,7 @@ function doStruts2_016(url)
 		}), 
     	function(e,r,b)
     {
-    	// console.log(b);
+    	// console.log(b.toString());
     	// if(-1 < b.indexOf("administrator"))console.log(b.toString("gbk"));
     	if(!e)fnDoBody(b,"s2-016");
     	// console.log(e || b || r);
@@ -400,7 +406,7 @@ function fnDoBody(body,t,rep)
 	}
 
 	var e = fnGetErrMsg(body);
-	if(e)g_oRst.errMsg = e;
+	if(e)g_oRst.errMsg = e.toString().replace(/<[^>]*>/gmi,'');//.trim();
 	// console.log(t);
 	var oCa = arguments.callee.caller.arguments;
 	if(!rep)rep = oCa[1];
@@ -420,6 +426,7 @@ function fnDoBody(body,t,rep)
 	}
 	if(!body)return;
 	body = body.toString("utf8").trim();
+	if(-1 < body.indexOf(".opensymphony.xwork2.ActionContext."))return;
 
 	g_oRst.config || (g_oRst.config = {});
 	if(!g_oRst.config["server"] && -1 < body.indexOf("at weblogic.work"))
@@ -647,7 +654,7 @@ function fnCheckKeys(b)
 	}
 }
 
-var g_reServer = /(Apache Tomcat\/[\d\.]+)/gmi;
+var g_reServer = /(Tomcat|JBossWeb|JBoss[\-\/][\d\.]+)/gmi;
 
 // 获取Ta3异常消息
 function fnGetErrMsg(body)
@@ -692,6 +699,8 @@ function fnLog(s)
 		console.log(s);
 }
 
+// 避免重复,后期可以支持字典目录，多个字典目录，这样可以扫描更多
+var g_mUrls = {};
 // 检查ta3默认菜单
 function fnCheckTa3(u,dict,szDes,type)
 {
@@ -739,6 +748,8 @@ function fnCheckTa3(u,dict,szDes,type)
 		a = String(fs.readFileSync(s)).trim().split(/\n/);
 		for(; i < a.length; i++)
 		{
+			if(g_mUrls[a[i]])continue;
+			g_mUrls[a[i]] = true;
 			// console.log(a[i]);
 			fnCbk(a[i]);
 		}

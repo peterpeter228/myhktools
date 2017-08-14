@@ -366,6 +366,8 @@ devshell.jsp
 devshell.php
 dface.php
 dm.jsp
+dns.asp
+dns.php
 doom.php
 dork.php
 download.jsp
@@ -396,6 +398,8 @@ fake.php
 fbi.php
 fenix.php
 fenixshell.php
+file.asp
+file.php
 filesman.php
 filesystembrowser.aspx
 fileupload.aspx
@@ -440,6 +444,7 @@ heykir.php
 hiddensshell.php
 hkmjj.asp
 hkrkoz.php
+host.php
 hp.php
 hsxa.jsp
 i-47_shell.php
@@ -544,6 +549,7 @@ indexx.asp
 indexxx.php
 info.jsp
 inj3ct0r.php
+ipcheck.php
 irc.pl
 ironshell.php
 isko.php
@@ -582,6 +588,7 @@ kacak.php
 kaiser.php
 kaker.php
 kaushell.php
+killnc.php
 klasvayv.asp
 klasvayv.php
 ksm.php
@@ -591,6 +598,7 @@ lNemexix.php
 lab.php
 lamashell.php
 lammer.php
+laudanum.php
 leo.jsp
 liber0.php
 libero.php
@@ -757,6 +765,8 @@ poison.php
 porno.php
 pr0f3s0r-php
 profesorX.php
+proxy.asp
+proxy.php
 pt.php
 ptm.php
 puma.php
@@ -810,10 +820,12 @@ secure.php
 securitypwn.php
 server.php
 set.php
+settings.php
 sh3ll.php
 she.php
 shel.php
 shell.asp
+shell.aspx
 shell.jsp
 shell.php
 shell1.php
@@ -824,6 +836,7 @@ shelltube.php
 silic.php
 simattacker.php
 simon.php
+simple.jsp
 simple_cmd.php
 simshell.php
 smowu.php
@@ -966,6 +979,7 @@ therules25.php
 thumb.php
 thx.jsp
 tigre.php
+tiny.php
 title.php
 tool.asp
 tool.php
