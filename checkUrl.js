@@ -125,11 +125,12 @@ function checkWeblogicT3(h,p)
 {
 	var s  = "t3 12.1.2\nAS:2048\nHL:19\n\n";
 	p || (p = 80);
-	// console.log(s);
+	fnLog(s);
 	fnSocket(h,p,s,function(data)
 	{
 		if(data)
 		g_oRst.t3 = {r:data.toString().trim(),des:"建议关闭T3协议，或者限定特定ip可访问"};
+		fnLog(g_oRst.t3.r);
 		/*
 		var d = data && data.toString().trim() || "", 
 			re = /^HELO:(\d+\.\d+\.\d+\.\d+)\./gm;
@@ -603,6 +604,7 @@ function fnCheckJavaFx(s)
 				{
 					g_oRst.weblogic_java_des = {des:"发现weblogic【高危】java反序列化漏洞",result:szF};
 				}
+				if(e)fnLog(e.toString());
 			});
 		}
 	});
@@ -769,7 +771,7 @@ request.post(//  + encodeURIComponent(g_postData)
 if(0 < a.length)
 {
 	//*
-	fnCheckTa3(g_szUrl,program.menu || "./urls/ta3menu.txt","一些常见、可能存在风险url检测",'ta3menu');
+	if(program.menu)fnCheckTa3(g_szUrl,program.menu || "./urls/ta3menu.txt","一些常见、可能存在风险url检测",'ta3menu');
 	if(program.webshell)fnCheckTa3(g_szUrl,program.webshell || "./urls/webshell.txt", "webshell、木马",'webshell');
 	
 	doStruts2_001(g_szUrl);
