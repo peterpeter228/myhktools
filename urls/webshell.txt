@@ -11,6 +11,7 @@
 13.php
 14.php
 15.php
+150.php
 16.php
 17.php
 18.php
@@ -58,6 +59,7 @@
 99.php
 AdminGay.php
 Ajan.asp
+Ani-Shell.php
 Atheroz.php
 BD.php
 Backd00r.php
@@ -84,9 +86,12 @@ Dx.php
 DxShell.php
 EFSO_2.php
 ELMALISEKER.php
+Ekin0x.php
 Elmaliseker.php
 FTPSHELL.php
+FaTaLisTiCz_Fx.php
 Frizell.php
+G5.php
 GAY.php
 GT.php
 Gamma.php
@@ -101,6 +106,7 @@ Inderxer.asp
 JFolder.jsp
 JUACKER.php
 JspSpy.jsp
+JspWebshell 1.2.jsp
 JspWebshell.php
 Jspspyweb.jsp
 KA_uShell.php
@@ -111,11 +117,13 @@ LOL.php
 Liz0ziM.php
 Loaderz.php
 LoaderzWEBShell.php
+Locus7s.php
 LulzSec.php
 MG.php
 MSSQL.asp
 Marihuana.php
 MyShell.php
+NCC-Shell.php
 NTDaddy.php
 NeMeSiS.php
 NetworkFileManagerPHP.php
@@ -131,6 +139,8 @@ PRO/index.php
 PTM.php
 PUMA.php
 PWNED.php
+PerlWebShellbyRST-GHC.pl
+Php_Backdoor.txt.php
 Pisher.php
 Predator.php
 Private-i3lue.php
@@ -148,6 +158,7 @@ ShellDDos.php
 Silic.jsp
 Sincap.php
 Siyanur5x.php
+SnIpEr_SA Shell.php
 SnIpEr_SA.php
 SnIpEr_SAShell.php
 THA.php
@@ -231,6 +242,7 @@ atheroz.php
 atherozhack.php
 author.php
 b.php
+b37.php
 b374k.php
 b374k779.php
 b4ck.php
@@ -245,6 +257,7 @@ backtrack.php
 backupsql.php
 base.asp
 bash.php
+bdotw44shell.php
 beta.php
 biantai.php
 black.php
@@ -264,13 +277,25 @@ c.php
 c0derzshell.php
 c0r3.php
 c100.php
+c37.php
+c66.php
+c99-Ultimate.php
+c99-shadows-mod.php
 c99.PHP
 c99.php
 c99_PSych0.php
+c99_locus7s.php
 c99_madnet.php
 c99_w4cking.php
+c99madshell.php
+c99shell.php
+c99ud.php
+c99unlimited.php
+c99v2.php
 cat.jsp
+cbfphpsh.php
 cgi.php
+cgitelnet.pl
 chido.php
 cihshell_fix.php
 cmd.asp
@@ -279,6 +304,7 @@ cmd.jsp
 cmd.jspx
 cmd.php
 cmd.pl
+cmd_win32.jsp
 cmdasp.asp
 cmdasp.aspx
 cmdexec.aspx
@@ -298,12 +324,14 @@ config-joomla.php
 config.jsp
 config.php
 confih-wordpress.php
+connect-back.php
 cookie.php
 cookier.php
 core.php
 cp.php
 cpanel.asp
 cpanel_cracker.php
+cpg_143_incl_xpl.php
 cr4ck.php
 crack.php
 cracker.php
@@ -320,6 +348,7 @@ data.jsp
 data.php
 db.php
 dc.pl
+ddos.php
 deface.php
 defaced.php
 defacer.php
@@ -340,6 +369,8 @@ dm.jsp
 doom.php
 dork.php
 download.jsp
+dq.php
+dra.php
 dxshell.php
 dy.jsp
 e.php
@@ -347,12 +378,15 @@ edia/fenixshell.php
 edit_config.php
 edit_ot.jsp
 editor.aspx
+egy.php
 ekin0x.php
 elmago.php
 elmaliseker.asp
 enforcer.php
+erne.php
 error.php
 error99.php
+ex0shell.php
 exim.pl
 f.php
 face.php
@@ -362,6 +396,7 @@ fake.php
 fbi.php
 fenix.php
 fenixshell.php
+filesman.php
 filesystembrowser.aspx
 fileupload.aspx
 finaly.aspx
@@ -374,6 +409,7 @@ fuckyou.php
 fuego.php
 functions.php
 g.php
+g00nv13.php
 gammer.php
 gay.php
 gaza.php
@@ -396,6 +432,7 @@ h.php
 h4ck.php
 ha.jsp
 hack.php
+hacker.php
 hackerarmy.php
 hackeronurshell.php
 hat.php
@@ -507,7 +544,10 @@ indexx.asp
 indexxx.php
 info.jsp
 inj3ct0r.php
+irc.pl
 ironshell.php
+isko.php
+iskorpitx.php
 itsec.php
 itsecteam_shell.php
 j.php
@@ -560,6 +600,7 @@ list.asp
 list.jsp
 list.php
 list.pl
+liz0zim.php
 llave.php
 lnc.php
 load_shell.php
@@ -612,6 +653,7 @@ mg.jsp
 mg.php
 minupload.jsp
 mitnick.php
+mma.php
 mmg.php
 money.php
 moon.php
@@ -723,14 +765,17 @@ pwhash.php
 pwn3d.php
 pwned.php
 pws.php
+pws.pl
 pyth.jsp
 queryDong.jsp
 quick.php
+r00t.php
 r57.php
 r57_Mohajer22.php
 r57_iFX.php
 r57_kartal.php
 r57shell.php
+r58.php
 radhat.asp
 rcpexp.pl
 reader.asp
@@ -777,6 +822,7 @@ shell_decoded.asp
 shellnymous.php
 shelltube.php
 silic.php
+simattacker.php
 simon.php
 simple_cmd.php
 simshell.php
@@ -789,6 +835,7 @@ spammer.php
 spexec.aspx
 spjspshell.jsp
 spy.php
+spyshell.php
 sql.aspx
 sql.php
 sqzr.php
@@ -932,11 +979,14 @@ tryag.php
 tube.php
 tuo.aspx
 u.jsp
+udp.php
 up.asp
 up.jsp
 up.php
 up.pl
+up_win32.jsp
 update.php
+upl0ader.php
 user.php
 usuarios_registrados.php
 utils.jsp
@@ -955,6 +1005,7 @@ web.php
 webshell.asp
 webshell.cgi
 webshell.php
+wewo.pl
 white.php
 whitehat.php
 wos.php
