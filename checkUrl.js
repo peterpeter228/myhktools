@@ -54,6 +54,7 @@ program.version(szMyName)
 	.option('-t, --t3', 'check weblogic t3,default false')
 	.option('-i, --install', 'install node modules')
 	.option('-m, --menu [value]', 'scan url + menus, default ./urls/ta3menu.txt')
+	.option('-s, --webshell [value]', 'scan webshell url, default ./urls/webshell.txt')
 	.option('-d, --method [value]', 'default PUT,DELETE,OPTIONS,HEAD,PATCH test')
 	.option('-a, --host ', 'host attack test,设置代理后该项功能可能无法使用,default true')
 	.option('-k, --keys [value]', 'scan html keywords, default ./urls/keywords')
@@ -676,13 +677,13 @@ function fnGetErrMsg(body)
 var g_HtmlMd5Cf = {};
 
 // 检查ta3默认菜单
-function fnCheckTa3(u)
+function fnCheckTa3(u,dict)
 {
 	var j = u.lastIndexOf('/');
 	if(10 < j)u = u.substr(0, j + 1);
 	else u += '/';
 
-	var s = program.menu || "./urls/ta3menu.txt",a,i = 0,fnCbk = function(url)
+	var s = dict,a,i = 0,fnCbk = function(url)
 	{
 		request(fnOptHeader({method: 'GET',uri: u + url
 		    ,headers:
@@ -751,7 +752,9 @@ request.post(//  + encodeURIComponent(g_postData)
 if(0 < a.length)
 {
 	//*
-	fnCheckTa3(g_szUrl);
+	fnCheckTa3(g_szUrl,program.menu || "./urls/ta3menu.txt");
+	fnCheckTa3(g_szUrl,program.webshell || "./urls/webshell.txt");
+	
 	doStruts2_001(g_szUrl);
 	doStruts2_016(g_szUrl);
 	doStruts2_019(g_szUrl);
