@@ -53,8 +53,9 @@ program.version(szMyName)
 	.option('-p, --proxy [value]', 'http proxy,eg: http://127.0.0.1:8080, or https://127.0.0.1:8080, no default')
 	.option('-t, --t3', 'check weblogic t3,default false')
 	.option('-i, --install', 'install node modules')
+	.option('-v, --verbose', 'show logs')
 	.option('-m, --menu [value]', 'scan url + menus, default ./urls/ta3menu.txt')
-	.option('-s, --webshell [value]', 'scan webshell url, default ./urls/webshell.txt')
+	.option('-s, --webshell [value]', 'scan webshell url，设置参数才会运行, default ./urls/webshell.txt')
 	.option('-d, --method [value]', 'default PUT,DELETE,OPTIONS,HEAD,PATCH test')
 	.option('-a, --host ', 'host attack test,设置代理后该项功能可能无法使用,default true')
 	.option('-k, --keys [value]', 'scan html keywords, default ./urls/keywords')
@@ -391,9 +392,9 @@ g_oRst.struts2 || (g_oRst.struts2 = {});
 function fnDoBody(body,t,rep)
 {
 	// win 字符集处理
-	if(body && -1 < String(body).indexOf("administrator"))
+	if(body && -1 < String(body).indexOf("[^\/]administrator"))
 	{
-		 body = iconv.decode(body,"cp936").toString("utf8");
+		 try{body = iconv.decode(body,"cp936").toString("utf8");}catch(e){}
 		 // console.log(body);
 	}
 
@@ -644,6 +645,8 @@ function fnCheckKeys(b)
 	}
 }
 
+var g_reServer = /(Apache Tomcat\/[\d\.]+)/gmi;
+
 // 获取Ta3异常消息
 function fnGetErrMsg(body)
 {
@@ -658,6 +661,11 @@ function fnGetErrMsg(body)
 		if(-1 < i)body = body.substr(0, i + 1);
 		try
 		{
+			if(g_reServer)
+			{
+				var oS = g_reServer.exec(body);
+				if(oS && 0 < oS.length && g_oRst.server)g_oRst.server += " " + oS[1],g_reServer = null;
+			}
 			var o = JSON.parse(body = body.replace(/'/gmi,"\"").replace(/\t/gmi,"\\t\\n").replace(/&nbsp;/gmi," "));
 			return o.errorDetail;
 		}catch(e)
@@ -676,15 +684,23 @@ function fnGetErrMsg(body)
 // 避免重复处理
 var g_HtmlMd5Cf = {};
 
+function fnLog(s)
+{
+	if(program.verbose)
+		console.log(s);
+}
+
 // 检查ta3默认菜单
-function fnCheckTa3(u,dict)
+function fnCheckTa3(u,dict,szDes,type)
 {
 	var j = u.lastIndexOf('/');
 	if(10 < j)u = u.substr(0, j + 1);
 	else u += '/';
 
+	fnLog("start check " + dict);
 	var s = dict,a,i = 0,fnCbk = function(url)
 	{
+		fnLog("check " + u + url);
 		request(fnOptHeader({method: 'GET',uri: u + url
 		    ,headers:
 		    {
@@ -707,10 +723,11 @@ function fnCheckTa3(u,dict)
 				{
 					var re = /<title>([^<]*)<\/title>/gmi, t = re.exec(body);
 					t && (t = t[1].trim());t || (t = "");
-					g_oRst.ta3menus || (g_oRst.ta3menus = {});
-					g_oRst.ta3menus.des = "这些url响应http 200";
-					g_oRst.ta3menus.urls  || (g_oRst.ta3menus.urls = []);
-					g_oRst.ta3menus.urls.push([u + url,t].join(","));
+					var oTm = (g_oRst[type] || (g_oRst[type] = {}));
+					
+					oTm.des = szDes + ",这些url响应http 200";
+					oTm.urls  || (oTm.urls = []);
+					oTm.urls.push([u + url,t].join(","));
 				}
 			}
 		});
@@ -723,7 +740,7 @@ function fnCheckTa3(u,dict)
 			// console.log(a[i]);
 			fnCbk(a[i]);
 		}
-	}else console.log("不存在: " + s);
+	}else fnLog("不存在: " + s);
 }
 // 全部编码为%xx格式
 function fnMakeData(s)
@@ -752,8 +769,8 @@ request.post(//  + encodeURIComponent(g_postData)
 if(0 < a.length)
 {
 	//*
-	fnCheckTa3(g_szUrl,program.menu || "./urls/ta3menu.txt");
-	fnCheckTa3(g_szUrl,program.webshell || "./urls/webshell.txt");
+	fnCheckTa3(g_szUrl,program.menu || "./urls/ta3menu.txt","一些常见、可能存在风险url检测",'ta3menu');
+	if(program.webshell)fnCheckTa3(g_szUrl,program.webshell || "./urls/webshell.txt", "webshell、木马",'webshell');
 	
 	doStruts2_001(g_szUrl);
 	doStruts2_016(g_szUrl);

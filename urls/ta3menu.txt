@@ -1,12 +1,11 @@
 ../manager
+../console
 j_spring_security_check
 loginFailureAction.do
 login.jsp
 logon
 logout
 login2.jsp
-console
-manager
 ta/inc.jsp
 ta/accessdeniedForward.jsp
 ta/accessdenied.jsp
