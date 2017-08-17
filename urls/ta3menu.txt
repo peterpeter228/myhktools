@@ -1,5 +1,3 @@
-../manager
-../console
 j_spring_security_check
 loginFailureAction.do
 login.jsp
