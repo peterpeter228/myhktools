@@ -1117,9 +1117,10 @@ function fastjson(url, fnCbk)
 	    ,headers:
 	    {
 	    	"User-Agent": g_szUa,
-	    	"Content-Type":"application/x-www-form-urlencoded"
+	    	"Content-Type":"xml/JSON"
 	    }})
 	  , function (error, response, body){
+	  		console.log(error || body);
 	  		if(body)
 	  		{
 	  			fnDoBody(body,"s2-009");
