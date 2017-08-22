@@ -111,8 +111,14 @@ String.prototype.bin2hex = function ()
 
 }
 
+function fnTo16(s)
+{
+  return parseInt(s).toString(16)
+}
+
 var Base64 = new fnBase64(),a = [
-  ["Base64编码",Base64.encode]
+  ["16进制编码",fnTo16]
+ ,["Base64编码",Base64.encode]
  ,["Base64解码",Base64.decode]
  ,["hex编码",function(s){return s.bin2hex()}]
  ,["hex解码",function(s){return s.hex2bin()}]

@@ -1,6 +1,7 @@
 // 别忘记了，后渗透meterpreter会产生大量的gbk文件，在mac osx、linux下无法正常阅读
 var a = process.argv.splice(2),
 	fs = require('fs'),
+	detectCharacterEncoding = require('detect-character-encoding'),
     iconv = require("iconv-lite");
 
 function doFile(filename)
@@ -11,7 +12,10 @@ function doFile(filename)
 		{
 			try{
 				var k = fs.readFileSync(filename);
-				k = iconv.decode(k,"gbk").toString("utf8");
+				var charset = detectCharacterEncoding(k);
+				if(charset.encoding == "UTF-8")return;
+				// console.log(charset.encoding + " " + filename);
+				k = iconv.decode(charset.encoding || "gbk").toString("utf8");
 				fs.writeFileSync(filename,k);
 				console.log(filename);
 				console.log(k);
