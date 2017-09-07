@@ -15,7 +15,7 @@ function doFile(filename)
 				var charset = detectCharacterEncoding(k);
 				if(charset.encoding == "UTF-8")return;
 				// console.log(charset.encoding + " " + filename);
-				k = iconv.decode(charset.encoding || "gbk").toString("utf8");
+				k = iconv.decode(k,charset.encoding || "gbk").toString("utf8");
 				fs.writeFileSync(filename,k);
 				console.log(filename);
 				console.log(k);

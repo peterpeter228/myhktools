@@ -73,7 +73,7 @@ function fnCrawler(url,fnCbk)
 	});
 }
 
-var g_nI = 55;
+var g_nI = 1;
 function fnDostart()
 {
 	fnCrawler("http://www.ip181.com/daili/"+ g_nI +".html"

