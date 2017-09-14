@@ -178,6 +178,7 @@ function fnDoHostAttack(url,fnCbk)
 		var uO = urlObj.parse(url), ss = "I.am.summer.M.T.X.T",host = uO.host.split(/:/)[0], port = uO.port || 80;
 		if(/.*?\/$/g.test(uO.path))uO.path = uO.path.substr(0, uO.path.length - 1);
 		// checkWeblogicT3(host,port);
+
 		if(program.t3)fnCheckJavaFx([host,port].join(":"));
 		fnSocket(host,port,'POST ' + uO.path + ' HTTP/1.1\r\nHost:' 
 			+ ss + '\r\nUser-Agent:Mozilla/5.0 (iPhone; CPU iPhone OS 10_2 like ' 
@@ -732,6 +733,7 @@ function fnCheckJavaFx(s)
 		else
 		{
 			szF = "java -jar " + szF + " " + s;
+			
 			child_process.exec(szF,function(e,so,se)
 			{
 				szF = __dirname + "/data/" + s.replace(/:/gmi,"_") + ".txt";
