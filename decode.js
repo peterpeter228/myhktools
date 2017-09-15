@@ -1,7 +1,8 @@
 // 各种解码 xiatian 2017-03-30
 var Entities = require('html-entities'),AE = new Entities.AllHtmlEntities(),
     xmlEt = new Entities.XmlEntities(),Html4Entities = new Entities.Html4Entities(),
-    jsQR = require("jsqr")
+    jsQR = require("jsqr"),
+    QrCode = require('./QrCodeDecode')
     ;
 
 // QRCode 解码
@@ -68,7 +69,7 @@ function decodeHtml(s)
 // 解码统一入口： 自动各种解码，可以多次调用
 function mtxDecode(s,fncbk)
 {
-	var a = [decodeURI,fnHex,fnUnzipFromBase64,fnBase64,decodeHtml];
+	var a = [decodeURI,fnHex,fnUnzipFromBase64,fnBase64,decodeHtml,QrCode.deCodeQrCode];
 	var szOld = s,szO2;
 	for(var k in a)
 	{
