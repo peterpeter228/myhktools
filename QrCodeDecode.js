@@ -1,4 +1,20 @@
-var QrCode = require('qrcode-reader');
+var QrCode = require('qrcode-reader'),
+	qc = require('qrcode');
+
+/*
+L (Low)	~7%
+M (Medium)	~15%
+Q (Quartile)	~25%
+H (High)	~30%
+version:2,
+*/
+function encodeQrCode(data,cbk)
+{
+	qc.toDataURL(data,{errorCorrectionLevel:"H"}, function (e, url) 
+	{
+  		if(e)console.log(e);else cbk(url);
+	});
+}	
 
 function deCodeQrCode(data,cbk)
 {
@@ -14,7 +30,7 @@ function deCodeQrCode(data,cbk)
 	qr.decode(data);
 }
 
-module.exports = {"deCodeQrCode":deCodeQrCode};
+module.exports = {"deCodeQrCode":deCodeQrCode,"encodeQrCode":encodeQrCode};
 
 //*
 if(process.argv)
