@@ -73,7 +73,7 @@ def delMac(mac):
             del g_IPdata[k]
 
 def pushMacInfo(szMac,ip):
-    if '00:00:00:00:00:00' == szMac or ip == '0.0.0.0':
+    if '00:00:00:00:00:00' == szMac or 'ff:ff:ff:ff:ff:ff' == szMac or ip == '0.0.0.0':
         return 
     oT = findIp(ip)
     if ('' != oT and szMac != oT) or 1 < findMac(szMac):

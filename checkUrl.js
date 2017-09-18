@@ -415,6 +415,7 @@ function fnDoBody(body,t,rep)
 	{
 		// myLog(arguments);
 	}
+
 	if(!body)return;
 	body = body.toString("utf8").trim();
 	var rg1 = /(__VIEWSTATEGENERATOR)|(java\.io\.InputStreamReader)|(org\.apache\.struts2\.ServletActionContext)|(\.getWriter)/gmi;
@@ -457,6 +458,8 @@ function fnDoBody(body,t,rep)
 	//if(-1 < t.indexOf("s2-001"))console.log(body)
 	body = body.substr(nwhoami);
 	var i = body.indexOf("cmdend") || body.indexOf("<!DOCTYPE") || body.indexOf("<html") || body.indexOf("<body");
+	if(-1 < i)body = body.substr(0,i);
+	// if("s2-045" == t)console.log(body)
 	// 误报
 	if(-1 < body.indexOf("<body"))return;
 	console.log("发现高危漏洞：" + t);
@@ -487,6 +490,8 @@ function doStruts2_045(url, fnCbk)
 	  , function (error, response, body){
 	  		if(body)
 	  		{
+	  			// body = String(body).replace(/cmdend.*?$/gmi, "cmdend\n");
+	  			// console.log(body);
 	  			fnDoBody(body,"s2-045");
 	  		}
 	    }
