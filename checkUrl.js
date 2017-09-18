@@ -47,6 +47,9 @@ var szMyName = 'M.T.X._2017-06-08 1.0',
 
 process.stdin.setEncoding('utf8');
 process.env.NODE_ENV = "production";
+process.on('uncaughtException', function(e){console.log(e)});
+process.on('unhandledRejection', function(e){console.log(e)});
+
 
 program.version(szMyName)
 	.option('-u, --url [value]', 'check url, no default')
@@ -107,6 +110,7 @@ function fnOptHeader(o)
 	return o;
 }
 
+var g_host2Ip = {};
 // tomcat测试
 // https://www.exploit-db.com/exploits/41783/
 // /?{{%25}}cake\=1
@@ -114,6 +118,19 @@ function fnOptHeader(o)
 // 基于socket发送数据
 function fnSocket(h,p,szSend,fnCbk)
 {
+	var s, rIp = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):?(\d+)?/gmi;
+
+	if(h && !(s = rIp.exec(h)))
+	{
+		if(g_host2Ip[h])h = g_host2Ip[h];
+		else
+		{
+			s = child_process.execSync("host " + h);
+			s = rIp.exec(s);
+			if(s)g_host2Ip[h] = s[0],h = s[0];
+
+		}
+	}
 	const client = net.connect(fnOptHeader({"port": p,"host":h}), () => 
 	{
 	  client.write(szSend);
@@ -144,10 +161,17 @@ function checkWeblogicT3(h,p)
 		console.log(re.test(d));*/
 	});
 }
+
 // checkWeblogicT3("192.168.18.89",7001);
 if(program.t3)
 {
-	var r1 = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):?(\d+)?/gmi.exec(g_szUrl);
+	var rIp = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):?(\d+)?/gmi, r1 = rIp.exec(g_szUrl);
+	if(!r1)
+	{
+		var s = g_szUrl.replace(/([https]*?:\/\/)|(\/.*?$)/gmi,'').split(":");
+		r1 = ['',s[0], 1 == s.length ? 80: s[1]];
+	}
+	// console.log(r1);
 	checkWeblogicT3(r1[1],r1[2]);
 }
 
@@ -846,6 +870,7 @@ function fnCheckTa3(u,dict,szDes,type)
 	var s = dict,a,i = 0,fnCbk = function(url)
 	{
 		fnLog("check " + u + url);
+		
 		request(fnOptHeader({method: 'GET',uri: u + url
 		    ,headers:
 		    {
@@ -875,6 +900,8 @@ function fnCheckTa3(u,dict,szDes,type)
 					oTm.urls.push([u + url,t].join(","));
 				}
 			}
+		}).on('error', function(err) {
+			// console.log(err)
 		});
 	};
 	if(fs.existsSync(s))
