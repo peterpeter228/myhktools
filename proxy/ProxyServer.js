@@ -8,6 +8,9 @@ var fs  = require("fs"),
     nPort = 8080,
     szIp = "0.0.0.0";
 
+process.on('uncaughtException', function(e){});
+process.on('unhandledRejection', function(e){});
+
 function fnWathProxyFile(s)
 {
 	var fnCbk = function()
@@ -131,7 +134,7 @@ var g_oMT = {};
 // 设置代理主程序
 function fnCreateProxyServer()
 {
-	var nTimeout = 199000, server = http.createServer(function (req, resp)
+	var nTimeout = 1900, server = http.createServer(function (req, resp)
 	{
 		// 检查通过就回调继续走
 		// JSESSIONID _SUBMIT_KEY
@@ -143,7 +146,7 @@ function fnCreateProxyServer()
 				|| ("content-type" in req.headers) && 'text/plain' == req.headers["content-type"]
 				)
 			{
-				var r = request;//getRequest(),
+				var r = getRequest(),
 					x = r[req.method.toLowerCase()]({"uri":req.url,"timeout":nTimeout});
 				req.pipe(x);
 				// fnFilterFunc(resp);
@@ -187,10 +190,13 @@ function fnCreateProxyServer()
 	    	}
 		});
 	});
-	server.on('clientError', (err, socket) => {
+	server.on('clientError', (err, socket) => 
+	{
+		if(err)console.log(err);
 	  socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
 	});
 	server.on('close', (err) => {
+		if(err)console.log(err);
 	});
 	server.on('connect', (request, socket,headBuffer) => 
 	{

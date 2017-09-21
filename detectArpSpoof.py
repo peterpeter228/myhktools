@@ -119,6 +119,8 @@ def arp_monitor_callback(pkt):
         #pkt[ARP].show()
         return
 def main():
+    os.system('sysctl -w net.inet.ip.forwarding=1 > /dev/null')
+    os.system('sudo sysctl -w net.inet.ip.fw.enable=1 > /dev/null ')
     defNet = netifaces.gateways()['default'][netifaces.AF_INET]
     g_szGateway = defNet[0]
     g_data = LoadData()

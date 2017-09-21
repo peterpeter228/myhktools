@@ -3,7 +3,8 @@
 var fs  = require("fs"),
 	a = process.argv.splice(2),
     request = require("request"),
-    g_oR = request;
+    g_oR = request,
+    g_aProxys = [];
 
 
 function fnCheck(a,fnCbk)
@@ -36,6 +37,7 @@ function fnCheck(a,fnCbk)
 						{
 							console.log("Ok: " + b + "  秒:" + (new Date().getTime() - t1) / 1000);
 							fs.appendFileSync(__dirname + "/autoProxy.txt", [aT2[3],aT2[1],aT2[2]].join(",") + "\n");
+							g_aProxys.push([aT2[3],aT2[1],aT2[2]].join("\t"));
 							g_oR = reP;
 						}
 					});
@@ -73,6 +75,22 @@ function fnCrawler(url,fnCbk)
 	});
 }
 
+fnCrawler("http://ip181.com",function()
+{
+	;
+});
+
+
+var szFile = "/usr/local/etc/proxychains.conf", s = fs.readFileSync("/usr/local/etc/proxychains.conf.bak").toString();
+process.on('exit', (code) => 
+{
+	var ss = g_aProxys.join("\n");
+	s = s.replace(/# start\s*.*?# end\s*/gmi,"# start\n" + ss.toLowerCase() + "\n# end\n");
+	fs.writeFileSync(szFile,s);
+	// console.log(s);
+});
+
+/*////
 var g_nI = 1;
 function fnDostart()
 {
@@ -83,8 +101,9 @@ function fnDostart()
 		fnDostart();
 	});
 }
+//////*/
 // 去重
 //  cat autoProxy.txt|sort|uniq >ok.txt
 // mv ok.txt autoProxy.txt
 // cat autoProxy.txt|wc -l
-fnDostart();
+// fnDostart();

