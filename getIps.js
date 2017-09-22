@@ -14,7 +14,7 @@ function isExists(t)
   return fs.existsSync( mypath+ t);
 }
 
-
+var rg = /<code>(\d*\.\d*\.\d*\.\d*)<\/code><\/p><p>所在地理位置：<code>([^<]+)<\/code><\/p>/gmi;
 // 获取ip信息
 function getIp(ip,fncbk)
 {
@@ -34,10 +34,32 @@ function getIp(ip,fncbk)
 	  if(isExists(ip))
 	  {
 	    o = JSON.parse(fs.readFileSync(mypath + ip));
+
+		if(!o.error && !o.bogon && (!o.region || o.region == o.ip))
+		{
+			(function(oT9){
+			request.get({uri:"http://ip.cn/" + oT9.ip,headers:{"user-agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36"}},
+				function(e,r,b)
+		  	{
+		  		if(e)return console.log(e);
+		  		// console.log(b);
+		  		var a = rg.exec(b);
+		  		if(a)
+		  		{
+		  			oT9.region = a[1];
+		  			// o.city = a[3];
+		  			fncbk1(oT9);
+		  			fs.writeFileSync(mypath + oT9.ip,JSON.stringify(oT9));
+		  			// console.log(["Ok ", a[1],a[2],a[3]].join("\t"));
+		  		}
+		  		else console.log(oT9);
+		  	});
+			})(o);
+		}
 	    // 显示公网
 	    //if(o && !o.bogon)
 	    	//console.log(o),
-	    	fncbk1(o);
+	    else fncbk1(o);
 	  }
 	  else 
 	  {
@@ -52,6 +74,7 @@ function getIp(ip,fncbk)
 	  }
 }
 
+var g_oIps = {};
 // 读取文本文件
 function fnReadTxt(f,szH)
 {
@@ -72,10 +95,17 @@ function fnReadTxt(f,szH)
 		        		{
 		        			(function(t1)
 		        			{
-		        				getIp(t1,function(o1)
+		        				if(!g_oIps[t1])
 		        				{
-		        					oT[t1] = o1;
-		        				});
+		        					if(0 == t1.indexOf("1.1."))return;
+		        					
+		        					g_oIps[t1]=1;
+			        				getIp(t1,function(o1)
+			        				{
+			        					oT[t1] = o1;
+			        					g_oIps[t1] = o1;
+			        				});
+		        				}
 		        			})(x[1]);
 		        			
 		        			// if(!szH || -1 < x[1].indexOf(szH))console.log(x[1]);
@@ -162,5 +192,17 @@ if(process.argv)
 }
 process.on('exit', (code) => 
 {
-	console.log(JSON.stringify(oT,null,' '));
+	for(var k in g_oIps)
+	{
+		var oT1 = g_oIps[k];
+		if(oT1.region && "Sichuan" == oT1.region || true == oT1.bogon || oT1.error)
+		{
+			if(oT1.country == "US")console.log(oT1);
+			delete g_oIps[k];
+			continue;
+		}
+		console.log([k,oT1.region,oT1.city].join(','));
+	}
+	// console.log(JSON.stringify(g_oIps,null,' '));
+	// console.log(JSON.stringify(oT,null,' '));
 });

