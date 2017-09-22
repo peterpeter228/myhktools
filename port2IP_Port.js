@@ -3,13 +3,14 @@ var net = require('net'),
 	
 
 program.version("MTX_port2IpPort_1.0 2017-09-22")
-	.option('-p, --port [value]', '接受数据的端口,默认为80')
-	.option('-t, --toPort [value]', '将数据转到该端口，默认8080')
+	.option('-p, --port [value]', '接受数据的端口,默认为80',parseInt)
+	.option('-t, --toPort [value]', '将数据转到该端口，默认8080',parseInt)
 	.option('-i, --ip [value]', '数据转到的ip,可以是外网、内网的ip,默认是127.0.0.1')
 	.option('-v, --verbose', '显示日志')
 	.option('-u, --unZip', 'http转发时间Accept-Encoding:.*?\\n替换掉，这样返回的数据就不是压缩的了')
 	.option('-o, --timeoutOut [value]', 'default 3000毫秒')
-	.option('\n说明：','将本地端口8080转向118.112.188.108的8080,例子：\nnode port2IP_Port.js  -p 8080 -v -t 8070 -i 118.112.188.108\n')
+	.description("说明：将本地http端口8080转向118.112.188.108的8080,例子：\nnode port2IP_Port.js  -p 8080 -v -t 8070 -i 118.112.188.108")
+	// .usage("node port2IP_Port.js  -p 8080 -v -t 8070 -i 118.112.188.108")
 	.parse(process.argv);
 
 var timeout = program.timeoutOut || 3000, 
