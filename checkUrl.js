@@ -55,7 +55,7 @@ program.version(szMyName)
 	.option('-u, --url [value]', 'check url, no default')
 	.option('-p, --proxy [value]', 'http proxy,eg: http://127.0.0.1:8080, or https://127.0.0.1:8080, no default')
 	.option('-t, --t3', 'check weblogic t3,default false')
-	.option('-i, --install', 'install node modules')
+	.option('-i, --install', 'install node modules,run: npm install')
 	.option('-v, --verbose', 'show logs')
 	.option('-o, --timeout', 'default ' + timeout)
 	.option('-l, --pool', 'default ' + g_nPool)
@@ -77,15 +77,15 @@ if(!/[\?;!&]/.test(g_szUrl) && '/' != g_szUrl.substr(-1))
 // 安装包
 if(program.install)
 {
-	var aI,szT = fs.readFileSync(__filename),r1 = /^(net|commander|fs|child_process)$/gmi,
-		r2 = /require\(['"]([^'"]+)['"]\)/gmi;
+	var aI,szT = fs.readFileSync(__filename),
+		r2 = /require\(['"]([^'"]+)['"]\)/gmi,szPkg = __dirname + "/package.json",
+		oPkg = JSON.parse(fs.readFileSync(szPkg));
 	while(aI = r2.exec(szT))
 	{
-		if(r1.exec(aI[1]))continue;
-		// console.log(r1.exec(aI[1]));
-		fnLog("start install %s to global",aI[1]);
-		fnLog(child_process.execSync("npm install -g " + aI[1]).toString());
+		oPkg["dependencies"][aI[1]] = "";
+		console.log(aI[1] + " = " + oPkg["dependencies"][aI[1]]);
 	}
+	fs.writeFileSync(szPkg,JSON.stringify(oPkg));
 	process.exit(0);
 }
 
