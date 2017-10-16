@@ -32,7 +32,8 @@ index_360desk.jsp
 index_blue.jsp
 index_desktop.jsp
 j_spring_security_check
-login.jsp
+login.jsp?ret_url=javascript:alert(3)
+login.jsp?ret_url=data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4
 login2.jsp
 login?uid=234'
 loginFailureAction.do
