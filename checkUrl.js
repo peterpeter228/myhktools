@@ -31,7 +31,7 @@ program.version(szMyName)
 	.option('-t, --t3', 'check weblogic t3,default false')
 	.option('-i, --install', 'install node modules,run: npm install')
 	.option('-v, --verbose', 'show logs')
-	.option('-S, --struts2 [value]', 'struts2 type,eg: 045')
+	.option('-u, --struts2 [value]', 'struts2 type,eg: 045')
 	.option('-C, --cmd [value]', 'cmd type,eg: "ping -c 3 www.baidu.com"')
 	.option('-o, --timeout', 'default ' + timeout)
 	.option('-l, --pool', 'default ' + g_nPool)
@@ -1466,8 +1466,6 @@ if(!program.test && 0 < a.length)
 	else
 	{
 		//*
-		if(program.menu)fnCheckTa3(g_szUrl,"string" != typeof(program.menu) && "./urls/ta3menu.txt" || program.menu,"一些常见、可能存在风险url检测",'ta3menu');
-		if(program.webshell)fnCheckTa3(g_szUrl,"string" != typeof(program.webshell) && "./urls/webshell.txt" || program.webshell, "webshell、木马",'webshell');
 		testWeblogic(g_szUrl);
 		fnMyPut(g_szUrl);
 		doStruts2_001(g_szUrl);
@@ -1496,6 +1494,8 @@ if(!program.test && 0 < a.length)
 		
 		// 测试method和伪造host
 		fnTestAll();
+		if(program.menu)fnCheckTa3(g_szUrl,"string" != typeof(program.menu) && "./urls/ta3menu.txt" || program.menu,"一些常见、可能存在风险url检测",'ta3menu');
+		if(program.webshell)fnCheckTa3(g_szUrl,"string" != typeof(program.webshell) && "./urls/webshell.txt" || program.webshell, "webshell、木马",'webshell');
 		////////////////////*/
 	}
 }
