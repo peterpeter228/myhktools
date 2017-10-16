@@ -497,7 +497,7 @@ function fnDoBody(body,t,rep)
 	{
 		return;
 	}
-	console.log("发现高危漏洞：" + t);
+	console.log("发现高危漏洞("+ (rep && rep.request && rep.request.uri &&rep.request.uri.href || "") +"):\n" + t);
 	
 	if(0 < i) body = body.substr(0, i).trim().replace(/\u0000/gmi,'');
 	// console.log(body);
@@ -1513,13 +1513,12 @@ if(program.test)
 	var a = fs.readFileSync("/Users/xiatian/C/targets.txt").toString().split(/\n/);
 	for(var i in a)
 		fnMyPut(a[i].trim());*/
-	// checkWeblogicT3("125.71.203.122","9088");
-	// doStruts2_016("http://192.168.10.216:8088/S2-016/default.action");
- 	
-	// doStruts2_005("http://192.168.10.216:8088/S2-005/example/HelloWorld.action");
-	
-	// doStruts2_032("http://192.168.10.216:8088/s2-032/memoindex.action");
-	// doStruts2_015("http://101.89.63.203:2001/jnrst/");
+
+	checkWeblogicT3("125.71.203.122","9088");
+	doStruts2_016("http://192.168.10.216:8088/S2-016/default.action");
+ 	doStruts2_005("http://192.168.10.216:8088/S2-005/example/HelloWorld.action");
+	doStruts2_032("http://192.168.10.216:8088/s2-032/memoindex.action");
+	doStruts2_015("http://101.89.63.203:2001/jnrst/");
 	
 	/**
 	doStruts2_009(g_szUrl);
@@ -1534,7 +1533,7 @@ if(program.test)
 	doStruts2_046(g_szUrl);
 	doStruts2_048(g_szUrl);
 	//*/
-	/*
+	//*
 	doStruts2_001("http://192.168.10.216:8088/S2-001/login.action");
 	doStruts2_007("http://192.168.10.216:8088/S2-007/user.action");
 	doStruts2_008("http://192.168.10.216:8088/S2-008/devmode.action");
