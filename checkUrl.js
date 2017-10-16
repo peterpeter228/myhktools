@@ -1466,7 +1466,7 @@ if(!program.test && 0 < a.length)
 	else
 	{
 		//*
-		if(program.menu)fnCheckTa3(g_szUrl,program.menu || "./urls/ta3menu.txt","一些常见、可能存在风险url检测",'ta3menu');
+		if(program.menu)fnCheckTa3(g_szUrl,"string" != typeof(program.menu) && "./urls/ta3menu.txt" || program.menu,"一些常见、可能存在风险url检测",'ta3menu');
 		if(program.webshell)fnCheckTa3(g_szUrl,"string" != typeof(program.webshell) && "./urls/webshell.txt" || program.webshell, "webshell、木马",'webshell');
 		testWeblogic(g_szUrl);
 		fnMyPut(g_szUrl);
