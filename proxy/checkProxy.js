@@ -22,24 +22,25 @@ function fnCheck(a,fnCbk)
 			// console.log("Start: " + aT[1]);
 			if(aT[3].indexOf(","))aT[3] = aT[3].split(/,/gmi)[0];
 			r = request.defaults({'proxy': aT[3].toLowerCase()+ '://' + aT[1] + ":" + aT[2]});
-			process.env[aT[3] + "_PROXY"] = aT[1] + ":" + aT[2];
+			// process.env[aT[3] + "_PROXY"] = aT[1] + ":" + aT[2];
 			// process.env["HTTPS_PROXY"] = ;
 			(function(t1,reP,aT2){
 				try{
 					r.get(
 						{
-							uri:"http://erp.yinhai.com:8070/ixp/ip.jsp?me=ok",
+							uri:"http://ipinfo.io/" + aT2[1],
 							"timeout":5000
 						},
 					function(e,r,b)
 					{
-						if(!e && b && /^\s*\d+\.\d+\.\d+\.\d+\s*$/.test(b = b.trim()))
+						if(!e && b && /\s*\d+\.\d+\.\d+\.\d+\s*/.test(b = b.trim()))
 						{
 							console.log("Ok: " + b + "  秒:" + (new Date().getTime() - t1) / 1000);
 							fs.appendFileSync(__dirname + "/autoProxy.txt", [aT2[3],aT2[1],aT2[2]].join(",") + "\n");
 							g_aProxys.push([aT2[3],aT2[1],aT2[2]].join("\t"));
 							g_oR = reP;
 						}
+						// else if(e)console.log(e);
 					});
 				}catch(e1){};
 			})(new Date().getTime(), r,aT);

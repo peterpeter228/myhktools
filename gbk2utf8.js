@@ -8,11 +8,12 @@ function doFile(filename)
 {
 	fs.stat(filename,function(e,stats)
 	{
-		if(stats.isFile() && /\.(txt|log)/gmi.test(filename) && fs.existsSync(filename))
+		if(stats.isFile() && /\.(txt|log|csv)/gmi.test(filename) && fs.existsSync(filename))
 		{
 			try{
 				var k = fs.readFileSync(filename);
 				var charset = detectCharacterEncoding(k);
+				console.log(filename + " 检测出来的字符集是：" + charset.encoding);
 				if(charset.encoding == "UTF-8")return;
 				// console.log(charset.encoding + " " + filename);
 				k = iconv.decode(k,charset.encoding || "gbk").toString("utf8");

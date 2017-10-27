@@ -134,7 +134,7 @@ var g_oMT = {};
 // 设置代理主程序
 function fnCreateProxyServer()
 {
-	var nTimeout = 1900, server = http.createServer(function (req, resp)
+	var nTimeout = 9000, server = http.createServer(function (req, resp)
 	{
 		// 检查通过就回调继续走
 		// JSESSIONID _SUBMIT_KEY
@@ -146,7 +146,7 @@ function fnCreateProxyServer()
 				|| ("content-type" in req.headers) && 'text/plain' == req.headers["content-type"]
 				)
 			{
-				var r = getRequest(),
+				var r = getRequest(),// 获取动态代理
 					x = r[req.method.toLowerCase()]({"uri":req.url,"timeout":nTimeout});
 				req.pipe(x);
 				// fnFilterFunc(resp);
@@ -164,7 +164,6 @@ function fnCreateProxyServer()
 				}
 	    		req.on("data",function()
 	    		{
-	    			console.log(arguments.length);
 	    			var s = String(arguments[0]);
 	    			console.log("拼接前：" + s);
 	    			/*/////////////
@@ -214,6 +213,7 @@ function fnCreateProxyServer()
 	});
 	server.maxHeadersCount = 2000;
 
+	// 超时设置
 	server.setTimeout(nTimeout);
 	server.timeout = nTimeout;
 	server.keepAliveTimeout = nTimeout;
