@@ -134,29 +134,31 @@ var g_oMT = {};
 // 设置代理主程序
 function fnCreateProxyServer()
 {
-	var nTimeout = 9000, server = http.createServer(function (req, resp)
+	var nTimeout = 19000, server = http.createServer(function (req, resp)
 	{
 		// 检查通过就回调继续走
 		// JSESSIONID _SUBMIT_KEY
 		fnSafeCheck(req,function()
 		{
-			//**
-			if(req.method == "GET" 
+			/**
+			if(req.method == "GET" ||
 				|| ("content-length" in req.headers) && 0 == req.headers["content-length"]
 				|| ("content-type" in req.headers) && 'text/plain' == req.headers["content-type"]
 				)
+			//////////////*/
 			{
-				var r = getRequest(),// 获取动态代理
+				var r = request,// getRequest(),// 获取动态代理
 					x = r[req.method.toLowerCase()]({"uri":req.url,"timeout":nTimeout});
 				req.pipe(x);
 				// fnFilterFunc(resp);
 		    	resp = x.pipe(resp);
 	    	}
-	    	else //////////////*/
+	    	/*
+	    	else 
 	    	{
 	    		// content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
 	    		// console.log(req.method + " "+  req.url);
-	    		// console.log(req.headers);
+	    		console.log(req.headers);
 	    		var ss = req.headers["cookie"],re;
 				if(ss)
 				{
@@ -166,11 +168,11 @@ function fnCreateProxyServer()
 	    		{
 	    			var s = String(arguments[0]);
 	    			console.log("拼接前：" + s);
-	    			/*/////////////
+	    			
 	    			if(g_oMT[re] && -1 == s.indexOf('_SUBMIT_KEY=NONE'))
 	    				s += "&_SUBMIT_KEY=" + g_oMT[re];
 	    			console.log("拼接后：" + s);
-	    			//////////*/
+	    			
 	    			request.post({uri:req.url,"timeout":nTimeout,headers:req.headers,body:s},function(e,r,b)
 					{// _SUBMIT_KEY
 						delete r.headers['x-powered-by'];delete r.headers['server'];
@@ -185,8 +187,7 @@ function fnCreateProxyServer()
 						resp.end(b);
 					});
 	    		});
-	    		
-	    	}
+	    	}////////*/
 		});
 	});
 	server.on('clientError', (err, socket) => 

@@ -156,10 +156,16 @@ var Base64 = new fnBase64(),a = [
  }]
  ,["JS全解码",function(s)
  {
- 	return s.replace(/\\x([a-fA-F0-9]{1,6})/gmi,function(a,c)
- 		{
- 			return String.fromCharCode(parseInt(c,16));
- 		});
+  s = s.replace(/\\x([a-fA-F0-9]{1,6})/gmi,function(a,c)
+    {
+      return String.fromCharCode(parseInt(c,16));
+    });
+  s = s.replace(/\\([0-9]{1,6})/gmi,function(a,c)
+    {
+      return String.fromCharCode(parseInt(c,10));
+    });
+  // s = s.replace(/)
+ 	return s;//eval(s +s + ";");
  }],["HTML全编码",function(s)
  {
  	return s.replace(/./gmi,function(a)
