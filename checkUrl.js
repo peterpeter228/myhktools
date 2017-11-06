@@ -298,6 +298,18 @@ function fnTest(s)
 	    }
 	  );
 }
+
+function getIps(ip)
+{
+	var re = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/gmi.exec(ip);
+	if(re && 0 < re.length)ip = re[1];
+	request.get("http://ipinfo.io/" + ip,function(e,r,b)
+	{
+		try{if(!e)g_oRst["ipinfo"] = JSON.parse(b);}catch(e1){}
+	});
+
+}
+
 // /usr/local/apache-tomcat-7.0.64-2/webapps
 // http://192.168.10.216:8082/s2-046/
 function doStruts2_046(url)
@@ -1482,6 +1494,7 @@ if(!program.test && 0 < a.length)
 	}
 	else
 	{
+		getIps(g_szUrl);
 		//*
 		testWeblogic(g_szUrl);
 		fnMyPut(g_szUrl);
