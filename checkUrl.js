@@ -1532,7 +1532,12 @@ if(!program.test && 0 < a.length)
 
 process.on('exit', (code) => 
 {
-	console.log(JSON.stringify(g_oRst,null,' '));
+	g_oRst.url = g_szUrl;
+	g_oRst.date = require('moment')(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss');
+	var ss = JSON.stringify(g_oRst,null,' '),
+	    md5 = require('md5');
+	console.log(ss);
+	fs.writeFileSync("./data/" + md5(g_szUrl),ss);
 });
 
 if(program.test)
