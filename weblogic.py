@@ -65,28 +65,29 @@ if __name__=="__main__":
     '''
     for i in range(0,len(VUL)):
         try:
-            run('192.168.10.134',7001,i)
+            run('118.112.188.109',80,i)
         except Exception, e:
             print str(e)
             pass
     '''
+
     filename = "ip.txt"
     f = open(filename)
     k = f.read().split('\n')
     for line in k:
         try:
-        hi = line.split(":")
-        dip = hi[0]
-        dport = 80
-        if 1 < len(hi):
-            dport = int(hi[1])
-        
-        for i in range(0,len(VUL)):
-            try:
-                run(dip,dport,i)
-            except Exception, e:
-                print str(e)
-                pass
+            hi = line.split(":")
+            dip = hi[0]
+            dport = 80
+            if 1 < len(hi):
+                dport = int(hi[1])
+            
+            for i in range(0,len(VUL)):
+                try:
+                    run(dip,dport,i)
+                except Exception, e:
+                    print str(e)
+                    pass
         except Exception, e1:
             print str(e1)
             pass

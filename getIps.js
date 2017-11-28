@@ -18,7 +18,7 @@ var rg = /<code>(\d*\.\d*\.\d*\.\d*)<\/code><\/p><p>所在地理位置：<code>(
 // 获取ip信息
 function getIp(ip,fncbk)
 {
-	if(oT[ip])return;
+	if(oT[ip] || /^192\./.test(ip))return;
 	var o,fncbk1 = function(o)
 	{
 		if(oT[ip])return;

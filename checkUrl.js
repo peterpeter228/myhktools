@@ -783,7 +783,8 @@ function fnTestAll()
 	{
 		fnLog(o);
 	},null);
-	var aMethod = (program.method || "PUT,DELETE,OPTIONS,HEAD,PATCH").split(/[,;]/);
+	var ss = "string" != typeof(program.method) && "PUT,DELETE,OPTIONS,HEAD,PATCH" || program.method;
+	var aMethod = ss.split(/[,;]/);
 	for(var k in aMethod)
 		fnTest(aMethod[k]);
 }
