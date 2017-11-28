@@ -2,16 +2,31 @@
 # 巅狼安全 团队倾情奉献
 # struts2安全检查
 ```
-s2_001
-s2_016
-s2_019
-s2_029
-s2_032
-s2_033
-s2_037
-s2_045
+tomcat Put test
+Struts2_001
+Struts2_005
+Struts2_007
+Struts2_008
+Struts2_009
+Struts2_012
+Struts2_013
+Struts2_015
+Struts2_016
+Struts2_019
+Struts2_020
+Struts2_029
+Struts2_032
+Struts2_033
+Struts2_037
+Struts2_DevMode
+Struts2_045
+Struts2_046
+Struts2_048
+elasticsearch
 伪造host等检测
-node checkUrl.js url
+
+node checkUrl.js -u url
+
 查看帮助
 node checkUrl.js -h
 Options:
