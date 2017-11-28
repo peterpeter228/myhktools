@@ -201,7 +201,8 @@ process.on('exit', (code) =>
 			delete g_oIps[k];
 			continue;
 		}
-		console.log([k,oT1.region,oT1.city].join(','));
+		if(oT1.region || oT1.city){console.log([k,oT1.region,oT1.city].join(','));}
+		else console.log(k);
 	}
 	// console.log(JSON.stringify(g_oIps,null,' '));
 	// console.log(JSON.stringify(oT,null,' '));
