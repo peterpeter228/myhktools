@@ -428,8 +428,6 @@ function doStruts2_048(url,fnCbk)
     });
 }
 
-
-
 function myLog(a)
 {
 	// console.log(String(a.callee))
