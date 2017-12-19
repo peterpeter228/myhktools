@@ -84,6 +84,10 @@ var a = process.argv.splice(2),g_postData = "%{(#nike='multipart/form-data')"
 g_szUrl = program.url || 1 == a.length && a[0] || "";
 if(!/[\?;!&]|(\.jsp|do)/.test(g_szUrl) && '/' != g_szUrl.substr(-1))
 	g_szUrl += "/";
+
+if(-1 == g_szUrl.indexOf("http"))
+	g_szUrl = "http://" + g_szUrl;
+
 // 安装包
 if(program.install)
 {
@@ -448,6 +452,7 @@ function fnDoBody(body,t,rep)
 		 // console.log(body);
 	}
 	if(body)body = body.toString();
+	if(-1 < body.indexOf(".(#ros.flush()"))return;
 
 	var e = fnGetErrMsg(body);
 	if(e)g_oRst.errMsg = e.toString().replace(/<[^>]*>/gmi,'');//.trim();
@@ -1484,6 +1489,32 @@ function fnMyPut(url)
 		fnPt(url + a[k]);	
 }
 
+function fnTestStruts2(szUrl2)
+{
+	doStruts2_001(szUrl2);
+	doStruts2_005(szUrl2);
+	doStruts2_007(szUrl2);
+	doStruts2_008(szUrl2);
+	doStruts2_009(szUrl2);
+	doStruts2_012(szUrl2);
+	doStruts2_013(szUrl2);
+	doStruts2_015(szUrl2);
+	doStruts2_016(szUrl2);
+	doStruts2_019(szUrl2);
+	// doStruts2_020(g_szUrl);
+	doStruts2_029(szUrl2);
+	doStruts2_032(szUrl2);
+	doStruts2_033(szUrl2);
+	doStruts2_037(szUrl2);
+	doStruts2_DevMode(szUrl2);
+	doStruts2_045(szUrl2);
+	// 文件上传测试
+	doStruts2_046(szUrl2);
+	doStruts2_048(szUrl2);
+	if(-1 == szUrl2.indexOf("login.jsp"))
+		fnTestStruts2(szUrl2 + "/login.jsp");
+}
+
 if(!program.test && 0 < a.length)
 {
 	if(program.struts2)
@@ -1499,26 +1530,7 @@ if(!program.test && 0 < a.length)
 		//*
 		testWeblogic(g_szUrl);
 		fnMyPut(g_szUrl);
-		doStruts2_001(g_szUrl);
-		doStruts2_005(g_szUrl);
-		doStruts2_007(g_szUrl);
-		doStruts2_008(g_szUrl);
-		doStruts2_009(g_szUrl);
-		doStruts2_012(g_szUrl);
-		doStruts2_013(g_szUrl);
-		doStruts2_015(g_szUrl);
-		doStruts2_016(g_szUrl);
-		doStruts2_019(g_szUrl);
-		// doStruts2_020(g_szUrl);
-		doStruts2_029(g_szUrl);
-		doStruts2_032(g_szUrl);
-		doStruts2_033(g_szUrl);
-		doStruts2_037(g_szUrl);
-		doStruts2_DevMode(g_szUrl);
-		doStruts2_045(g_szUrl);
-		// 文件上传测试
-		doStruts2_046(g_szUrl);
-		doStruts2_048(g_szUrl);
+		fnTestStruts2(g_szUrl)
 		elasticsearch(g_szUrl);
 		
 		// fastjson(g_szUrl);
