@@ -2,6 +2,7 @@
 import socket
 import time
 import re,sys
+import subprocess
 
 
 VUL=['CVE-2016-0638','CVE-2016-3510','CVE-2017-3248']
@@ -45,6 +46,7 @@ def checkVul(res,server_addr,index):
     p=re.findall(VER_SIG[index], res, re.S)
     if len(p)>0:
         print '%s:%d is vul %s'%(server_addr[0],server_addr[1],VUL[index])
+        subprocess.Popen(("java -jar jfxl.jar " + server_addr[0] + ":" + str(server_addr[1])).split())
     # else:
     #    print '%s:%d is not vul %s' % (server_addr[0],server_addr[1],VUL[index])
 

