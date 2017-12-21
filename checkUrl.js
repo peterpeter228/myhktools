@@ -192,7 +192,8 @@ if(program.t3)
 {
 	if("string" == typeof program.t3)
 	{
-		var aT1 = fs.readFileSync(program.t3).toString().trim().split("\n"), p;
+		var aT1 = fs.readFileSync(program.t3).toString().trim().split("\n"), p,
+		    g_oT11 = {};
 		for(var k in aT1)
 		{
 			aT1[k] = aT1[k].replace(/(^.*?\/\/)|(\/.*?$)|(\s*)/gmi,'');
@@ -200,7 +201,12 @@ if(program.t3)
 			p[1] = p[1] || "80";
 			if(2 < p.length)
 				console.log("地址正确："+ p);
-			checkWeblogicT3(p[0], p[1]);
+			var szIp = p.join(":");
+			if(!g_oT11[szIp])
+			{
+				g_oT11[szIp] = 1;
+				checkWeblogicT3(p[0], p[1]);
+			}
 		}
 	}
 	else
