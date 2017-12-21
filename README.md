@@ -1,6 +1,7 @@
 本工具以mac os x 10.12.5的环境
 # 巅狼安全 团队倾情奉献
 # struts2安全检查
+自动捕获表单字段并调用相关漏洞进行检测
 ```
 tomcat Put test
 Struts2_001
@@ -22,6 +23,7 @@ Struts2_DevMode
 Struts2_045
 Struts2_046
 Struts2_048
+Struts2_053
 elasticsearch
 伪造host等检测
 
@@ -31,17 +33,23 @@ node checkUrl.js -u url
 node checkUrl.js -h
 Options:
 
-    -V, --version         output the version number
-    -u, --url [value]     check url, no default
-    -p, --proxy [value]   http proxy,eg: http://127.0.0.1:8080, or https://127.0.0.1:8080, no default
-    -t, --t3              check weblogic t3,default false
-    -i, --install         install node modules
-    -m, --menu [value]    scan url + menus, default ./urls/ta3menu.txt
-    -d, --method [value]  default PUT,DELETE,OPTIONS,HEAD,PATCH test
-    -a, --host            host attack test,设置代理后该项功能可能无法使用,default true
-    -k, --keys [value]    scan html keywords, default ./urls/keywords
-    -h, --help            output usage information
-
+    -V, --version           output the version number
+    -u, --url [value]       check url, no default
+    -p, --proxy [value]     http proxy,eg: http://127.0.0.1:8080, or https://127.0.0.1:8080, no default
+    -t, --t3                check weblogic t3,default false
+    -i, --install           install node modules,run: npm install
+    -v, --verbose           show logs
+    -w, --struts2 [value]   struts2 type,eg: 045
+    -C, --cmd [value]       cmd type,eg: "ping -c 3 www.baidu.com"
+    -o, --timeout           default 5000
+    -l, --pool              default 100
+    -r, --test              test
+    -m, --menu [value]      scan url + menus, default ./urls/ta3menu.txt
+    -s, --webshell [value]  scan webshell url，设置参数才会运行, default ./urls/webshell.txt
+    -d, --method [value]    default PUT,DELETE,OPTIONS,HEAD,PATCH test
+    -a, --host              host attack test,设置代理后该项功能可能无法使用,default true
+    -k, --keys [value]      scan html keywords, default ./urls/keywords
+    -h, --help              output usage information
 ```
 
 # 获取图片中的元数据（经纬度、创建时间）
@@ -58,7 +66,7 @@ pm2 start ProxyServer.js -i max
 ```
 然后本机代理设置为127.0.0.1  8080
 ```
-验证：curl -x http://127.0.0.1:8080 http://good.www.com:8070/ixp/ip.jsp?me=ok
+验证：http://ip.cn
 ```
 pm2的安装
 ```
@@ -73,7 +81,7 @@ cat autoProxy.txt|wc -l
 ```
 # 后渗透后得到很多win的数据txt文件，字符集gbk批量转换为utf8
 ```
-node gbk2utf8.js /your/dir
+node gbk2utf8.js /your/fileOrdir
 ```
 # 多种解码
 ```
@@ -102,7 +110,6 @@ python reGeorgSocksProxy.py -l 127.0.0.1 -p 8080 -u http://118.222.100.108:8070/
 iptablesSh.sh
 iptablesSh.sh
 ``` 
-
 
 # 依赖
 <pre>
