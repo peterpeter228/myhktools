@@ -23,7 +23,7 @@ process.stdin.setEncoding('utf8');
 process.env.NODE_ENV = "production";
 var fnError = function(e)
 {
-	// console.log(e)
+	console.log(String(e));
 };
 process.on('uncaughtException', fnError);
 process.on('unhandledRejection', fnError);
@@ -164,6 +164,7 @@ function fnSocket(h,p,szSend,fnCbk)
 }
 
 // check weblogic T3
+// sort ip.txt|uniq>ip2.txt;mv ip2.txt ip.txt
 function checkWeblogicT3(h,p)
 {
 	var s  = "t3 12.1.2\nAS:2048\nHL:19\n\n";
@@ -177,6 +178,7 @@ function checkWeblogicT3(h,p)
 			fnLog(g_oRst.t3.r);
 			console.log("found T3 " + h + ":" + p);
 		}
+		else console.log("not found T3 " + h + ":" + p);
 		/*
 		var d = data && data.toString().trim() || "", 
 			re = /^HELO:(\d+\.\d+\.\d+\.\d+)\./gm;
@@ -190,12 +192,14 @@ if(program.t3)
 {
 	if("string" == typeof program.t3)
 	{
-		var a = fs.readFileSync(program.t3).toString().trim().split("\n"), p;
-		for(var k in a)
+		var aT1 = fs.readFileSync(program.t3).toString().trim().split("\n"), p;
+		for(var k in aT1)
 		{
-			a[k] = a[k].replace(/(^.*?\/\/)|(\/.*?$)|(\s*)/gmi,'');
-			p = a[k].split(":");
+			aT1[k] = aT1[k].replace(/(^.*?\/\/)|(\/.*?$)|(\s*)/gmi,'');
+			p = aT1[k].split(":");
 			p[1] = p[1] || "80";
+			if(2 < p.length)
+				console.log("地址正确："+ p);
 			checkWeblogicT3(p[0], p[1]);
 		}
 	}
