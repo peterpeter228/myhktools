@@ -52,6 +52,15 @@ Options:
     -h, --help              output usage information
 ```
 
+# 反序列化检测
+## 1、新建、编辑ip.txt
+192.168.10.221:7001
+192.168.10.222:7001
+## 2、运行
+python weblogic.py
+当发现问题后，会自动调动jfxl.jar进行验证
+但是，最新的漏洞CVE-2017-3248无法验证
+
 # 获取图片中的元数据（经纬度、创建时间）
 ```
 node getFileMetadata.js /your/img/file
