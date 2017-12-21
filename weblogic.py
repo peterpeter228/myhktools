@@ -62,7 +62,6 @@ def run(dip,dport,index):
     rs=sendEvilObjData(sock,PAYLOAD[index])
     checkVul(rs,server_addr,index)
 
-
 if __name__=="__main__":
     filename = "ip.txt"
     f = open(filename)
@@ -74,7 +73,7 @@ if __name__=="__main__":
             dport = 80
             if 1 < len(hi):
                 dport = int(hi[1])
-            
+
             for i in range(0,len(VUL)):
                 try:
                     run(dip,dport,i)

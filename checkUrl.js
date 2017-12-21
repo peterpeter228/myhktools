@@ -21,14 +21,18 @@ var szMyName = 'M.T.X._2017-06-08 1.0',
 process.title = '巅狼团队_M.T.X.V 2.0'
 process.stdin.setEncoding('utf8');
 process.env.NODE_ENV = "production";
-process.on('uncaughtException', function(e){console.log(e)});
-process.on('unhandledRejection', function(e){console.log(e)});
+var fnError = function(e)
+{
+	// console.log(e)
+};
+process.on('uncaughtException', fnError);
+process.on('unhandledRejection', fnError);
 
 
 program.version(szMyName)
 	.option('-u, --url [value]', 'check url, no default')
 	.option('-p, --proxy [value]', 'http proxy,eg: http://127.0.0.1:8080, or https://127.0.0.1:8080, no default')
-	.option('-t, --t3', 'check weblogic t3,default false')
+	.option('-t, --t3 [value]', 'check weblogic t3,default false，可以指定列表进行检测')
 	.option('-i, --install', 'install node modules,run: npm install')
 	.option('-v, --verbose', 'show logs')
 	.option('-w, --struts2 [value]', 'struts2 type,eg: 045')
@@ -145,16 +149,18 @@ function fnSocket(h,p,szSend,fnCbk)
 
 		}
 	}
-	const client = net.connect(fnOptHeader({"port": p,"host":h}), () => 
-	{
-	  client.write(szSend);
-	});
-	client.on('data', (data) => 
-	{
-		fnCbk(data);
-		client.end();
-	});
-	client.on('end', () =>{});
+	try{
+		const client = net.connect(fnOptHeader({"port": p,"host":h}), () => 
+		{
+		  client.write(szSend);
+		});
+		client.on('data', (data) => 
+		{
+			fnCbk(data);
+			client.end();
+		});
+		client.on('end', () =>{});
+	}catch(e){}
 }
 
 // check weblogic T3
@@ -166,8 +172,11 @@ function checkWeblogicT3(h,p)
 	fnSocket(h,p,s,function(data)
 	{
 		if(data)
-		g_oRst.t3 = {r:data.toString().trim(),des:"建议关闭T3协议，或者限定特定ip可访问"};
-		fnLog(g_oRst.t3.r);
+		{
+			g_oRst.t3 = {r:data.toString().trim(),des:"建议关闭T3协议，或者限定特定ip可访问"};
+			fnLog(g_oRst.t3.r);
+			console.log("found T3 " + h + ":" + p);
+		}
 		/*
 		var d = data && data.toString().trim() || "", 
 			re = /^HELO:(\d+\.\d+\.\d+\.\d+)\./gm;
@@ -179,14 +188,29 @@ function checkWeblogicT3(h,p)
 // checkWeblogicT3("192.168.18.89",7001);
 if(program.t3)
 {
-	var rIp = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):?(\d+)?/gmi, r1 = rIp.exec(g_szUrl);
-	if(!r1)
+	if("string" == typeof program.t3)
 	{
-		var s = g_szUrl.replace(/([https]*?:\/\/)|(\/.*?$)/gmi,'').split(":");
-		r1 = ['',s[0], 1 == s.length ? 80: s[1]];
+		var a = fs.readFileSync(program.t3).toString().trim().split("\n"), p;
+		for(var k in a)
+		{
+			a[k] = a[k].replace(/(^.*?\/\/)|(\/.*?$)|(\s*)/gmi,'');
+			p = a[k].split(":");
+			p[1] = p[1] || "80";
+			checkWeblogicT3(p[0], p[1]);
+		}
 	}
-	// console.log(r1);
-	checkWeblogicT3(r1[1],r1[2]);
+	else
+	{
+		var rIp = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):?(\d+)?/gmi, r1 = rIp.exec(g_szUrl);
+		if(!r1)
+		{
+			var s = g_szUrl.replace(/([https]*?:\/\/)|(\/.*?$)/gmi,'').split(":");
+			r1 = ['',s[0], 1 == s.length ? 80: s[1]];
+		}
+		// console.log(r1);
+		checkWeblogicT3(r1[1],r1[2]);
+	};
+
 }
 
 // 解析裸头信息
@@ -1587,7 +1611,7 @@ function fnTestStruts2(szUrl2, obj)
 	// if(!(/\/$/g.test(szUrl2)))fnTestStruts2(szUrl2 + "/");
 }
 
-if(!program.test && 0 < a.length)
+if(!program.test && 0 < a.length && g_szUrl)
 {
 	if(program.struts2)
 	{
