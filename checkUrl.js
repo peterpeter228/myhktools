@@ -479,7 +479,6 @@ function doStruts2_033(url)
     	fnDoBody(b,"s2-033",szOldUrl);
     });
 }
-   
 // integration/saveGangster.action
 function doStruts2_048(url,fnCbk)
 {

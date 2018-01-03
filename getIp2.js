@@ -13,7 +13,8 @@ function fnGetIp(s,fnCbk)
 			szStr = child_process.execSync(ip).toString();
 		}catch(e)
 		{
-			console.log(ip)
+			// 一些无效的地址
+			// console.log(ip)
 			// console.log(e)
 			return;
 		}
@@ -38,6 +39,9 @@ function fnGetIp(s,fnCbk)
 		fnCbk(JSON.parse(fs.readFileSync(s1).toString()));
 		return;
 	}
+	console.log(s);
+	// 跳过，只使用历史数据
+	// return;
 	request.get("http://ipinfo.io/" + s,function(e,r,b)
 	{
 		if(e)return console.log(e);
@@ -53,7 +57,7 @@ function fnGetIp(s,fnCbk)
 	});
 }
 
-var a = fs.readFileSync(szPath + "ww.txt").toString().split("\n"),g_oT = {};
+var a = fs.readFileSync(szPath + "ww.txt").toString().split("\n"),g_oT = {},g_aList = [];
 for(var i = 0; i < a.length; i++)
 {
 	var szOld = a[i];
@@ -66,7 +70,15 @@ for(var i = 0; i < a.length; i++)
 		// console.log(a[i])
 		fnGetIp(a[i],function(s)
 		{
-			// console.log(s);
+			// 排除内网的，只要国内的数据
+			if(!s.bogon && s.region && s.city && "CN" == s.country)
+				g_aList.push([s.region,s.city,s.ip,s.loc]);// console.log([s.region,s.city,s.ip,s.loc]);
 		});
 	}
 }
+
+process.on('exit', (code) => 
+{
+	console.log(g_aList);
+	fs.writeFileSync("../myapp/ww.js","var g_oData = " + JSON.stringify(g_aList) + ";");
+});
