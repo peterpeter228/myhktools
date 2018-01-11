@@ -27,10 +27,18 @@ function fnGetIp(s,fnCbk)
 				if(-1 < szStr.indexOf(k))
 				{
 					s = aT[i].split(k)[1].replace(/\s/gmi,'');
-					if(1 < aT.length)fnGetIp(s,fnCbk);
+					if(szOld != s && g_oT[szOld])
+						g_oT[s] = g_oT[szOld];
+					if(1 < aT.length)
+					{
+						fnGetIp(s,fnCbk);
+					}
 				}
 			}
-			if(1 < aT.length)return;
+			if(1 < aT.length)
+			{
+				return;
+			}
 		}
 		else console.log(szStr);
 	}
@@ -39,9 +47,9 @@ function fnGetIp(s,fnCbk)
 		fnCbk(JSON.parse(fs.readFileSync(s1).toString()));
 		return;
 	}
-	console.log(s);
+	// console.log(s);
 	// 跳过，只使用历史数据
-	// return;
+	return;
 	request.get("http://ipinfo.io/" + s,function(e,r,b)
 	{
 		if(e)return console.log(e);
@@ -60,13 +68,13 @@ function fnGetIp(s,fnCbk)
 var a = fs.readFileSync(szPath + "ww.txt").toString().split("\n"),g_oT = {},g_aList = [];
 for(var i = 0; i < a.length; i++)
 {
-	var szOld = a[i];
+	var szOld = a[i].replace(/(^\s*)|(\s*$)/gmi,'');
 	a[i] = a[i].replace(/(^.*?\/\/)|(:.*?$)|(\/.*?$)|(\s)/gmi, '');
 	if("http" == a[i])
 		console.log(szOld);
 	if(a[i] && !g_oT[a[i]])
 	{
-		g_oT[a[i]] = 1;
+		g_oT[a[i]] = {cnt:1,urls:[]};
 		// console.log(a[i])
 		fnGetIp(a[i],function(s)
 		{
@@ -74,11 +82,13 @@ for(var i = 0; i < a.length; i++)
 			if(!s.bogon && s.region && s.city && "CN" == s.country)
 				g_aList.push([s.region,s.city,s.ip,s.loc]);// console.log([s.region,s.city,s.ip,s.loc]);
 		});
-	}
+	}else g_oT[a[i]].cnt++;
+	g_oT[a[i]].urls.push(szOld);
 }
 
 process.on('exit', (code) => 
 {
-	console.log(g_aList);
+	console.log(g_oT);
 	fs.writeFileSync("../myapp/ww.js","var g_oData = " + JSON.stringify(g_aList) + ";");
+	fs.writeFileSync("../myapp/ww1.js","var g_oData1 = " + JSON.stringify(g_oT) + ";");
 });

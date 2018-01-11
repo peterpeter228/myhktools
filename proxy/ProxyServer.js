@@ -204,6 +204,16 @@ function fnCreateProxyServer()
 	  // socket.end();
 	});
 	server.on('request', (request,response) => {
+		let body = [];
+		request.on('data', (chunk) => {
+		  body.push(chunk);
+		}).on('end', () => {
+		  body = Buffer.concat(body);
+		  var fs = require("fs");
+		  fs.writeFileSync("testAmf.bin",body);
+		  console.log(body.toString());
+		  // at this point, `body` has the entire request body stored in it as a string
+		});
 	});
 	server.on('upgrade', (request, socket,headBuffer) => {
 		//socket.end();
