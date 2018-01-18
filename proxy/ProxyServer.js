@@ -203,6 +203,7 @@ function fnCreateProxyServer()
 		console.log([socket.remoteFamily,socket.remoteAddress,socket.remotePort])
 	  // socket.end();
 	});
+	
 	server.on('request', (request,response) => {
 		let body = [];
 		request.on('data', (chunk) => {

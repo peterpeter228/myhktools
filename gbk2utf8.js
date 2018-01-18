@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 // 别忘记了，后渗透meterpreter会产生大量的gbk文件，在mac osx、linux下无法正常阅读
 var a = process.argv.splice(2),
 	fs = require('fs'),
@@ -8,7 +10,7 @@ function doFile(filename)
 {
 	fs.stat(filename,function(e,stats)
 	{
-		if(stats.isFile() && /\.(txt|log|csv)/gmi.test(filename) && fs.existsSync(filename))
+		if(stats.isFile() && /\.(txt|log|csv|hta|htm|html)/gmi.test(filename) && fs.existsSync(filename))
 		{
 			try{
 				var k = fs.readFileSync(filename);

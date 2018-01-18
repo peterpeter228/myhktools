@@ -1,15 +1,16 @@
 // 各种解码 xiatian 2017-03-30
 var Entities = require('html-entities'),AE = new Entities.AllHtmlEntities(),
     xmlEt = new Entities.XmlEntities(),Html4Entities = new Entities.Html4Entities(),
-    jsQR = require("jsqr"),
-    QrCode = require('./QrCodeDecode')
+    jsQR = require("jsqr")
     ;
 
 // QRCode 解码
 function decodeQRCode(s)
 {
-	var decoded = jsQR.decodeQRFromImage(s, 300, 300);
-	return decoded;
+	try{
+		var decoded = jsQR.decodeQRFromImage(s, 300, 300);
+		return decoded;
+	}catch(e){return null;}
 }
 
 // base64解码
@@ -69,7 +70,8 @@ function decodeHtml(s)
 // 解码统一入口： 自动各种解码，可以多次调用
 function mtxDecode(s,fncbk)
 {
-	var a = [decodeURI,fnHex,fnUnzipFromBase64,fnBase64,decodeHtml,QrCode.deCodeQrCode];
+	// ,QrCode.deCodeQrCode
+	var a = [decodeURI,fnHex,fnUnzipFromBase64,fnBase64,decodeHtml,fnUnzipFromBase64,fnHex];
 	var szOld = s,szO2;
 	for(var k in a)
 	{

