@@ -48,7 +48,7 @@ function fnCheckAll(u,user,pswd)
 			
 		 	if(-1 < s1.indexOf("svn - Revision") && -1 == s1.indexOf("You don't have permission to access") && -1 == s1.indexOf("bad password"))
 		 	{
-		 		console.log(["svn export",u + s,"--username",user,"--password",pswd].join(" "));
+		 		console.log(["svn checkout",u + s,"--username",user,"--password",pswd].join(" "));
 		 		console.log(["Ok",r.statusCode, s, s1]);
 		 	}
 		});
