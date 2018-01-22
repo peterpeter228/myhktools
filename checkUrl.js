@@ -78,6 +78,18 @@ node checkSvn.js http://18.12.88.10:8090/svn/ userName Pswd
 
 # 信箱默认密码测试
 node testPop3.js 12.171.20.20 110 mytels.txt
+
+# http代理，有时候需要一个二级代理，来获得、修改一些数据
+node proxy/ProxyServer.js
+
+# 提取目录、文件，包含二进制文件中 ip信息
+node getIps.js fileOrDir
+
+# 发送无跟踪邮件
+sendmail.js  内容自行修改
+邮件跟踪功能，当对方阅读后，能够从http://23.105.209.65/获取到阅读邮件的ip、user-agent等信息
+proxychains4 -f ~/pc.conf  node sendmail.js 
+
 */
 };
 
