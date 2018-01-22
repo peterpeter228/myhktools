@@ -30,6 +30,9 @@ function fnCheckSvn(url,u,p,fnCbk)
 	});
 }
 
+/*
+svn
+*/
 function fnCheckAll(u,user,pswd)
 {
 	var url = u, a = fs.readFileSync("./urls/yhxm.txt").toString().split(/\n/gmi);
