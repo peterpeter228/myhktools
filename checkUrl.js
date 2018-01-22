@@ -73,6 +73,9 @@ python ./weblogic.py
 # 二维码解码
 node QrCodeDecode.js Haiios.jpg
 
+# svn 弱密码检测 2017-01-22 M.T.X
+node checkSvn.js http://118.12.88.10:8090/svn/ userName Pswd
+
 */
 };
 
