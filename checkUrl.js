@@ -4,6 +4,7 @@ var szMyName = 'M.T.X._2017-06-08 1.0',
 	program     = require('commander'),
 	request = require('request'),
 	urlObj = require('url'),
+	async = require('async'),
 	child_process = require("child_process"),
 	net = require('net'),
 	crypto = require('crypto'),
@@ -68,6 +69,10 @@ java -jar ./JNDI_TEST/JNDITEST.jar
 # weblogic中间件T3漏洞扫描
 编辑ip.txt
 python ./weblogic.py
+
+# 二维码解码
+node QrCodeDecode.js Haiios.jpg
+
 */
 };
 
@@ -1085,7 +1090,7 @@ function fnCheckTa3(u,dict,szDes,type)
 	else u += '/';
 
 	fnLog("start check " + dict);
-	var s = dict,a,i = 0,fnCbk = function(url)
+	var s = dict,a,i = 0,fnCbk = function(url,fnCbk1)
 	{
 		fnLog("check " + u + url);
 		
@@ -1097,6 +1102,7 @@ function fnCheckTa3(u,dict,szDes,type)
 		})
 		, function (error, response, body)
 		{
+			fnCbk1(null,null);
 			if(!error && body)
 			{
 				var md5sum = crypto.createHash('md5');
@@ -1125,13 +1131,20 @@ function fnCheckTa3(u,dict,szDes,type)
 	if(fs.existsSync(s))
 	{
 		a = String(fs.readFileSync(s)).trim().split(/\n/);
+		// 并发5个线程
+		async.mapLimit(a,5,function(s,fnCbk1)
+		{
+			g_mUrls[a[i]] = true;
+			fnCbk(s,fnCbk1);
+		});
+		/*
 		for(; i < a.length; i++)
 		{
 			if(g_mUrls[a[i]])continue;
 			g_mUrls[a[i]] = true;
 			// console.log(a[i]);
 			fnCbk(a[i]);
-		}
+		}*/
 	}else fnLog("不存在: " + s);
 }
 // 全部编码为%xx格式
@@ -1773,7 +1786,7 @@ process.on('exit', (code) =>
 	var ss = JSON.stringify(g_oRst,null,' '),
 	    md5 = require('md5');
 	console.log(ss);
-	fs.writeFileSync("./data/" + md5(g_szUrl),ss);
+	fs.writeFileSync("./data/" + md5(g_szUrl) + ".txt",ss);
 });
 
 if(program.test)

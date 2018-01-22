@@ -31,8 +31,9 @@ function fnWt(ip,s)
 }
 
 // 主程序
-function fnHttpServer()
+function fnHttpServer(options)
 {
+	options || (options = {"port":nPort,"ip":szIp});
 	var nTimeout = 19000, server = http.createServer(function (req, resp)
 	{
 		var ip = fnGetIp(req).toString();
@@ -64,9 +65,9 @@ function fnHttpServer()
 	///*/
 	server.on('upgrade', (request, socket,headBuffer) => {
 	});
-	server.listen(nPort,szIp,function()
+	server.listen(options.port,options.ip,function()
 	{
-		console.log("start: " + szIp + ":" + nPort);
+		console.log("start: " + options.ip + ":" + options.port);
 	});
 	server.maxHeadersCount = 2000;
 
@@ -81,3 +82,4 @@ process.setMaxListeners(0);
 require('events').EventEmitter.prototype._maxListeners = 0;
 require('events').EventEmitter.defaultMaxListeners = 0;
 fnHttpServer();
+fnHttpServer({port:3000});

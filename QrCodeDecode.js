@@ -1,4 +1,5 @@
 var QrCode = require('qrcode-reader'),
+	fs  = require("fs"),
 	qc = require('qrcode');
 
 /*
@@ -37,9 +38,12 @@ if(process.argv)
 {
 	var a = process.argv.splice(2);
 	if(a && 0 < a.length)
-	deCodeQrCode(a[0],
-		function(s)
 	{
-		console.log(s);
-	});
+		var buffer = fs.readFileSync(a[0]);
+		deCodeQrCode(buffer.toDataURL(),
+			function(s)
+			{
+				console.log(s);
+			});
+	}
 }//*/

@@ -5,7 +5,7 @@ var fs  = require("fs"),
 	a = process.argv.splice(2),
     request = require("request"),
     g_aProxy = null,
-    nPort = 8080,
+    nPort = 8880,
     szIp = "0.0.0.0";
 
 process.on('uncaughtException', function(e){});
@@ -149,6 +149,7 @@ function fnCreateProxyServer()
 			{
 				var r = request,// getRequest(),// 获取动态代理
 					x = r[req.method.toLowerCase()]({"uri":req.url,"timeout":nTimeout});
+					console.log(req.headers)
 				req.pipe(x);
 				// fnFilterFunc(resp);
 		    	resp = x.pipe(resp);
