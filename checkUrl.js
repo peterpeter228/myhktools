@@ -76,6 +76,8 @@ node QrCodeDecode.js Haiios.jpg
 # svn 弱密码检测 2017-01-22 M.T.X
 node checkSvn.js http://118.12.88.10:8090/svn/ userName Pswd
 
+# 信箱默认密码测试
+node testPop3.js 125.71.203.220 110 /Users/xiatian/Desktop/mytels.txt
 */
 };
 
