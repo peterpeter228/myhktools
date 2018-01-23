@@ -112,6 +112,7 @@ function fnCheckWeblogicCve201710271(url)
 if(program.t3)
 {
 	var nPort = -1 < g_szUrl.indexOf("https")? 443: 80;
+	// 批量检测
 	if("string" == typeof program.t3)
 	{
 		var aT1 = fs.readFileSync(program.t3).toString().trim().split("\n"), p;
@@ -124,25 +125,6 @@ if(program.t3)
 	{
 		runChecks(g_szUrl,"t3,weblogic");
 	};
-
-}
-
-// 解析裸头信息
-function fnParseHttpHd(s,fnCbk)
-{
-	var a = s.trim().split(/\n/), obj = {"statusCode":a[0].split(/ /)[1]};
-	// if(!(/^\d+$/.test(obj.statusCode))) obj['body'] = s.trim().replace(/[\r\n\t]/gmi, "").replace(/>\s*</gmi, "><");
-
-	for(var i in a)
-	{
-		// if(0 == i)continue;
-		var x = a[i].indexOf(":");
-		var aT = [a[i].substr(0, x), a[i].substr(x + 1)];
-		
-		if(aT[0])
-			obj[aT[0].toLowerCase().trim()] = aT[1].trim();
-	}
-	if(fnCbk)fnCbk(obj);
 }
 
 // 伪造host攻击测试
