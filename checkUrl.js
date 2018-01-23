@@ -97,7 +97,7 @@ open strDecodeEncode.html
 node getFileMetadata.js yourJpgFile.jpg
 
 # jndi内网无密码访问漏洞测试
-java -jar ./JNDI_TEST/JNDITEST.jar
+java -jar ./JNDI_TEST/JNDITEST.jar -p 7101 -u 192.168.10.216 -j QIMS_TEST -d mysql
 
 # weblogic中间件T3漏洞扫描
 编辑ip.txt

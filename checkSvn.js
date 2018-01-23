@@ -1,5 +1,5 @@
 // svn 弱密码检测 2017-01-22 M.T.X
-// node checkSvn.js http://118.112.188.108:8090/svn/ userName Pswd
+// node checkSvn.js http://192.168.10.70:8088/svn/ userName Pswd
 fs  = require("fs"),
 	http = require("http"),
 	async = require('async'),
