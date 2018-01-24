@@ -58,7 +58,7 @@ function getFileMetaDataInfo()
   // 获取图片的经纬度信息
   new exif({image:a[0]},function(e,d)
   {
-    if(d.image)
+    if(d && d.image)
     {
       fnMyCopy("Make,Software,ModifyDate", d.image,aGpsO);
     }

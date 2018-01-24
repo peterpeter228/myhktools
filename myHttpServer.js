@@ -37,6 +37,8 @@ function fnHttpServer(options)
 	var nTimeout = 19000, server = http.createServer(function (req, resp)
 	{
 		var ip = fnGetIp(req).toString();
+		// hook.js
+		if(-1 == req.url.indexOf("hook.js"))
 		fnWt(ip,[moment(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss'),req.url,req.headers["user-agent"]].join("\t"));
 		// console.log([moment(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss'), ip,req.url,req.headers["user-agent"]]);
 		resp.end();
