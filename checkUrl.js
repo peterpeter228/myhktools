@@ -1025,7 +1025,14 @@ if(!program.test && 0 < a.length && g_szUrl)
 		if(/^\d\d\d$/g.test(program.struts2))
 		{
 			// eval("doStruts2_" + program.struts2 + "(g_szUrl)");
-			runChecks(g_szUrl,"struts2," + program.struts2);
+			setTimeout(function()
+			{
+				request(fnOptHeader({method: 'GET',uri: g_szUrl}),function(e,r,b)
+				{
+					if(!e)fnDoForm(b.toString(),g_szUrl);
+					runChecks(g_szUrl,"struts2," + program.struts2);
+				});
+			},3000);
 			if(program.cmd && "string" == typeof program.cmd)
 			{
 				/*
@@ -1043,7 +1050,15 @@ if(!program.test && 0 < a.length && g_szUrl)
 		//*
 		testWeblogic(g_szUrl);
 		fnMyPut(g_szUrl);
-		fnTestStruts2(g_szUrl)
+		setTimeout(function()
+		{
+			request.get(g_szUrl,function(e,r,b)
+			{
+				// console.log(b);
+				if(!e)fnDoForm(b.toString(),g_szUrl);
+				fnTestStruts2(g_szUrl);
+			});
+		},3000);
 		elasticsearch(g_szUrl);
 		
 		// fastjson(g_szUrl);
