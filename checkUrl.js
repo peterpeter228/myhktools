@@ -997,7 +997,7 @@ function fnMyPut(url)
 // https://github.com/Medicean/VulApps/tree/master/s/struts2
 function fnTestStruts2(szUrl2, obj)
 {
-	var a = [doStruts2_007,doStruts2_009,doStruts2_013,doStruts2_029,doStruts2_048,doStruts2_053], fnGetCpy = function()
+	var a = [doStruts2_009,doStruts2_013,doStruts2_029,doStruts2_053], fnGetCpy = function()
 	{
 		var o = {name:null};
 		if(!obj)return o;
@@ -1010,14 +1010,7 @@ function fnTestStruts2(szUrl2, obj)
 	{
 		a[k].call(fnGetCpy(),szUrl2);
 	}
-	a = "005,008,015,016,019,032,033,037,045,046,DevMode".split(g_szSplit);
-	if(!obj)
-	for(var k in a)
-	{
-		if("fnction" == typeof global["doStruts2_" + a[k]])
-			global["doStruts2_" + a[k]](szUrl2);
-		else runChecks(szUrl2,"struts2," + a[k],null,{x:34});
-	}
+	runChecks(szUrl2,"struts2");
 	// doStruts2_020(g_szUrl);
 	// doStruts2_052(szUrl2);
 	if(-1 == szUrl2.indexOf("login.jsp"))
