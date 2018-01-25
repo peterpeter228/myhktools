@@ -16,7 +16,7 @@ function fnMkUp (u,p)
 }
 
 /*
-http://118.112.188.108:8090/svn/
+
 */
 function fnCheckSvn(url,u,p,fnCbk)
 {
@@ -49,7 +49,7 @@ function fnCheckAll(u,user,pswd)
 		 	if(-1 < s1.indexOf("svn - Revision") && -1 == s1.indexOf("You don't have permission to access") && -1 == s1.indexOf("bad password"))
 		 	{
 		 		console.log(["svn checkout",u + s,"--username",user,"--password",pswd].join(" "));
-		 		console.log(["Ok",r.statusCode, s, s1]);
+		 		// console.log(["Ok",r.statusCode, s, s1]);
 		 	}
 		});
 	});
