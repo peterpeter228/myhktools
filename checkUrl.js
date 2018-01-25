@@ -451,7 +451,6 @@ function fnCheckJavaFx(s)
 			});
 		}
 	});
-	
 }
 
 

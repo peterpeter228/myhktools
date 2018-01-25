@@ -9,6 +9,7 @@ var fs  = require("fs"),
 	a = process.argv.splice(2),
     request = require("request"),
     g_aProxy = null,
+    child_process = require("child_process"),
     nPort = 8080,
     moment = require('moment'),
     szIp = "0.0.0.0";
@@ -25,15 +26,22 @@ function fnGetIp(req)
 }
 
 function fnWt(ip,s)
-{// if(fs.existsSync(szF))
+{
 	fs.appendFileSync("data/" + ip + ".txt", s + "\n");
-	console.log([ip,s]);
+	try{
+		var a = s.split(/\t/),szName = /\/([^\/]+)\//gmi.exec(s)[1],szFn = "data/nmap/" + szName + ".xml ";
+		console.log([ip,szName,a[0]]);
+		if(!fs.existsSync(szFn))
+			child_process.exec("echo ${rtpswd} | sudo -S nmap --host-timeout=100m  --max-rtt-timeout=3000ms --initial-rtt-timeout=1000ms --min-rtt-timeout=1000ms --max-retries=2 --stats-every 10s --min-hostgroup=64 --min-rate=500 --traceroute -PS1-65535 -A -O -oX " + szFn + " " + ip + " &",function(e,so,se){});
+	}catch(e){console.log(e);}
 }
 
 // 主程序
 function fnHttpServer(options)
 {
-	options || (options = {"port":nPort,"ip":szIp});
+	options || (options = {});
+	options.ip || (options.ip = szIp);
+	options.port || (options.port = nPort);
 	var nTimeout = 19000, server = http.createServer(function (req, resp)
 	{
 		var ip = fnGetIp(req).toString();
@@ -84,4 +92,4 @@ process.setMaxListeners(0);
 require('events').EventEmitter.prototype._maxListeners = 0;
 require('events').EventEmitter.defaultMaxListeners = 0;
 fnHttpServer();
-fnHttpServer({port:3000});
+fnHttpServer({ip:"0.0.0.0",port:3000});
