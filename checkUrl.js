@@ -829,10 +829,10 @@ if(program.test)
 	// doStruts2_001.call({name:null},"http://192.168.10.216:8088/S2-001/login.action");
 	// doStruts2_007.call({name:null},"http://192.168.10.216:8088/S2-007/user.action");
 	// doStruts2_012.call({name:null},"http://192.168.10.216:8088/S2-012/user.action");
-	doStruts2_013.call({name:null},"http://192.168.10.216:8088/S2-013/link.action");
+	// doStruts2_013.call({name:null},"http://192.168.10.216:8088/S2-013/link.action");
 	// doStruts2_015.call({name:null},"http://192.168.10.216:8088/S2-015/");
-	doStruts2_016.call({name:null},"http://192.168.10.216:8088/S2-016/default.action");
-	doStruts2_019.call({name:null},"http://192.168.10.216:8088/S2-019/example/HelloWorld.action");
+	// doStruts2_016.call({name:null},"http://192.168.10.216:8088/S2-016/default.action");
+	// doStruts2_019.call({name:null},"http://192.168.10.216:8088/S2-019/example/HelloWorld.action");
 	// doStruts2_029.call({name:null},"http://192.168.10.216:8088/S2-029/default.action");
 	
 	runChecks("http://192.168.10.216:8082/s2-048/integration/saveGangster.action","struts2,048");
