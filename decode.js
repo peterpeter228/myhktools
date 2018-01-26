@@ -72,7 +72,14 @@ function decodeJsU(s)
 	});
 }
 
-
+// url解码
+function decodeUrl(s)
+{
+	return s.replace(/%([0-9a-fA-F]{2})/gmi,function(a,b)
+	{
+		return String.fromCharCode(parseInt(b,16));
+	});
+}
 
 // console.log(fnHex('9bed67ade8f04951b1d4cd43dfa0d2f2').toString("16"));
 
@@ -80,7 +87,7 @@ function decodeJsU(s)
 function mtxDecode(s,fncbk)
 {
 	// ,QrCode.deCodeQrCode
-	var a = [decodeURI,decodeJsU,fnHex,fnUnzipFromBase64,fnBase64,decodeHtml,fnUnzipFromBase64,fnHex];
+	var a = [decodeURI,decodeJsU,decodeUrl,fnHex,fnUnzipFromBase64,fnBase64,decodeHtml,fnUnzipFromBase64,decodeURI];
 	var szOld = s,szO2;
 	for(var k in a)
 	{
